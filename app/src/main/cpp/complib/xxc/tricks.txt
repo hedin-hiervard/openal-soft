@@ -1,0 +1,43 @@
+1] antidebug
+	a) detect presense of debugger - change execution path / redirect to fake checks
+	b) detect presense of emulator - change execution path / redirect to fake checks
+	c) reset breakpoints with dcode-snipnets
+	d) disable error reaction in TLS
+	e) *RESET* reset PDA in some path
+
+2] antiunpack
+	a) detect change of PE header : sections number and size - redirect code check, perform reset somewhere
+	b) ?do not set KMode (unpacket should switch to KMode anyway)
+	c) stole bytes from EOP?
+	d) check file 
+	e) search for EOP in the stack 
+
+3] anticrack (includes active and delayed protection)
+	a) obfuscate important functions
+	b) obfuscate jumps with *JPROTECT*
+	c) d-code snipnets to check crc
+	d) s-store to hide important constants
+	e) s-store shuffle to protect against s-store tampering
+	f) use FSM to direct "jump" functions
+	g) use fake "jump" functions to obfuscate program flow
+	h) hide API calls with DirectCall + CallStub's
+	j) secure data exchange - do not pass plain data
+	k) pseudo random cyclic sequence generator
+	k2) x-> wbox -> fsm (f,graph) -> x
+
+
+4] antikeygen
+	a) pack secret constants with wwbox
+	b) wipe important intermediate data
+	c) hide valid-keys bitset
+
+
+----
+ |--|--|--|--|
+ |a |  |  |c |
+ |--|--|--|--| -> wbox -> case (fi(x)) -> @self
+ |  |  |b |x |
+ |--|--|--|--|
+ |x |x |x |  |
+ |--|--|--|--|
+ |x |d |x |  |

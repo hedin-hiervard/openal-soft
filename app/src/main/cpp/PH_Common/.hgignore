@@ -1,0 +1,10 @@
+bld/*
+obj/*
+glob:*.pdb
+glob:*.htm
+glob:*.idb
+glob:*.user
+glob:src/cnst_gfx.h
+glob:cnst_*
+glob:lang_*
+glob:.hgignore

@@ -1,0 +1,3 @@
+glob:bld/*
+glob:obj/*
+glob:*.user
