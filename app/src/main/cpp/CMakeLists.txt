@@ -170,7 +170,7 @@ set(source
   ./gxlib/gxl.viewmgr.cpp
   #./gxlib/gxl.winapp.cpp
   ./gxlib/gxl.window.cpp
-  # ./gxlib/android_specific/osys_iphone.cpp
+  ./gxlib/android_specific/android_main.cpp
   ./gxlib/android_specific/touchdb.cpp
   ./gxlib/android_specific/android_common.cpp
   ./gxlib/android_specific/AndroidView.cpp
@@ -246,7 +246,6 @@ set(source
   ./screens_iphone/MeetView.cpp
   ./screens_iphone/OverlandUI.cpp
   ./screens_iphone/UpgradeView.cpp
-  ./native-lib.cpp
   ./iosdk/analytics/android/Analytics.cpp
 )
 
@@ -276,18 +275,18 @@ target_include_directories(
     ./reslib
   )
 
-add_compile_definitions(
-  OS_ANDROID
-  FULL_VERSION
-  HMM_GAME_2X
-  IPHONE_DEBUG
-  UNICODE_
-  _UNICODE_
-  UNICODE
-  _UNICODE
-  _HMM_GAME_
-  SINGLEPLAYER
-  DEVICE_IPHONE
+add_definitions(
+  -DOS_ANDROID
+  -DFULL_VERSION
+  -DHMM_GAME_2X
+  -DIPHONE_DEBUG
+  -DUNICODE_
+  -D_UNICODE_
+  -DUNICODE
+  -D_UNICODE
+  -D_HMM_GAME_
+  -DSINGLEPLAYER
+  -DDEVICE_IPHONE
 )
 
 # full version flags
