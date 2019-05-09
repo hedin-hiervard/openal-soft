@@ -30,23 +30,23 @@ public:
 	// Copy c-tor
 	inline iStringTemplate<T>( const iStringTemplate<T>& s )
 	{
-		str = null; 
+		str = null;
 		siz = len = 0;
-		*this = s;	// explicit operator = 
+		*this = s;	// explicit operator =
 	}
 
 	// Copy of existing string
 	/*explicit*/ inline iStringTemplate<T>( const T* s )
 	{
-		str = null; 
+		str = null;
 		siz = len = 0;
-		*this = s;	// explicit operator = 
+		*this = s;	// explicit operator =
 	}
 
 	// Copy of existing string
 	inline iStringTemplate<T>( const T* s, uint32 nr )
 	{
-		str = null; 
+		str = null;
 		siz = len = 0;
 		Set( s, nr );
 	}
@@ -64,14 +64,14 @@ public:
 		SetEmpty();
 	}
 
-#if 0 
+#if 0
 	// Append C style string
 	void Append( const T* src, uint32 srclen )
 	{
 		check( src != NULL && srclen != 0 );
 		uint32 newlength = len + srclen;
 		uint32 pos = len;
-		if ( srclen > 0 ) 
+		if ( srclen > 0 )
 		{
 			// reallocate
 			Realloc( newlength );
@@ -114,17 +114,17 @@ public:
         // format string to the temp buffer
         sint32 buflen = IOSTRING_STD::VStrNPrintF( buf, STRING_BUFFER-1, fmt, argptr );
 		// add buffer to existing string
-		if ( buflen < 0 ) 
+		if ( buflen < 0 )
 		{
 			buflen = STRING_BUFFER;
 		}
-		if ( buflen > 0 ) 
+		if ( buflen > 0 )
 		{
 			Realloc( buflen );
 			memcpy( str, buf, buflen * sizeof(T) );
 			str[ buflen ] = 0;
 			len = buflen;
-		} 
+		}
 		else SetEmpty();
 	}
 
@@ -145,18 +145,18 @@ public:
 	void Set( uint32 ch, uint32 nr )
 	{
 		Realloc( nr );
-		if ( nr > 0 ) 
+		if ( nr > 0 )
 		{
 			T* p = str;
 			len = nr;
-			while ( nr-- ) 
+			while ( nr-- )
 			{
 				*p++ = (T)ch;
 			}
 			str[len] = 0;
-		} 
-		else 
-		{ 
+		}
+		else
+		{
 			len = 0;
 		}
 	}
@@ -181,7 +181,7 @@ public:
 			memcpy(str,src,nlen*sizeof(T));
 			str[ nlen ] = 0;
 			len = nlen;
-		} 
+		}
 		else SetEmpty();
 
 		if (src != s) {
@@ -210,7 +210,7 @@ public:
 	{
 		return (str) ? (sint32)IOSTRING_STD::StrToL( str, NULL, radix ) : 0;
 	}
-		
+
 	inline	uint32		GetUInt( sint32 radix = 10 ) const
 	{
 		return (str) ? (uint32)IOSTRING_STD::StrToUL( str, NULL, radix ) : 0;
@@ -218,13 +218,13 @@ public:
 
 	inline	float		GetFloat() const
 	{
-		T* ptr; 
+		T* ptr;
 		return (str) ? (float)IOSTRING_STD::StrToD( str, &ptr ) : 0;
 	}
 
 	inline	double		GetDouble() const
 	{
-		T* ptr; 
+		T* ptr;
 		return (str) ? (double)IOSTRING_STD::StrToD( str, &ptr ) : 0;
 	}
 
@@ -232,11 +232,11 @@ public:
 	void Replace( const T* look_for, const T* replace_to )
 	{
 		check( look_for != NULL );
-		if ( len > 0 ) 
+		if ( len > 0 )
 		{
 			T*	start = str;
 			uint32	found = IOSTRING_STD::StrCSpn( str, look_for );
-			while ( found != len ) 
+			while ( found != len )
 			{
 				Del( found );
 				Ins( replace_to, found );
@@ -250,11 +250,11 @@ public:
 	void Strip(const T* chars)
 	{
 		check( chars != NULL );
-		if ( len > 0 ) 
+		if ( len > 0 )
 		{
 			T*	start = str;
 			uint32	found = IOSTRING_STD::StrCSpn( str, chars );
-			while ( found != len ) 
+			while ( found != len )
 			{
 				Del( found );
 				if ( str == 0 ) break;
@@ -266,7 +266,7 @@ public:
 	// Trim string for whitespaces from left and right
 	void Trim( const T* wspaces = NULL )
 	{
-		if ( str != null ) 
+		if ( str != null )
 		{
 			if ( wspaces == NULL )
 			{
@@ -275,14 +275,14 @@ public:
 
 			// trim from the begining
 			sint32 frombegin = IOSTRING_STD::StrSpn( str, wspaces );
-			if ( frombegin != 0 ) 
+			if ( frombegin != 0 )
 			{
 				Del( 0, frombegin );
 			}
 			if ( len == 0 )	return;
 			// trim from the end
 			T* end = str + len - 1;
-			while ( (end > str) && ( IOSTRING_STD::StrChr( wspaces, *end ) != NULL ) ) 
+			while ( (end > str) && ( IOSTRING_STD::StrChr( wspaces, *end ) != NULL ) )
 			{
 				--end;
 			}
@@ -367,7 +367,7 @@ public:
 	  return true;
 	  //return IOSTRING_STD::StrICmp( str, s.str );
 	}
-	
+
 	sint32	CompareIgnoreCase( const T* s ) const
 	{
 	  return true;
@@ -376,12 +376,12 @@ public:
 
 	inline bool EqualIgnoreCase( const iStringTemplate<T>& s ) const
 	{
-		return (CompareWith(s) == EQUAL);	
+		return (CompareWith(s) == EQUAL);
 	}
 
 	inline bool EqualIgnoreCase( const T* s ) const
 	{
-		return (CompareWith(s) == EQUAL);	
+		return (CompareWith(s) == EQUAL);
 	}
 
 
@@ -433,7 +433,7 @@ public:
 		}
 	}
 
-	// Reverse Find a character, returns position or NOT_FOUND 
+	// Reverse Find a character, returns position or NOT_FOUND
 	sint32	ReverseFind( T c) const
 	{
 		if (Empty()) return NOT_FOUND;
@@ -445,7 +445,7 @@ public:
 		return ( cPtr - str );
 	}
 
-	// Find a character, returns position or NOT_FOUND 
+	// Find a character, returns position or NOT_FOUND
 	sint32	Find( T c, uint32 start =  0 ) const
 	{
 		if ( start >= len )	return NOT_FOUND;
@@ -489,7 +489,7 @@ public:
 		if ( Empty() ) 	return iStringTemplate<T>();
 
 		num = ( num > len ? len : num );
-		
+
 		return iStringTemplate<T>( str, num );
 	}
 
@@ -508,9 +508,9 @@ public:
 	{
 		if ( Empty() || (start >= len) ) return iStringTemplate<T>();
 
-		if ( length == 0 ) 
+		if ( length == 0 )
 		{
-			length = len - start;	
+			length = len - start;
 		}
 		return iStringTemplate<T>( str + start, length );
 	}
@@ -521,7 +521,7 @@ public:
 		return siz * sizeof(T);
 	}
 
-	// Extracts next token from this string 
+	// Extracts next token from this string
 	iStringTemplate<T>	Token( const T* delim )
 	{
 		check( delim != NULL );
@@ -531,14 +531,14 @@ public:
 		const T* ptr = str;
 		while( *ptr != '\0' && (IOSTRING_STD::StrChr( delim, *ptr ) != NULL)) ptr++;
 		// if string empty, return it
-		if ( *ptr == '\0' ) 
+		if ( *ptr == '\0' )
 		{
 			SetEmpty();
 			return iStringTemplate<T>();
 		}
 		// find next delimiter occurence
 		const T* next = ptr;
-		while( *next != '\0' && (IOSTRING_STD::StrChr( delim, *next ) == NULL)) 
+		while( *next != '\0' && (IOSTRING_STD::StrChr( delim, *next ) == NULL))
 			next++;
 		// get text between next & ptr into substring, cuts fragment from *this
 		check( (next - ptr) > 0 );
@@ -553,7 +553,7 @@ public:
 		check( s != NULL );
 		uint32 insertlen = IOSTRING_STD::StrLen( s );
 		uint32 newlength = len + insertlen;
-		if ( insertlen > 0 ) 
+		if ( insertlen > 0 )
 		{
 			if ( pos > len ) pos = len;
 
@@ -579,7 +579,7 @@ public:
 	// Delete a character at given 'pos' for 'nr' times
 	void Del( uint32 pos = 0, uint32 nr = 1 )
 	{
-		if ( nr > 0 && pos < len ) 
+		if ( nr > 0 && pos < len )
 		{
 			nr = ((pos + nr) > len ? (len - pos) : nr);
 			sint32 bcopy = len - ( pos + nr ) + 1;
@@ -658,7 +658,7 @@ public:
 		check( start != 0 );
 		const T* ptr = str + start;
 		c = IOSTRING_STD::ToUpper(c);
-		while ( *ptr != '\0') 
+		while ( *ptr != '\0')
 		{
 			if ( IOSTRING_STD::ToUpper(*ptr) == c )	return (sint32)(ptr - str);
 			ptr++;
@@ -673,11 +673,11 @@ public:
 		check( start != 0 );
 
 		const T* ptr = str + start;
-		while( *ptr != '\0' ) 
+		while( *ptr != '\0' )
 		{
 			const T* sptr = ptr;
 			const T* pptr = s;
-			while ( IOSTRING_STD::ToUpper(*sptr) == IOSTRING_STD::ToUpper(*pptr) ) 
+			while ( IOSTRING_STD::ToUpper(*sptr) == IOSTRING_STD::ToUpper(*pptr) )
 			{
 				if ( *pptr == '\0' ) return (sint32)(ptr - str);
 				if ( *sptr == '\0' ) return NOT_FOUND;
@@ -708,7 +708,7 @@ private:
 
 	static T defwsps[];
 
-	enum CompareResult 
+	enum CompareResult
 	{
 		LESS	= 0,
 		EQUAL,
@@ -843,7 +843,7 @@ struct iStringSetter
 {
 	operator TCh*() { return buf; }
 
-	~iStringSetter() 
+	~iStringSetter()
 	{
 		if ( owns ) {
 			str = buf;
@@ -864,7 +864,7 @@ struct iStringSetter
 	}
 
 protected:
-	//iStringSetter& operator=( const iStringSetter& ); 
+	//iStringSetter& operator=( const iStringSetter& );
 	mutable bool owns;
 	iStringTemplate<TCh>& str;
 	TCh* buf;
@@ -935,7 +935,7 @@ class CvtW2A : private NoCopy
 {
 public:
 
-#if defined (OS_APPLE) || defined(OS_LINUX)
+#if defined (OS_APPLE) || defined(OS_LINUX) || defined(OS_ANDROID)
 	CvtW2A( const WCHAR* in, unsigned int codePage = CP_ACP )
 	: str_( buffer_ )
 	{
@@ -950,7 +950,7 @@ public:
 			  check(str_ != 0);
 			}
 
-			wcstombs(str_, in, lenA);	    
+			wcstombs(str_, in, lenA);
 		}
 	}
 #else
@@ -999,7 +999,7 @@ class CvtA2W : private NoCopy
 {
 public:
 
-#if defined (OS_APPLE) || defined(OS_LINUX)
+#if defined (OS_APPLE) || defined(OS_LINUX) || defined(OS_ANDROID)
  CvtA2W( const char* in, unsigned int codePage = CP_ACP ): str_( buffer_ )
   {
     if ( in == 0 ) {
@@ -1040,7 +1040,7 @@ public:
 
 #endif
 	~CvtA2W()
-	{ 
+	{
 		if ( str_ != buffer_ ) free( str_ );
 	}
 

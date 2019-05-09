@@ -2,7 +2,7 @@
 #define GXLIB_GXL_INC_H_
 
 #if defined(OS_IPHONE) || defined(OS_MACOS)
-#define OS_APPLE 
+#define OS_APPLE
 #endif //(OS_IPHONE || OS_MACOS)
 
 #if defined(OS_WIN32) || defined(OS_MACOS)
@@ -32,7 +32,7 @@
 #endif
 
 #endif
-#if defined(OS_APPLE) || defined(OS_LINUX)
+#if defined(OS_APPLE) || defined(OS_LINUX) || defined(OS_ANDROID)
 #include <assert.h>
 #include <new>
 #endif
@@ -78,7 +78,7 @@
 #include "gxl.dib.h"
 
 
-// flags 
+// flags
 const uint32 GXLF_DOUBLESIZE	= 0x01;
 const uint32 GXLF_LANDSCAPE		= 0x02;
 const uint32 GXLF_DEV_LANDSCAPE	= 0x04;

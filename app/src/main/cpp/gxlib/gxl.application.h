@@ -4,7 +4,7 @@
 #include "gxl.audio.h"
 
 /*
- *	
+ *
  */
 struct IGame
 {
@@ -19,12 +19,12 @@ struct IGame
 };
 
 /*
- *	
+ *
  */
 class iGXApp
 {
-public:	
-#ifndef OS_APPLE
+public:
+#ifdef OS_WIN32
 	bool Init(HINSTANCE hInst, LPCWSTR appName, IGame* pGame, uint32 cdelay, uint32 flags, iSize baseSize);
 #else
 	bool Init(IGame* pGame, uint32 cdelay, uint32 flags, iSize baseSize);
@@ -52,7 +52,7 @@ public:
 	inline bool IsActive() const { return m_bInited && !m_bSuspended; }
 
 	void ForceCompose();
-	
+
 	//
 	void SetOrientation(bool bLandscape, bool bLeftHander);
 	void ToggleOrientation();
@@ -63,20 +63,20 @@ public:
 #ifdef OS_WIN32
     void DoSizeChange(const iSize &siz);
     void SwitchScreenMode();
-    bool IsModeFullScreen(){ return m_mode_fullscreen; };    
+    bool IsModeFullScreen(){ return m_mode_fullscreen; };
     void DoDebugCommand();
-	void SetFullScreen( bool flag ) { m_bFullScreen = flag; } 
+	void SetFullScreen( bool flag ) { m_bFullScreen = flag; }
 	bool IsFullScreen() { return m_bFullScreen; }
 	iSize GetWindowSize();
 #endif
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	BOOL ShellFullscreen( HWND, DWORD );
 #endif
-	
+
 #if defined(OS_MACOS)
-	void UpdateSize(); 
+	void UpdateSize();
 #endif
-	
+
 	static iGXApp& Instance()
 	{
 		static iGXApp theSingleInstance;
@@ -101,11 +101,11 @@ protected:
 	bool			m_bInited;
 	bool			m_bSuspended;
 
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 	bool			m_bFullScreen;
 #endif
-	
-#ifndef OS_APPLE
+
+#ifdef OS_WIN32
 	HINSTANCE		m_aygDLL;
 	HINSTANCE		m_coreDLL;
 
@@ -122,7 +122,7 @@ protected:
 private:
 	/* singleton */
 	iGXApp();
-	~iGXApp();	
+	~iGXApp();
 };
 
 

@@ -13,7 +13,7 @@ sint32 GetRectsHeight(sint32 w, iSimpleArray<iSize>& szs)
 			curh = szs[xx].h;
 			curw = szs[xx].w;
 		}
-	}	
+	}
 	res += curh;
 	return res;
 }
@@ -22,7 +22,7 @@ iPoint GetRectOffset(sint32 w, uint32 idx, iSimpleArray<iSize>& szs)
 {
 	iPoint res;
 	sint32 linestart = 0, lineend, linecnt;
-	
+
 	// traverse the list to find out our line
 	sint32 curw = 0, curline = 0, curh = 0;
 	bool bDone = false;
@@ -32,7 +32,7 @@ iPoint GetRectOffset(sint32 w, uint32 idx, iSimpleArray<iSize>& szs)
 		if(curw > w) {
 			lineend = xx - 1;
 			curline++;
-			if(lineend >= idx) 
+			if(lineend >= idx)
 				bDone = true;
 			else {
 				res.y += curh;
@@ -43,28 +43,28 @@ iPoint GetRectOffset(sint32 w, uint32 idx, iSimpleArray<iSize>& szs)
 		if(bDone) { break; }
 	}
 	if(!bDone) lineend = szs.GetSize() - 1;
-	
+
 	// now, linestart <= idx <= lineend
 	linecnt = lineend - linestart;
-	
+
 	if(linecnt % 2 == 0) { //even, not 0, with center element
 		check(linecnt != 0);
 		res.x = w / 2;
 		sint32 s = (linestart+lineend)/2;
 		if(s == idx) // our element is the center one, just center it
 			res.x -= (sint32)szs[idx].w / 2;
-		else {				
+		else {
 			sint32 sgn = iSIGN<sint32>(idx-s);	// the direction of movement
 			sint32 add = iMIN<sint32>(sgn, 0);
-			for(sint32 xx=s; xx != idx + add; xx += sgn) 
+			for(sint32 xx=s; xx != idx + add; xx += sgn)
 				res.x += (sgn * (sint32)szs[xx].w) / (xx == s ? 2 : 1); // move to half space for center element, full space for others
 		}
 	} else { // odd, with center space
 		res.x = w / 2;
 		double s = ((double)linestart + (double)lineend) / 2;
 		sint32 sgn, fidx;
-		if((double)idx > s) 
-		{ 
+		if((double)idx > s)
+		{
 			sgn = 1;
 			fidx = ceil(s);
 		}
@@ -137,7 +137,7 @@ sint32 InitialExpPts()
 //////////////////////////////////////////////////////////////////////////
 uint32 GetCurrentTimestamp()
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	SYSTEMTIME st;
 	FILETIME ft;
 	GetLocalTime(&st);
@@ -154,7 +154,7 @@ uint32 GetCurrentTimestamp()
 
 iStringT FormatDate(uint32 timestamp, bool bShowTime)
 {
-  #ifndef OS_APPLE
+  #ifdef OS_WIN32
     FILETIME ft;
 	SYSTEMTIME st;
 	LONGLONG ll;
@@ -175,7 +175,7 @@ iStringT FormatDate(uint32 timestamp, bool bShowTime)
 
 iStringT FormatDateDM(uint32 timestamp, bool bShowTime)
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
     FILETIME ft;
     SYSTEMTIME st;
     LONGLONG ll;
@@ -196,7 +196,7 @@ iStringT FormatDateDM(uint32 timestamp, bool bShowTime)
 
 iStringT FormatTime(uint32 timestamp)
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
     FILETIME ft;
     SYSTEMTIME st;
     LONGLONG ll;
@@ -209,7 +209,7 @@ iStringT FormatTime(uint32 timestamp)
     time_t tim=timestamp;
     tm *now=localtime(&tim);
 
-    return iFormat(_T("(%d:%02d)"), now->tm_hour, now->tm_min);    
+    return iFormat(_T("(%d:%02d)"), now->tm_hour, now->tm_min);
 #endif
 }
 
@@ -217,7 +217,7 @@ iStringT FormatTime(uint32 timestamp)
 
 bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	// Check and create save directory (if not exists)
 	iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
 	bool dirIsOk = iFile::DirExists(saveDir);
@@ -231,7 +231,7 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 
 	}
 #endif
-	
+
 	// normally we should create it in the save directory
 	iStringT tempSaveName( gSavePath + _T("tempsave.tmp") );
 #ifdef HMM_COMPOVERSION
@@ -241,7 +241,7 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 #endif
 
 	if ( !pFile ) {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 		DWORD dwErr = GetLastError();
 		iTextDlg dlg( &gApp.ViewMgr(), _T("Failure"), iFormat(_T("Unable to save [%s], ErrorCode: 0x%08X"), fname.CStr(), dwErr), PID_NEUTRAL);
 		dlg.DoModal();
@@ -249,8 +249,8 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 		return false;
 	}
 /*
-	// a small hack for displaying "saving..." message while saving 
-	
+	// a small hack for displaying "saving..." message while saving
+
 	iTextDlg dlg( &gApp.ViewMgr(), _T("Saving..."), _T(""), PID_NEUTRAL );
 	dlg.Center();
 	dlg.OnCreateDlg();
@@ -258,7 +258,7 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 	gApp.ViewMgr().PushModalDlg(&dlg);
 	gApp.ForceCompose();
 	gApp.ViewMgr().PopModalDlg();
-*/	
+*/
 	if ( !gGame.Map().SaveToFile( pFile.get(), MP ) ) {
 		iTextDlg dlg( &gApp.ViewMgr(), _T("Failure"), _T("Unable to save game!"), PID_NEUTRAL );
 		dlg.DoModal();
@@ -270,10 +270,10 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 	iFile::Delete( fname );
 	iFile::Rename( tempSaveName, fname );
 	iFile::Delete( tempSaveName );
-	
-	gGame.AddMsg(iStringT(_T("#F6B6")) + gTextMgr[TRID_MSG_GAME_SAVED]);          
-	
-	
+
+	gGame.AddMsg(iStringT(_T("#F6B6")) + gTextMgr[TRID_MSG_GAME_SAVED]);
+
+
 	return true;
 }
 

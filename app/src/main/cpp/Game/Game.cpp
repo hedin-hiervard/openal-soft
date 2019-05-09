@@ -19,11 +19,9 @@
 #include "Dlg_HallOfFame.h"
 #include "Dlg_Save.h"
 #include "helpers.h"
-#include "NewMapShop/NewMapShop.h"
+//#include "NewMapShop/NewMapShop.h"
 
 #include "transitionview.h"
-
-#include "iosdk/iosdk.h"
 
 #ifdef MULTIPLAYER
 #include "HiddenBattle.h"
@@ -69,6 +67,7 @@ extern uint8* pBloomBits;
 #include "screens_iphone/OverlandUI.h"
 #include "screens_iphone/UpgradeView.h"
 
+#include "iosdk/analytics/analytics.h"
 
 using namespace iosdk;
 
@@ -80,21 +79,21 @@ iBlackBackView::iBlackBackView() : iTopmostView(&gApp.ViewMgr())
 }
 
 
-iSize iBlackBackView::GetDefaultSize() const 
-{ 
-	return gApp.ViewMgr().Metrics(); 
+iSize iBlackBackView::GetDefaultSize() const
+{
+	return gApp.ViewMgr().Metrics();
 }
 
 
 void iBlackBackView::OnCompose()
-{   
+{
     iRect rect = GetScrRect();
     gGfxMgr.BlitTile(PDGG(BKTILE), gApp.Surface(), rect);
     gApp.Surface().Darken50Rect(rect);
 }
 
 /*
-*  Game 
+*  Game
 */
 iGame::iGame()
 : m_bInited(false)
@@ -130,7 +129,7 @@ iGame::iGame()
 , m_bCenter(false)
 , m_bShowCastle(false)
 #endif
-{ 		
+{
 }
 #ifdef OS_MACOS
 extern pthread_mutex_t processing_mutex;
@@ -210,13 +209,13 @@ bool iGame::Init(const iStringT& fname)
                 case iChildGameView::CV_GAMERESULT: m_pChildView[xx] = new UI_IPHONE::iGameResultView(); break;
             }
         }
-        
+
 	}
-	
+
     // check last session
-    if ( 
+    if (
 #ifndef FREE_VER
-        (localyRegistered > 256) && 
+        (localyRegistered > 256) &&
 #endif
         iFile::Exists(gSavePath + _T("lastses.phsd"))) {
             // here is the protection agains corrupts saves: first we move lastses.phs to lastses.use, then
@@ -263,20 +262,20 @@ void iGame::Quit()
 }
 
 void iGame::SaveLastSes()
-{   
-    if(ActViewType() != iChildGameView::CV_MENU && 
+{
+    if(ActViewType() != iChildGameView::CV_MENU &&
 	   ActViewType() != iChildGameView::CV_BATTLE &&
-          Map().CurPlayer() && 
+          Map().CurPlayer() &&
 	   Map().CurPlayer()->PlayerType() == PT_HUMAN) {
-		
+
         Crashsave();
-    }    
+    }
 }
 
 void iGame::RealMainMenu()
 {
     //if(ActViewType() != iChildGameView::CV_MENU)
-    m_bGoToMainMenu = true; 
+    m_bGoToMainMenu = true;
 }
 
 void iGame::ShowMainMenu(bool fInGame)
@@ -304,9 +303,9 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
     ShowProgressReport( 0, false );
     // Load map info
     iMapInfo _mapInfo;
-#ifdef HMM_COMPOVERSION 
+#ifdef HMM_COMPOVERSION
     iFileI* nakedFile;
-    //if ( bNewGame ) nakedFile = OpenWin32File( mapInfo.m_FileName ); else 
+    //if ( bNewGame ) nakedFile = OpenWin32File( mapInfo.m_FileName ); else
     nakedFile = xxc::OpenXFile( mapInfo.m_FileName, HMM_COMPOCODE );
     iFilePtr pFile( nakedFile );
 #else
@@ -321,9 +320,9 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
 
     ShowProgressReport( 25, false );
     // Show Main view
-		
+
     ShowView(iChildGameView::CV_OVERLAND);
-			
+
 	gGame.MainView()->CleanupAni();
 
     ShowProgressReport( 30, false );
@@ -350,7 +349,7 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
     m_soundMap.Init(&m_Map);
 
     ShowProgressReport( 85, false );
-    
+
     //gTutorial.Trigger(TUT_BEGIN);
     // Start the game
     m_Map.StartGame(mapInfo.m_curPlayerId, !bNewGame);
@@ -359,7 +358,7 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
 	m_bStarted = true;
 
 	MainView()->OnGameStarted();
-	   
+
     Analytics::sharedInstance()->TrackEvent("game", mapInfo.m_gameMode == iMapInfo::GM_SPLAYER ? "map started: single" : "map started: hotseat", CvtT2A<>(mapInfo.MapEnglishName().CStr()).Unsafe());
 
 	/*char dif[256];
@@ -374,7 +373,7 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
     */
 /*	if(bNewGame)
 		gGame.Autosave();
-*/	
+*/
     return true;
 }
 
@@ -394,7 +393,7 @@ bool iGame::StartTutorialMap()
 			mapInfo.m_Difficulty = DFC_NORMAL;
 			mapInfo.ReorderPlayers();
 			return StartNewGame(mapInfo, true, true);
-		} else 		
+		} else
 			return false;
 	} else
 		return false;
@@ -418,7 +417,7 @@ bool iGame::StartSingleMap()
 			mapInfo.m_Difficulty = DFC_NORMAL;
 			mapInfo.ReorderPlayers();
 			return StartNewGame(mapInfo, true, true);
-		} else 		
+		} else
 			return false;
 	} else
 		return false;
@@ -440,12 +439,12 @@ void iGame::ExitGame(bool bChangeView)
 
 	iFile::Delete(gSavePath + _T("lastses.tmp"));
 
-    if (m_pBattle) 
+    if (m_pBattle)
     {
         delete m_pBattle;
         m_pBattle = NULL;
     }
-    if (bChangeView) 
+    if (bChangeView)
     {
         ShowView(iChildGameView::CV_MENU);
         ((iMenuView*)m_pChildView[iChildGameView::CV_MENU])->NewStart(false);
@@ -499,7 +498,7 @@ const char * viewName[] =
     "CV_SCROLL",
     "CV_UPGRADE",
     "CV_GAMERESULT",
-    
+
 #ifdef MULTIPLAYER
     "CV_MPLOGIN",
     "CV_MPLOBBY",
@@ -514,15 +513,15 @@ void iGame::ShowView(iChildGameView::CHILD_VIEW cv, bool bAfterHide)
     if (cv == m_tActView) return;
 
     m_soundMap.ResetEnvSounds();
-   
+
 	// if showing overland, main menu, or battle, clear the view stack
 	if(m_tActView == iChildGameView::CV_OVERLAND ||
 	   m_tActView == iChildGameView::CV_MENU ||
 	   iChildGameView::CV_BATTLE) {
-        
+
 		gGame.ClearScreenStack();
 	}
-	
+
     // Delete/Hide old active view
     if (m_tActView != iChildGameView::CV_UNDEFINED) {
         m_pChildView[m_tActView]->OnActivate(false);
@@ -541,25 +540,25 @@ void iGame::ShowView(iChildGameView::CHILD_VIEW cv, bool bAfterHide)
         {
             static int counter = 0;
             counter++;
-            if(counter > 1)
-                Adomatic::sharedInstance()->requestFullscreenAd();
+            // if(counter > 1)
+            //     Adomatic::sharedInstance()->requestFullscreenAd();
             break;
         }
     case iChildGameView::CV_HARBOR:
     case iChildGameView::CV_HERO:
     case iChildGameView::CV_UPGRADE:
-	case iChildGameView::CV_MEET:  
+	case iChildGameView::CV_MEET:
 	case iChildGameView::CV_GAMEMENU:
 	case iChildGameView::CV_GAMERESULT:
 		if(!bAfterHide)
-            gGame.PushScreen();		
+            gGame.PushScreen();
 		break;
-    case iChildGameView::CV_CASTLE:   
+    case iChildGameView::CV_CASTLE:
         if(!bAfterHide)
-           gGame.PushScreen();		
+           gGame.PushScreen();
         break;
     case iChildGameView::CV_MINIMAP:
-        ((iMinimapView*)m_pChildView[cv])->SetCenterCell(m_pMainView->Composer().GetCenterCell());                
+        ((iMinimapView*)m_pChildView[cv])->SetCenterCell(m_pMainView->Composer().GetCenterCell());
 		break;
     case iChildGameView::CV_SCROLL:
         //check(!m_pChildView[cv]);
@@ -586,26 +585,26 @@ void iGame::ShowView(iChildGameView::CHILD_VIEW cv, bool bAfterHide)
         break;
 #endif
     };
-	
+
 	if(!bAfterHide)
-		m_viewStack.Push(cv);	
+		m_viewStack.Push(cv);
 	m_pChildView[cv]->SetVisible(true);
 	m_pChildView[cv]->SetRect(AlignRect(m_pChildView[cv]->GetDefaultSize(), iRect(iPoint(), gApp.ViewMgr().Metrics()), AlignCenter));
     m_pChildView[cv]->UpdateSize();
     m_pChildView[cv]->OnActivate(true);
-	
+
 	if(cv != iChildGameView::CV_OVERLAND){
 
 		PauseMoveSound();
 //		MainView()->SetHighlighted(false);
 	}
-	//else	
-	//	ResumeMoveSound();	
-	
+	//else
+	//	ResumeMoveSound();
+
 	gApp.ViewMgr().SetCurView(m_pChildView[cv]);
-    
+
     //Analytics::sharedInstance()->TrackEvent("UX", "entered screen", viewName[cv]);
-    
+
     m_tActView = cv;
 }
 
@@ -628,20 +627,20 @@ void iGame::HideView(iChildGameView::CHILD_VIEW cv)
     check(m_pChildView[cv]);
 #ifdef PC_VERSION
 	if( cv == iChildGameView::CV_CASTLE ){
-        
+
         CastleView()->SetHighlighted(iCastleView::CVM_EMPTY);
         MainView()->SetHighlighted(false);
     }
-    
+
     if( cv == iChildGameView::CV_HERO ){
-        
+
         HeroView()->SetHighlighted(false);
         MainView()->SetHighlighted(false);
     }
-#endif    
+#endif
     if(cv == iChildGameView::CV_GAMEMENU)
         MainView()->SetHighlighted(false);
-    
+
     if(gSettings.GetInterfaceType() == IT_TOUCH)
         if(cv == iChildGameView::CV_HERO ||
        cv == iChildGameView::CV_CASTLE ||
@@ -651,7 +650,7 @@ void iGame::HideView(iChildGameView::CHILD_VIEW cv)
 
 	m_viewStack.Pop();
 	if(m_viewStack.GetSize() > 0)
-		ShowView(m_viewStack.GetLast(), true);	
+		ShowView(m_viewStack.GetLast(), true);
 	else
 		ShowView(m_pChildView[cv]->ParentView(), true);
 }
@@ -667,10 +666,10 @@ void iGame::BeginBattle(const iBattleInfo& bi, bool quickbattle)
     if(!gMPMgr.IsMultiplayer()) {
 #endif
 
-	
+
 	//	DISABLED before-battle crash save as it interferes with before-battle events (like teleport)
     // I hope it's very rare occasion and should be considered a map bug
-        
+
 	 if(gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN) {
 #ifndef ROYAL_BOUNTY
 			gGame.Crashsave();
@@ -682,7 +681,7 @@ void iGame::BeginBattle(const iBattleInfo& bi, bool quickbattle)
 #endif
         }
 
-		
+
 #ifdef MULTIPLAYER
     }
 #endif
@@ -744,7 +743,7 @@ void iGame::EndBattle()
     check(m_pBattle);
     delete m_pBattle;
     m_pBattle = NULL;
-	
+
     if(gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN) {
 #ifndef ROYAL_BOUNTY
 		gGame.Crashsave();
@@ -761,9 +760,9 @@ void iGame::MeetHeroes(iHero* pHero1, iHero* pHero2, bool bAct)
         return;
 #endif
     if (bAct){
-		MeetView()->SetHeroes(pHero1, pHero2);		
+		MeetView()->SetHeroes(pHero1, pHero2);
         ShowView(iChildGameView::CV_MEET);
-		
+
     }
 }
 
@@ -771,7 +770,7 @@ sint32 iGame::Process(fix32 t)
 {
     if (m_bGoToMainMenu) {
         m_bGoToMainMenu = false;
-        ExitGame(true);     
+        ExitGame(true);
         return 0;
     }
 #ifdef MULTIPLAYER
@@ -791,8 +790,8 @@ sint32 iGame::Process(fix32 t)
         !gGame.IsExitingToMenu()) {
         m_Map.Process(t);
     }
-    
-    gMapShop.GetStatus();
+
+//    gMapShop.GetStatus();
 
     // purge the delete list. safe if not in modal mode (Hedin)
     if(!gApp.ViewMgr().HasModalDlg()) {
@@ -800,7 +799,7 @@ sint32 iGame::Process(fix32 t)
             delete (iView*)m_deleteList[x];
         m_deleteList.RemoveAll();
     }
-	
+
 	// drive the animations
 	gAniHost.Process(t);
 
@@ -811,119 +810,119 @@ sint32 iGame::Process(fix32 t)
 	}
 #if defined( PC_VERSION )
 	m_Timer += 400;
-	
+
 	//hot up,down,left,right keys
 	if( m_Timer > 1000 ){
-			
+
 		if( m_bKeyUpFlag ){
-			
+
 			m_Timer = 0;
-			
+
 			iPoint cell = m_pMainView->Composer().GetAnchor();
-				
-			cell.y -=40;				
+
+			cell.y -=40;
 			m_pMainView->Composer().SetAnchor(cell);
 		}
 		if( m_bKeyDownFlag ){
-		
+
 			m_Timer = 0;
-			
+
 			iPoint cell = m_pMainView->Composer().GetAnchor();
-				
-			cell.y +=40;				
+
+			cell.y +=40;
 			m_pMainView->Composer().SetAnchor(cell);
 		}
 		if( m_bKeyLeftFlag ){
-			
+
             if( ActViewType() == iChildGameView::CV_OVERLAND ){
-            
+
                 m_Timer = 0;
-                
+
                 iPoint cell = m_pMainView->Composer().GetAnchor();
-				
-                cell.x -=30;				
+
+                cell.x -=30;
                 m_pMainView->Composer().SetAnchor(cell);
             }
             else if( ActViewType() == iChildGameView::CV_HERO ){
-                
+
                 m_bKeyLeftFlag = false;
                 Map().CurPlayer()->PrevHero();
             }
             else if( ActViewType() == iChildGameView::CV_CASTLE ){
-                
+
                 m_bKeyLeftFlag = false;
                 iCastleView::CastleViewMode mode = CastleView()->GetViewMode();
-                
+
                 if( mode != iCastleView::CVM_BUILD ){
                     Map().CurPlayer()->PrevCastle();
-                    
+
                     if( mode != iCastleView::CVM_MARKET && mode != iCastleView::CVM_TAVERNDOCK && mode != iCastleView::CVM_RECRUIT && mode != iCastleView::CVM_MGUILD )
                         CastleView()->SetHighlighted(iCastleView::CVM_MAIN);
                 }
             }
 		}
 		if( m_bKeyRightFlag ){
-			
+
             if( ActViewType() == iChildGameView::CV_OVERLAND ){
-            
+
                 m_Timer = 0;
-                
+
                 iPoint cell = m_pMainView->Composer().GetAnchor();
-				
-                cell.x +=30;				
+
+                cell.x +=30;
                 m_pMainView->Composer().SetAnchor(cell);
             }
             else if( ActViewType() == iChildGameView::CV_HERO ){
-                
+
                 m_bKeyRightFlag = false;
                 Map().CurPlayer()->NextHero();
             }
             else if( ActViewType() == iChildGameView::CV_CASTLE ){
-                
+
                 m_bKeyRightFlag = false;
                 iCastleView::CastleViewMode mode = CastleView()->GetViewMode();
-                
+
                 if( mode != iCastleView::CVM_BUILD ){
                     Map().CurPlayer()->NextCastle();
-                    
+
                     if( mode != iCastleView::CVM_MARKET && mode != iCastleView::CVM_TAVERNDOCK && mode != iCastleView::CVM_RECRUIT && mode != iCastleView::CVM_MGUILD)
                         CastleView()->SetHighlighted(iCastleView::CVM_MAIN);
                 }
             }
-		}			
+		}
 	}
-	
+
 	if( m_bSaveScreen && ActViewType() == iChildGameView::CV_OVERLAND ){
-		
+
 		m_bSaveScreen = false;
-		
+
 		m_pChildView[9]->SetSaveFlagTrue();
-		
+
 		ShowView( iChildGameView::CV_GAMEMENU, false );
-		
+
 	}
 	if( m_bLoadScreen && ActViewType() == iChildGameView::CV_OVERLAND ){
-		
+
 		m_bLoadScreen = false;
-		
+
 		m_pChildView[9]->SetLoadFlagTrue();
-		
+
 		ShowView( iChildGameView::CV_GAMEMENU, false );
-		
+
 	}
 	//Cast spell
 	if( m_bSpell ){
-	
+
 		m_bSpell = false;
-		
+
 		ShowView(iChildGameView::CV_HERO);
-		
+
 		HeroView()->m_bSpell = true;
 		HeroView()->SpellDlg();
 	}
-	
+
 	if( m_bNumMove ){
-		
+
 		m_bNumMove = false;
 
 		if( pos != iPoint(0,0) ){
@@ -931,69 +930,69 @@ sint32 iGame::Process(fix32 t)
 			MainView()->SetHeroPath(pos);
 			pos = iPoint(0,0);
 		}
-		
+
 		Map().CurHero()->Step();
-	}	
-    
+	}
+
 /*    if( m_bQuickLoad ){
-    
+
         m_bQuickLoad = false;
         Quickload();
     }
-*/    
+*/
     if( m_bQuickSave ){
-        
+
         m_bQuickSave = false;
-        Quicksave();        
+        Quicksave();
     }
-    
-    
+
+
     if( m_bExitDlg ){
-    
+
         m_bExitDlg = false;
-        
+
         if( gApp.ViewMgr().HasModalDlg() )
             gApp.ViewMgr().PeepDlg()->OnDown();
         else if( ActViewType() == iChildGameView::CV_GAMERESULT )
             MainMenu();
     }
-    
+
     if( m_bEnter ){
-    
+
         m_bEnter = false;
-        
+
         //In Modal Dlg
-        if( gApp.ViewMgr().HasModalDlg() )            
+        if( gApp.ViewMgr().HasModalDlg() )
             gApp.ViewMgr().PeepDlg()->OnClickYes();
         //Show current hero's screen
         else if(Map().CurPlayer()) {
-            
+
 			if( Map().CurPlayer()->CurCastle() )
 				ShowView(iChildGameView::CV_CASTLE);
 			else if(Map().CurPlayer()->CurHero())
 				ShowView(iChildGameView::CV_HERO);
         }
     }
-    
+
     if( m_bEsc ){
-    
+
         m_bEsc = false;
-        
+
         //Exit Dialog
         if( gApp.ViewMgr().HasModalDlg() )
             gApp.ViewMgr().PeepDlg()->OnClickNo();
         else{
             //Exit Minimap
             if( m_bMinimapEsc ){
-                
+
                 m_bMinimapEsc = false;
                 MainView()->MinimapRawView()->SetVisible(false);
                 MainView()->UpdateButtons();
             }
-            else{            
+            else{
                 //Exit Menu
                 switch (ActViewType()){
-                    
+
                     case iChildGameView::CV_GAMEMENU:
                         HideView(iChildGameView::CV_GAMEMENU);
                         break;
@@ -1031,31 +1030,31 @@ sint32 iGame::Process(fix32 t)
             }
         }
     }
-    
+
     if(m_bCenter){
-    
+
         m_bCenter = false;
-        
+
         MainView()->Composer().CenterView(Map().CurHero()->Pos());
     }
-    
+
     if( m_bShowCastle ){
-    
+
         m_bShowCastle = false;
-        
+
         if( gGame.Map().CurHero() )
             if( iMapCnst* mc = gGame.Map().CurHero()->GetLocation() )
                 if (iCastle* pCastle = DynamicCast<iCastle*>(mc)){
-                 
+
                     CastleView()->SetCastle(pCastle);
                     ShowView(iChildGameView::CV_CASTLE);
                 }
                 else
                     gGame.Map().CurHero()->ActivateConstruction(mc);
-        
+
 //        ShowView(iChildGameView::CV_CASTLE);
     }
-#endif	
+#endif
     return 0;
 }
 
@@ -1074,7 +1073,7 @@ void iGame::OnKeyUp(sint32 key)
         iStringT scrndir = gRootPath + _T("Scrn\\");
         iFile::DirCreate(scrndir);
         for (i = 1; i < 999; i++)
-        {   
+        {
             iStringT fname = scrndir + iFormat(_T("screenshot%03d.bmp"), i);
             if (!iFile::Exists(fname))
             {
@@ -1088,12 +1087,12 @@ void iGame::OnKeyUp(sint32 key)
         //      SaveDibBitmap16(gApp.Surface(), fname);
         //      AddMsg(iStringT(_T("#F4B4")) + gTextMgr[TRID_MSG_SCREENSHOT_SAVED]);
     }
-    // Cotulla: NOT SUPPORTED FOR IPAD 
+    // Cotulla: NOT SUPPORTED FOR IPAD
 #if 0
-    else if (key == gSettings.ActionKey(BAT_QUICK_SAVE)) 
+    else if (key == gSettings.ActionKey(BAT_QUICK_SAVE))
     {
 #ifdef MULTIPLAYER
-        if (!gMPMgr.IsMultiplayer()) 
+        if (!gMPMgr.IsMultiplayer())
         {
 #endif
                 iStringT fname;
@@ -1101,7 +1100,7 @@ void iGame::OnKeyUp(sint32 key)
                 SaveGameFile(fname, gGame.Map() );
 #ifdef MULTIPLAYER
         }
-#endif  
+#endif
     }
 #endif
 
@@ -1123,7 +1122,7 @@ void iGame::AddCellMsg(const iStringT& msg, const iPoint& pos)
 // Animation
 void iGame::OnDisapObject(SpriteId sid, const iPoint& pos, const iPoint& offset)
 {
-#ifdef MULTIPLAYER  
+#ifdef MULTIPLAYER
     gMPMgr.OnDisapObject(pos);
 #endif
     if (!gGame.Map().ActPlayer()->FogMap().IsHidden(pos)) {
@@ -1147,10 +1146,10 @@ void iGame::OnVictory( VICTORY_CONDITION_TYPE vc )
                     havehuman = true;
                     break;
                 }
-            }   
+            }
             if(!havehuman)
                 gMPMgr.OnPlayerWon(m_Players.First()->PlayerId());
-            
+
             iTextDlg tdlg(&gApp.ViewMgr(), _T("The game ended."), _T(""),PID_NEUTRAL);
             tdlg.DoModal();
             //gGame.MainMenu();
@@ -1163,15 +1162,15 @@ void iGame::OnVictory( VICTORY_CONDITION_TYPE vc )
 	// Show victory dialog
 	iTextDlg tdlg(&gApp.ViewMgr(), gTextMgr[TRID_VICTORY], gTextMgr[TRID_VICT_DEFEAT_ALL_ENEMIES + vc],PID_NEUTRAL);
     tdlg.DoModal();
-	
+
 	/*Hall of fame disabled
 	uint32 ut = GetCurrentTimestamp();
     iHighScore::iEntry entry(m_Map.MapName(), ut, m_Map.m_CurDay, m_Map.CalcGameScore());
-	
-    iDlg_HallOfFame dlg(&gApp.ViewMgr(), gSettingsPath + _T("PalmHeroes.hsc"), entry);  
+
+    iDlg_HallOfFame dlg(&gApp.ViewMgr(), gSettingsPath + _T("PalmHeroes.hsc"), entry);
     dlg.DoModal();
     */
-	
+
 	/* show game result screen */
 #ifndef ROYAL_BOUNTY
 	gGame.GameResultView()->SetTitle(gTextMgr[TRID_VICTORY_CAP]);
@@ -1185,7 +1184,7 @@ void iGame::OnVictory( VICTORY_CONDITION_TYPE vc )
 	gGame.ShowView(iChildGameView::CV_GAMERESULT);
     if(gGame.Map().GameMode() == iMapInfo::GM_SPLAYER)
         Analytics::sharedInstance()->TrackEvent("game", "won map: single", CvtT2A<>(gGame.Map().MapEnglishName().CStr()).Unsafe());
-    
+
 	iFile::Delete(gSavePath + _T("lastses.tmp"));
 }
 
@@ -1195,9 +1194,9 @@ void iGame::OnDefeat( LOSE_CONDITION_TYPE lc, bool bExitGame )
 		if(!bExitGame) {
 			iTextDlg tdlg(&gApp.ViewMgr(), gTextMgr[TRID_DEFEAT], gTextMgr[TRID_LOSE_DEFAULT + lc],PID_NEUTRAL);
 			tdlg.DoModal();
-		} 
-		else 
-		{	
+		}
+		else
+		{
 			iTextDlg tdlg(&gApp.ViewMgr(), gTextMgr[TRID_DEFEAT], gTextMgr[TRID_LOSE_DEFAULT + lc],PID_NEUTRAL);
 			tdlg.DoModal();
 
@@ -1205,7 +1204,7 @@ void iGame::OnDefeat( LOSE_CONDITION_TYPE lc, bool bExitGame )
 			gGame.GameResultView()->SetText(gTextMgr[TRID_LOSE_SHORT]);
 			gGame.GameResultView()->SetType(IGameResultView::GRDefeat);
 			gGame.GameResultView()->SetMapName(gGame.Map().MapName());
-			
+
 			gGame.ShowView(iChildGameView::CV_GAMERESULT);
 		}
     }
@@ -1286,7 +1285,7 @@ void iGame::OnDelHero(iHero* pHero)
             if (!gGame.Map().ActPlayer()->CurHero()) m_soundMap.ResetEnvSounds();
             gSfxMgr.PlaySound(CSND_DEL_GUARD);
         }
-    } 
+    }
 
     if (iAI_Player* pAIPlayer = DynamicCast<iAI_Player*>(gGame.Map().CurPlayer())) {
         pAIPlayer->OnHeroDead(pHero);
@@ -1294,7 +1293,7 @@ void iGame::OnDelHero(iHero* pHero)
 }
 
 void iGame::OnAddShip(iShip* pShip)
-{       
+{
 }
 
 void iGame::OnDelShip(iShip* pShip)
@@ -1352,12 +1351,12 @@ uint16 iGame::GetMovSound(SURF_TYPE st, bool bRoad)
 void iGame::PauseMoveSound()
 {
 	if(m_hmChannel != -1)
-		gApp.SndPlayer().Stop(m_hmChannel);	
+		gApp.SndPlayer().Stop(m_hmChannel);
 }
 
 void iGame::ResumeMoveSound()
 {
-	if(m_hmChannel != -1)		
+	if(m_hmChannel != -1)
 		m_hmChannel = gSfxMgr.PlaySound(m_hmSound, true);
 }
 
@@ -1409,7 +1408,7 @@ void iGame::OnHeroStopMoving(iHero* pHero)
             m_pMainView->EnableToolBar(true);
             ((iMainView_touch*)m_pMainView)->UpdateButtons();
         }
-				
+
     }
 }
 
@@ -1440,31 +1439,31 @@ void iGame::SetLHandMode(bool lhandmode)
     ((iMainView_touch*)m_pMainView)->SetLHandMode(lhandmode);
 }
 
-void iGame::PushScreen()    
+void iGame::PushScreen()
 {
-    iDib n; 
+    iDib n;
     n.Init(gApp.Surface().GetSize(), iDib::RGB);
-    gApp.Surface().CopyToDibXY(n, iPoint()); 
+    gApp.Surface().CopyToDibXY(n, iPoint());
 	iRect all(iPoint(), gApp.Surface().GetSize());
 	n.Darken50Rect(all);
 	n.Darken50Rect(all);
 
 
 	m_screenStack.Push(n);
-/*    for(uint32 xx=0; xx<iChildGameView::CV_COUNT; xx++) 
+/*    for(uint32 xx=0; xx<iChildGameView::CV_COUNT; xx++)
         if(m_pChildView[xx])
         {
             m_pChildView[xx]->UpdateSize();
             m_pChildView[xx]->Invalidate();
         }
-*/		
+*/
 }
 
 void iGame::UpdateViewSizes()
 {
     for (uint32 xx = 0; xx < iChildGameView::CV_COUNT; ++xx)
     {
-        if (m_pChildView[xx]) 
+        if (m_pChildView[xx])
         {
 #if defined( PC_VERSION )
 			if( m_pChildView[xx]->Type() == iChildGameView::CV_CASTLE ||
@@ -1472,7 +1471,7 @@ void iGame::UpdateViewSizes()
                 m_pChildView[xx]->Type() == iChildGameView::CV_HERO   ||
                 m_pChildView[xx]->Type() == iChildGameView::CV_MEET
                ){
- #ifdef OS_WIN32                 
+ #ifdef OS_WIN32
 				HWND hWnd = gApp.Window().GetHWND();
 				RECT rect;
 
@@ -1492,25 +1491,25 @@ void iGame::UpdateViewSizes()
                 else
                     m_pChildView[xx]->SetRect(iRect( (GetWindowWidth()-1024)/2, (GetWindowHeight()-768)/2, 1024,768));
 #endif
-                    
+
 			}
             else
 #endif
                 m_pChildView[xx]->SetRect(gApp.Surface().GetSize());
-            
+
             m_pChildView[xx]->UpdateSize();
             m_pChildView[xx]->Invalidate();
         }
     }
-  
+
     if( Map().CurPlayer() ){
-    
+
         if( Map().CurPlayer()->CurHero() ){
-			
+
             MainView()->Composer().CenterView( Map().CurPlayer()->CurHero()->Pos() );
         }
         else if( Map().CurPlayer()->CurCastle() ){
-            
+
             MainView()->Composer().CenterView( Map().CurPlayer()->CurCastle()->Pos() );
         }
     }
@@ -1520,14 +1519,14 @@ bool iGame::CheckPlayerWinAndLose( iPlayer *pPlayer )
 {
 	if(!gGame.Started() || !pPlayer) return false;
 	VICTORY_CONDITION_TYPE vc = pPlayer->MeetsVictoryCondition();
-	if(vc != VC_INVALID) {		
+	if(vc != VC_INVALID) {
 		if(pPlayer == Map().ActPlayer()) {
 			// active player won - show the win message
-			gGame.OnVictory(vc);			
+			gGame.OnVictory(vc);
 		} else {
 			// otherwise we lost because someone else won
 			gGame.OnDefeat(LC_OTHER_WON, true);
-		}	
+		}
 		return true;
 	}
 
@@ -1542,7 +1541,7 @@ bool iGame::CheckPlayerWinAndLose( iPlayer *pPlayer )
 
 
 void iGame::Crashsave()
-{    
+{
 	iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
 	bool bOk = false;
 	iFilePtr pFile(CreateWin32File(gSavePath + _T("lastses.tmp")));
@@ -1550,18 +1549,18 @@ void iGame::Crashsave()
 	bOk = (pFile && gGame.Map().SaveToFile(pFile.operator->()));
 	if (bOk) iFile::Move(gSavePath + _T("lastses.tmp"), gSavePath + _T("lastses.phsd"));
 }
-	
+
 void iGame::Autosave()
 {
 	iStringT fname;
 	iSaveDlg::GetSaveFileName(fname,0);
 	iFile::Delete(gSavePath + _T("lastses.tmp"));
-	
+
 	SaveGameFile( fname, gGame.Map() );
 }
 
 extern const uint32 SAVE_GAME_SLOTS;
-#if defined( OS_MACOS )	
+#if defined( OS_MACOS )
 void iGame::ShowSaveScreen(){
 
 	HeroView()->SetHero(gGame.Map().CurHero());
@@ -1573,7 +1572,7 @@ void iGame::Quicksave()
 	iStringT fname;
 	iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 1);
 	//iFile::Delete(gSavePath + _T("lastses.tmp"));
-	
+
 	SaveGameFile( fname, gGame.Map() );
 }
 
@@ -1584,12 +1583,12 @@ void iGame::Quickload()
 	iMapInfo mapInfo;
 	mapInfo.m_bNewGame = false;
 	mapInfo.m_FileName = fname;
-	
+
 	iFilePtr pFile(OpenWin32File(fname));
 
 	if(!pFile)
 		return;
-	
+
 	iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_RELOAD], PID_NEUTRAL);
 	if (qdlg.DoModal() == DRC_YES) {
 		uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));
@@ -1597,12 +1596,12 @@ void iGame::Quickload()
 			ExitGame(false);
 			mapInfo.ReorderPlayers();
 			StartNewGame(mapInfo, false, false);
-		} 
+		}
 	}
 }
-	
+
 bool IsOneHanded()
-{	
+{
 #if defined(PC_VERSION) || (defined(TARGET_IPHONE_SIMULATOR) && TARGET_IPHONE_SIMULATOR)
 	return true;
 #endif

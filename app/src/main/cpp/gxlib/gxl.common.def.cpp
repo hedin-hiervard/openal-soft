@@ -1,8 +1,8 @@
 #if defined(OS_IPHONE) || defined(OS_MACOS)
-#define OS_APPLE 
+#define OS_APPLE
 #endif //(OS_IPHONE || OS_MACOS)
 
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 #include <windows.h>
 #else
 #include <sys/time.h>
@@ -12,7 +12,7 @@
 #include "gxl.common.def.h"
 #include "gxl.inc.h"
 
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 sint32 GetTickCount() {
 	struct timeval tv;
 	gettimeofday(&tv, 0);

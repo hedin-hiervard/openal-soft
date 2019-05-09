@@ -20,7 +20,7 @@
 // size of pixel chunk should be less than ( sizeof(uint16) * 65535 )
 // Refer to the <*1*> marked lines
 
-const static uint16 SPFT_SPANNED	= (1 << 0);  
+const static uint16 SPFT_SPANNED	= (1 << 0);
 const static uint16 SPFT_ALPHA   	= (1 << 1);
 
 #pragma pack(push,1)
@@ -60,7 +60,7 @@ iGfxManager::MakeSpriteId( BankId cat, uint32 sn )
 	return sn + (((SpriteId)cat) << 16);
 }
 
-iGfxManager::SpriteId 
+iGfxManager::SpriteId
 iGfxManager::GetFlippedSpriteId( SpriteId sid )
 {
 	return sid | (1UL<<31);
@@ -120,7 +120,7 @@ iGfxManager::EndId( BankId cat ) const
 	return MakeSpriteId( cat, bank_[cat].props.GetSize() );
 }
 
-iSize 
+iSize
 iGfxManager::Dimension( SpriteId sid ) const
 {
 	uint32 catId = sid >> 16;
@@ -134,7 +134,7 @@ iGfxManager::Dimension( SpriteId sid ) const
 	return iSize( sprPtr->sizeW_, sprPtr->sizeH_ );
 }
 
-iPoint 
+iPoint
 iGfxManager::Anchor( SpriteId sid ) const
 {
 	uint32 catId = sid >> 16;
@@ -148,7 +148,7 @@ iGfxManager::Anchor( SpriteId sid ) const
 	return iPoint( sprPtr->originX_ , sprPtr->originY_);
 }
 
-void 
+void
 iGfxManager::FlipSprite(SpriteId sid)
 {
 	uint32 catId = sid >> 16;
@@ -223,7 +223,7 @@ iGfxManager::BlitFlipped( SpriteId sid, iDib& srf, iPoint pos ) const
 
 	//const Sprite* sprPtr= bank_[catId].GetSprite( sprId );
 	//const uint16* pixels= bank_[catId].Data( sprPtr->offset_ );
-	//   
+	//
 	//iRect src_rect( 0, 0, sprPtr->sizeW_, sprPtr->sizeH_ );
 	//if(sprPtr->type_ & 0x8)
 	//	BlitRealAlphaFlipped( sprPtr, pixels, srf, src_rect, pos );
@@ -232,7 +232,7 @@ iGfxManager::BlitFlipped( SpriteId sid, iDib& srf, iPoint pos ) const
 }
 
 
-void 
+void
 iGfxManager::Blit( SpriteId sid, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	BlitUniversal(sid, srf, pos, src);
@@ -252,7 +252,7 @@ iGfxManager::Blit( SpriteId sid, iDib& srf, const iRect& src, iPoint pos ) const
 
 }
 
-void 
+void
 iGfxManager::BlitAlpha( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const
 {
 	BlitUniversal(sid, to, pos, cInvalidRect, EfxNone, false, -1, a, FlipNone);
@@ -268,14 +268,14 @@ iGfxManager::BlitAlpha( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const
 	//iRect src_rect( 0, 0, sprPtr->sizeW_, sprPtr->sizeH_ );
 
 	////if (a == 63) BlitNormal(sprPtr, pixels, to, src_rect, pos);
-	////else 
+	////else
 	//if(sprPtr->type_ & 0x8)
 	//	BlitRealConstAlpha( sprPtr, pixels, to, src_rect, pos, a );
-	//else	
+	//else
 	//	BlitAlpha(sprPtr, pixels, to, src_rect, pos, a);
 }
 
-void 
+void
 iGfxManager::BlitAlphaFlipped( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const
 {
 	BlitUniversal(sid, to, pos, cInvalidRect, EfxNone, false, -1, a, FlipVert);
@@ -291,15 +291,15 @@ iGfxManager::BlitAlphaFlipped( SpriteId sid, iDib& to, iPoint pos, uint8 a ) con
 	//iRect src_rect( 0, 0, sprPtr->sizeW_, sprPtr->sizeH_ );
 
 	////if (a == 63) BlitNormal(sprPtr, pixels, to, src_rect, pos);
-	////else 
+	////else
 	//if(sprPtr->type_ & 0x8)
 	//	BlitRealConstAlphaFlipped( sprPtr, pixels, to, src_rect, pos, a );
-	//else	
+	//else
 	//	BlitAlphaFlipped(sprPtr, pixels, to, src_rect, pos, a);
 }
 
 
-void 
+void
 iGfxManager::BlitAlpha( SpriteId sid, iDib& to, const iRect& src, iPoint pos, uint8 a ) const
 {
 	BlitUniversal(sid, to, pos, src, EfxNone, false, -1, a, FlipNone);
@@ -317,12 +317,12 @@ iGfxManager::BlitAlpha( SpriteId sid, iDib& to, const iRect& src, iPoint pos, ui
 	// BlitNormal(sprPtr, pixels, to, src, pos);
 	if(sprPtr->type_ & 0x8)
 	BlitRealConstAlpha( sprPtr, pixels, to, src, pos, a );
-	else	
-	BlitAlpha(sprPtr, pixels, to, src, pos, a);	
+	else
+	BlitAlpha(sprPtr, pixels, to, src, pos, a);
 	*/
 }
 
-void 
+void
 iGfxManager::BlitEffect( SpriteId sid, iDib& to, iPoint pos, Effects efx) const
 {
 	BlitUniversal(sid, to, pos, cInvalidRect, efx);
@@ -374,7 +374,7 @@ iGfxManager::BlitEffect( SpriteId sid, iDib& to, iPoint pos, Effects efx) const
 }
 
 
-void 
+void
 iGfxManager::BlitNormal( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	/*check( sprPtr != 0 && pixels != 0 );
@@ -389,7 +389,7 @@ iGfxManager::BlitNormal( const iGfxManager::Sprite* sprPtr, const uint16* pixels
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -411,11 +411,11 @@ iGfxManager::BlitNormal( const iGfxManager::Sprite* sprPtr, const uint16* pixels
 	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	// <*1*>
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
+	// sprite non clipped - use lighting fast blit
 	while (ptr != eptr) {
 	ptr = Blt::SpanFast( op, ptr,dst_clr );
 	dst_clr += dstStride;
@@ -449,7 +449,7 @@ iGfxManager::BlitNormal( const iGfxManager::Sprite* sprPtr, const uint16* pixels
 }
 
 
-void 
+void
 iGfxManager::BlitRealAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	/*	check( sprPtr != 0 && pixels != 0 );
@@ -464,7 +464,7 @@ iGfxManager::BlitRealAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pix
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -477,13 +477,13 @@ iGfxManager::BlitRealAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pix
 	if ( sprPtr->type_ & 1 ) {
 	// Spanned sprite
 	typedef Blitter<RealAlphaBlendOp> Blt;
-	RealAlphaBlendOp op;		
+	RealAlphaBlendOp op;
 
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
+	// sprite non clipped - use lighting fast blit
 	while (ptr != eptr) {
 	ptr = Blt::SpanFast( op, ptr,dst_clr );
 	dst_clr += dstStride;
@@ -517,7 +517,7 @@ iGfxManager::BlitRealAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pix
 }
 
 
-void 
+void
 iGfxManager::BlitRealConstAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos, uint8 alpha ) const
 {
 	/*check( sprPtr != 0 && pixels != 0 );
@@ -532,7 +532,7 @@ iGfxManager::BlitRealConstAlpha( const iGfxManager::Sprite* sprPtr, const uint16
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -545,13 +545,13 @@ iGfxManager::BlitRealConstAlpha( const iGfxManager::Sprite* sprPtr, const uint16
 	if ( sprPtr->type_ & 1 ) {
 	// Spanned sprite
 	typedef Blitter<RealConstAlphaBlendOp> Blt;
-	RealConstAlphaBlendOp op(alpha);		
+	RealConstAlphaBlendOp op(alpha);
 
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
+	// sprite non clipped - use lighting fast blit
 	while (ptr != eptr) {
 	ptr = Blt::SpanFast( op, ptr,dst_clr );
 	dst_clr += dstStride;
@@ -585,7 +585,7 @@ iGfxManager::BlitRealConstAlpha( const iGfxManager::Sprite* sprPtr, const uint16
 }
 
 
-void 
+void
 iGfxManager::BlitRealConstAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos, uint8 alpha ) const
 {
 	/*check( sprPtr != 0 && pixels != 0 );
@@ -600,7 +600,7 @@ iGfxManager::BlitRealConstAlphaFlipped( const iGfxManager::Sprite* sprPtr, const
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -613,14 +613,14 @@ iGfxManager::BlitRealConstAlphaFlipped( const iGfxManager::Sprite* sprPtr, const
 	if ( sprPtr->type_ & 1 ) {
 	// Spanned sprite
 	typedef Blitter<RealConstAlphaBlendOp> Blt;
-	RealConstAlphaBlendOp op(alpha);		
+	RealConstAlphaBlendOp op(alpha);
 
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
-	while (ptr != eptr) {				
+	// sprite non clipped - use lighting fast blit
+	while (ptr != eptr) {
 	ptr = Blt::SpanFastFlipped( op, ptr,dst_clr + src_rect.w);
 	dst_clr += dstStride;
 	}
@@ -631,7 +631,7 @@ iGfxManager::BlitRealConstAlphaFlipped( const iGfxManager::Sprite* sprPtr, const
 	sint32 toSkip = src_rect.y;
 	while (toSkip--) ptr = Blt::SpanSkip( ptr );
 
-	const uint16* clipIn = dst_clr + src_rect.x;			
+	const uint16* clipIn = dst_clr + src_rect.x;
 	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy){
 	ptr = Blt::SpanFlipped(op, ptr, dst_clr + src.w, clipIn, clipIn + src_rect.w - 1 );
 	dst_clr	+= dstStride;
@@ -647,7 +647,7 @@ iGfxManager::BlitRealConstAlphaFlipped( const iGfxManager::Sprite* sprPtr, const
 
 
 
-void 
+void
 iGfxManager::BlitNormalFlipped( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	/*check( sprPtr != 0 && pixels != 0 );
@@ -663,7 +663,7 @@ iGfxManager::BlitNormalFlipped( const iGfxManager::Sprite* sprPtr, const uint16*
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -680,12 +680,12 @@ iGfxManager::BlitNormalFlipped( const iGfxManager::Sprite* sprPtr, const uint16*
 	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	// <*1*>
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
-	while (ptr != eptr) {				
+	// sprite non clipped - use lighting fast blit
+	while (ptr != eptr) {
 	ptr = Blt::SpanFastFlipped( op, ptr,dst_clr + src_rect.w);
 	dst_clr += dstStride;
 	}
@@ -696,7 +696,7 @@ iGfxManager::BlitNormalFlipped( const iGfxManager::Sprite* sprPtr, const uint16*
 	sint32 toSkip = src_rect.y;
 	while (toSkip--) ptr = Blt::SpanSkip( ptr );
 
-	const uint16* clipIn = dst_clr + src_rect.x;			
+	const uint16* clipIn = dst_clr + src_rect.x;
 	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy){
 	ptr = Blt::SpanFlipped(op, ptr, dst_clr + src.w, clipIn, clipIn + src_rect.w - 1 );
 	dst_clr	+= dstStride;
@@ -711,7 +711,7 @@ iGfxManager::BlitNormalFlipped( const iGfxManager::Sprite* sprPtr, const uint16*
 }
 
 
-void 
+void
 iGfxManager::BlitRealAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	/*	check( sprPtr != 0 && pixels != 0 );
@@ -727,7 +727,7 @@ iGfxManager::BlitRealAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -744,12 +744,12 @@ iGfxManager::BlitRealAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint
 	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	// <*1*>
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	if (src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
-	while (ptr != eptr) {				
+	// sprite non clipped - use lighting fast blit
+	while (ptr != eptr) {
 	ptr = Blt::SpanFastFlipped( op, ptr,dst_clr + src_rect.w);
 	dst_clr += dstStride;
 	}
@@ -760,7 +760,7 @@ iGfxManager::BlitRealAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint
 	sint32 toSkip = src_rect.y;
 	while (toSkip--) ptr = Blt::SpanSkip( ptr );
 
-	const uint16* clipIn = dst_clr + src_rect.x;			
+	const uint16* clipIn = dst_clr + src_rect.x;
 	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy){
 	ptr = Blt::SpanFlipped(op, ptr, dst_clr + src.w, clipIn, clipIn + src_rect.w - 1 );
 	dst_clr	+= dstStride;
@@ -774,7 +774,7 @@ iGfxManager::BlitRealAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint
 	*/
 }
 
-void 
+void
 iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	/*check( sprPtr != 0 && pixels != 0 );
@@ -789,7 +789,7 @@ iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	iRect src_rect(src);
 	//iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	//iRect dst_rect(pos,siz);  
+	//iRect dst_rect(pos,siz);
 	//__SAME_AS__
 	iRect dst_rect( pos, size );
 	if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -806,7 +806,7 @@ iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	// <*1*>
-	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	const uint16* ptr = pixels + 2;
 
 	uint16 s, e, ns, ne;
@@ -814,7 +814,7 @@ iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	e = 0;
 
 	if (false && src_rect.size() == size){
-	// sprite non clipped - use lighting fast blit			
+	// sprite non clipped - use lighting fast blit
 	while (ptr != eptr) {
 	//ptr = Blt::SpanFastWired( op, ptr,dst_clr, &ns, &ne );
 	dst_clr += dstStride;
@@ -832,7 +832,7 @@ iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 
 	const uint16* clipIn = dst_clr + src_rect.x;
 	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy){
-	ptr = Blt::GetSpanEdges(ptr, dst_clr, &ns, &ne);//, clipIn, clipIn + src_rect.w );			
+	ptr = Blt::GetSpanEdges(ptr, dst_clr, &ns, &ne);//, clipIn, clipIn + src_rect.w );
 	clipIn	+= dstStride;
 
 	if(s != 0 && ns != 0)  {
@@ -861,7 +861,7 @@ iGfxManager::BlitWired( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	*/
 }
 
-void 
+void
 iGfxManager::BlitWiredFlipped( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -876,7 +876,7 @@ iGfxManager::BlitWiredFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 	//// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	//iRect src_rect(src);
 	////iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	////iRect dst_rect(pos,siz);  
+	////iRect dst_rect(pos,siz);
 	////__SAME_AS__
 	//iRect dst_rect( pos, size );
 	//if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -893,11 +893,11 @@ iGfxManager::BlitWiredFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 	//	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	//	// <*1*>
-	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//	const uint16* ptr = pixels + 2;
 
 	//	if (src_rect.size() == size){
-	//		// sprite non clipped - use lighting fast blit			
+	//		// sprite non clipped - use lighting fast blit
 	//		while (ptr != eptr) {
 	//			ptr = Blt::SpanFastWiredFlipped( op, ptr,dst_clr + src_rect.w );
 	//			dst_clr += dstStride;
@@ -931,7 +931,7 @@ iGfxManager::BlitWiredFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 }
 
 
-void 
+void
 iGfxManager::BlitGlow( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -946,7 +946,7 @@ iGfxManager::BlitGlow( const iGfxManager::Sprite* sprPtr, const uint16* pixels, 
 	//// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	//iRect src_rect(src);
 	////iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	////iRect dst_rect(pos,siz);  
+	////iRect dst_rect(pos,siz);
 	////__SAME_AS__
 	//iRect dst_rect( pos, size );
 	//if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -959,13 +959,13 @@ iGfxManager::BlitGlow( const iGfxManager::Sprite* sprPtr, const uint16* pixels, 
 	//if ( sprPtr->type_ & 1 ) {
 	//	// Spanned sprite
 	//	typedef Blitter<GlowBlendOp> Blt;
-	//	GlowBlendOp op;		
+	//	GlowBlendOp op;
 
-	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//	const uint16* ptr = pixels + 2;
 
 	//	if (src_rect.size() == size){
-	//		// sprite non clipped - use lighting fast blit			
+	//		// sprite non clipped - use lighting fast blit
 	//		while (ptr != eptr) {
 	//			ptr = Blt::SpanFast( op, ptr,dst_clr );
 	//			dst_clr += dstStride;
@@ -990,7 +990,7 @@ iGfxManager::BlitGlow( const iGfxManager::Sprite* sprPtr, const uint16* pixels, 
 
 
 
-void 
+void
 iGfxManager::BlitAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos, uint8 a ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1008,7 +1008,7 @@ iGfxManager::BlitAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	//// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	//iRect src_rect(src);
 	////iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	////iRect dst_rect(pos,siz);  
+	////iRect dst_rect(pos,siz);
 	////__SAME_AS__
 	//iRect dst_rect( pos, size );
 	//if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -1025,7 +1025,7 @@ iGfxManager::BlitAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 	//	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	//	// <*1*>
-	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//	const uint16* ptr = pixels + 2;
 
 	//	if (src_rect.size() == size){
@@ -1062,7 +1062,7 @@ iGfxManager::BlitAlpha( const iGfxManager::Sprite* sprPtr, const uint16* pixels,
 }
 
 
-void 
+void
 iGfxManager::BlitAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* pixels, iDib& srf, const iRect& src, iPoint pos, uint8 a ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1080,7 +1080,7 @@ iGfxManager::BlitAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 	//// __NOT_NECESSARY__ if ( (pos.x + (sint32)size.w) <= 0 || (pos.y + (sint32)size.h) <= 0) return;
 	//iRect src_rect(src);
 	////iSize siz( srf.GetWidth() - pos.x, srf.GetHeight() - pos.y);
-	////iRect dst_rect(pos,siz);  
+	////iRect dst_rect(pos,siz);
 	////__SAME_AS__
 	//iRect dst_rect( pos, size );
 	//if (!iClipper::iClipRectRect(dst_rect,srf.GetSize(),src_rect,size)) return;
@@ -1097,12 +1097,12 @@ iGfxManager::BlitAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 	//	// ptr, dst_clr, dstStrude, src_rect(.x .y .w, .h )
 
 	//	// <*1*>
-	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//	const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//	const uint16* ptr = pixels + 2;
 
 	//	if (src_rect.size() == size){
-	//		// sprite non clipped - use lighting fast blit			
-	//		while (ptr != eptr) {				
+	//		// sprite non clipped - use lighting fast blit
+	//		while (ptr != eptr) {
 	//			ptr = Blt::SpanFastFlipped( op, ptr,dst_clr + src_rect.w);
 	//			dst_clr += dstStride;
 	//		}
@@ -1113,7 +1113,7 @@ iGfxManager::BlitAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 	//		sint32 toSkip = src_rect.y;
 	//		while (toSkip--) ptr = Blt::SpanSkip( ptr );
 
-	//		const uint16* clipIn = dst_clr + src_rect.x;			
+	//		const uint16* clipIn = dst_clr + src_rect.x;
 	//		for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy){
 	//			ptr = Blt::SpanFlipped(op, ptr, dst_clr + src.w, clipIn, clipIn + src_rect.w - 1 );
 	//			dst_clr	+= dstStride;
@@ -1127,7 +1127,7 @@ iGfxManager::BlitAlphaFlipped( const iGfxManager::Sprite* sprPtr, const uint16* 
 }
 
 
-void 
+void
 iGfxManager::BlitTransparent( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1156,7 +1156,7 @@ iGfxManager::BlitTransparent( const Sprite* sprPtr, const uint16* pixels, iDib& 
 	//Shadow25Op op;
 
 	//// <*1*>
-	//const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//const uint16* ptr = pixels + 2;
 
 	//if (src_rect.size() == size){
@@ -1181,7 +1181,7 @@ iGfxManager::BlitTransparent( const Sprite* sprPtr, const uint16* pixels, iDib& 
 	//}
 }
 
-void 
+void
 iGfxManager::BlitShadowIso( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1218,7 +1218,7 @@ iGfxManager::BlitShadowIso( const Sprite* sprPtr, const uint16* pixels, iDib& sr
 	//	while (ptr != eptr) {
 	//		//ptr = ProcessShadowSpanLine(ptr, dst_clr);
 	//		ptr = Blt::SpanFast(op, ptr, dst_clr);
-	//		++dst_clr;											// shadow skew			
+	//		++dst_clr;											// shadow skew
 	//		dst_clr += dstStride;
 	//		//if ( ptr != eptr ) ptr = SkipSpanLine(ptr);			// shadow skip
 	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr);			// shadow skip
@@ -1228,12 +1228,12 @@ iGfxManager::BlitShadowIso( const Sprite* sprPtr, const uint16* pixels, iDib& sr
 	//	dst_clr -= src_rect.x;
 
 	//	sint32 toSkip = src_rect.y;
-	//	while (toSkip--) { 
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//	while (toSkip--) {
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//		check( ptr != eptr );								// skip by factor of two
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//	}
 
 	//	const uint16* clipIn = dst_clr + src_rect.x;
@@ -1244,14 +1244,14 @@ iGfxManager::BlitShadowIso( const Sprite* sprPtr, const uint16* pixels, iDib& sr
 	//		clipIn += dstStride;
 	//		dst_clr += dstStride;
 	//		++dst_clr;
-	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr); 
+	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr);
 	//		else break;
 	//		//ptr = SkipSpanLine(ptr);							// shadow skip
 	//	}
 	//}
 }
 
-void 
+void
 iGfxManager::BlitShadowIsoBattle( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1284,12 +1284,12 @@ iGfxManager::BlitShadowIsoBattle( const Sprite* sprPtr, const uint16* pixels, iD
 	//typedef Blitter<Shadow50Op> Blt;
 	//Shadow50Op op;
 
-	//if (src_rect.size() == sprSz  ){	
+	//if (src_rect.size() == sprSz  ){
 	//	while (ptr != eptr) {
 
 	//		ptr = Blt::SpanFast(op, ptr, dst_clr);
-	//		dst_clr += 2;											// shadow skew		
-	//		dst_clr += dstStride;			
+	//		dst_clr += 2;											// shadow skew
+	//		dst_clr += dstStride;
 	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr);			// shadow skip
 	//		//	x++;
 	//	}
@@ -1297,12 +1297,12 @@ iGfxManager::BlitShadowIsoBattle( const Sprite* sprPtr, const uint16* pixels, iD
 	//	//	dst_clr -= src_rect.x;
 
 	//	sint32 toSkip = src_rect.y;
-	//	while (toSkip--) { 
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//	while (toSkip--) {
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//		check( ptr != eptr );								// skip by factor of two
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//	}
 
 	//	const uint16* clipIn = dst_clr + src_rect.x;
@@ -1313,21 +1313,21 @@ iGfxManager::BlitShadowIsoBattle( const Sprite* sprPtr, const uint16* pixels, iD
 	//		clipIn += dstStride;
 	//		dst_clr += dstStride;
 	//		dst_clr += 2;
-	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr); 
+	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr);
 	//		else break;
 	//		//ptr = SkipSpanLine(ptr);							// shadow skip
 	//	}
 	//}
 }
 
-void 
+void
 iGfxManager::BlitShadowIsoBattleFlipped( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
-	//check( (sprPtr->type_ & 1) == 1 );	// sprite must be spanned	
+	//check( (sprPtr->type_ & 1) == 1 );	// sprite must be spanned
 
 	//iPoint origin( -sprPtr->originX_, sprPtr->originY_ );
-	//iPoint opos = origin + pos;	
+	//iPoint opos = origin + pos;
 
 	//// sprite rect -> sprite shadow rect
 	//iSize sprSz( sprPtr->sizeW_, sprPtr->sizeH_ );
@@ -1354,7 +1354,7 @@ iGfxManager::BlitShadowIsoBattleFlipped( const Sprite* sprPtr, const uint16* pix
 	//typedef Blitter<Shadow50Op> Blt;
 	//Shadow50Op op;
 
-	//if (src_rect.size() == sprSz  ){		
+	//if (src_rect.size() == sprSz  ){
 	//	//uint32 x = 0;
 	//	//dst_clr -= (sprPtr->sizeH_ * 2 + 50);
 	//	while (ptr != eptr) {
@@ -1372,28 +1372,28 @@ iGfxManager::BlitShadowIsoBattleFlipped( const Sprite* sprPtr, const uint16* pix
 	//	dst_clr -= src_rect.x;
 
 	//	sint32 toSkip = src_rect.y;
-	//	while (toSkip--) { 
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//	while (toSkip--) {
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//		check( ptr != eptr );								// skip by factor of two
-	//		//ptr = SkipSpanLine(ptr); 
-	//		ptr = Blt::SpanSkip(ptr); 
+	//		//ptr = SkipSpanLine(ptr);
+	//		ptr = Blt::SpanSkip(ptr);
 	//	}
 
 	//	const uint16* clipIn = dst_clr + src_rect.x;
 	//	dst_clr += (src_rect.y * 2);									// pre-skew ( after y-clipping )
-	//	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy) {		    
+	//	for (sint32 yy=0; yy<(sint32)src_rect.h; ++yy) {
 	//		ptr = Blt::SpanFlipped(op, ptr, dst_clr	+ src.w, clipIn, clipIn + src.w - 1);
 	//		clipIn += dstStride;
 	//		dst_clr += dstStride;
 	//		dst_clr += 2;
-	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr); 
+	//		if ( ptr != eptr ) ptr = Blt::SpanSkip(ptr);
 	//		else break;
 	//	}
 	//}
 }
 
-void 
+void
 iGfxManager::BlitShadow2D( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos ) const
 {
 	//check( sprPtr != 0 && pixels != 0 );
@@ -1423,7 +1423,7 @@ iGfxManager::BlitShadow2D( const Sprite* sprPtr, const uint16* pixels, iDib& srf
 	//Shadow50Op op;
 
 	//// <*1*>
-	//const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;	
+	//const uint16* eptr= pixels + (uint32)((*pixels) << 16 | *(pixels + 1)) + 2;
 	//const uint16* ptr = pixels + 2;
 
 	//if (src_rect.size() == size){
@@ -1448,7 +1448,7 @@ iGfxManager::BlitShadow2D( const Sprite* sprPtr, const uint16* pixels, iDib& srf
 	//}
 }
 
-void 
+void
 iGfxManager::BlitWired( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos) const
 {
 	check( sprPtr != 0 && pixels != 0 );
@@ -1459,7 +1459,7 @@ iGfxManager::BlitWired( const Sprite* sprPtr, const uint16* pixels, iDib& srf, i
 	BlitWired(sprPtr, pixels, srf, iRect(0,0,size.w,size.h), pos);
 }
 
-void 
+void
 iGfxManager::BlitWiredFlipped( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos) const
 {
 	check( sprPtr != 0 && pixels != 0 );
@@ -1470,7 +1470,7 @@ iGfxManager::BlitWiredFlipped( const Sprite* sprPtr, const uint16* pixels, iDib&
 	BlitWiredFlipped(sprPtr, pixels, srf, iRect(0,0,size.w,size.h), pos);
 }
 
-void 
+void
 iGfxManager::BlitGlow( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iPoint pos) const
 {
 	check( sprPtr != 0 && pixels != 0 );
@@ -1483,13 +1483,13 @@ iGfxManager::BlitGlow( const Sprite* sprPtr, const uint16* pixels, iDib& srf, iP
 }
 
 //
-void 
+void
 iGfxManager::BlitTile( SpriteId sid, iDib& srf, const iRect& dst, uint8 alpha ) const
 {
 	BlitTile(sid,srf,Dimension(sid),dst, alpha);
 }
 
-void 
+void
 iGfxManager::BlitTile( SpriteId sid, iDib& srf, const iRect& src, const iRect& dst, uint8 alpha ) const
 {
 	if (!src.w || !src.h) return;
@@ -1502,8 +1502,8 @@ iGfxManager::BlitTile( SpriteId sid, iDib& srf, const iRect& src, const iRect& d
 
 	for (uint32 yy=0; yy<numy; ++yy) {
 		for (uint32 xx=0; xx<numx; ++xx) {
-			sint32 w = iMIN(src.w,dst.w - (xx*src.w)); 
-			sint32 h = iMIN(src.h,dst.h - (yy*src.h)); 
+			sint32 w = iMIN(src.w,dst.w - (xx*src.w));
+			sint32 h = iMIN(src.h,dst.h - (yy*src.h));
             if(alpha != 255)
                 Blit( sid, srf, iRect(src.x,src.y,w,h), iPoint( dst.x+xx*src.w, dst.y+yy*src.h ) );
             else
@@ -1512,7 +1512,7 @@ iGfxManager::BlitTile( SpriteId sid, iDib& srf, const iRect& src, const iRect& d
 	}
 }
 
-void 
+void
 iGfxManager::BlitTile3( SpriteId sid, iDib& srf, const iRect& src, const iRect& dst ) const
 {
 	uint32 sH = src.h;
@@ -1550,7 +1550,7 @@ iGfxManager::SpriteBank::SpriteBank()
 {
 	data = 0;
 	dataSize = 0;
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	hFile = INVALID_HANDLE_VALUE;
 	hMapping = INVALID_HANDLE_VALUE;
 #else
@@ -1659,7 +1659,7 @@ iGfxManager::SpriteBank::Load( const TCHAR* filename, LoadMode lmode, uint32 gam
 		ApplyGammaMethod::Operator op = method.makeop();
 		while ( ptr != eptr ) {
 		op( ptr++ );
-		}	
+		}
 		}
 		}
 
@@ -1670,7 +1670,7 @@ iGfxManager::SpriteBank::Load( const TCHAR* filename, LoadMode lmode, uint32 gam
 #elif defined OS_WINCE
 		hFile = CreateFileForMapping( filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 #endif
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 		//PORTTODO
 		if ( INVALID_HANDLE_VALUE == hFile ) {
 			DWORD err = GetLastError();
@@ -1725,7 +1725,7 @@ iGfxManager::SpriteBank::Load( const TCHAR* filename, LoadMode lmode, uint32 gam
 void
 iGfxManager::SpriteBank::Unload()
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	//PORTTODO
 	props.Clean();
 	if (loadMode == LM_Memory) {
@@ -1783,7 +1783,7 @@ inline void BlitDibBlockRealAlpha(iDib::pixel *dst, const uint8 *src, uint32 siz
 {
 	for (uint32 xx=0; xx<size; ++xx, ++dst, src+=3) {
 		const uint16 a  = *((const uint16*)src);
-		const uint16 b  = *dst;				
+		const uint16 b  = *dst;
 		uint32 sb = a & 0x1f;
 		uint32 sg = (a >> 5) & 0x3f;
 		uint32 sr = (a >> 11) & 0x1f;
@@ -1792,8 +1792,8 @@ inline void BlitDibBlockRealAlpha(iDib::pixel *dst, const uint8 *src, uint32 siz
 		uint32 dr = (b >> 11) & 0x1f;
 
 		*dst = (iDib::pixel)(((*(src+2) * (sb-db)) >> 8) + db
-			| (((*(src+2) * (sg-dg)) >> 8) + dg) << 5 
-			| (((*(src+2) * (sr-dr)) >> 8) + dr) << 11);		
+			| (((*(src+2) * (sg-dg)) >> 8) + dg) << 5
+			| (((*(src+2) * (sr-dr)) >> 8) + dr) << 11);
 
 	}
 }
@@ -1802,7 +1802,7 @@ inline void BlitDibBlockRealConstAlpha(iDib::pixel *dst, const uint8 *src, uint3
 {
 	for (uint32 xx=0; xx<size; ++xx, ++dst, src+=3) {
 		const uint16 a  = *((const uint16*)src);
-		const uint16 b  = *dst;				
+		const uint16 b  = *dst;
 		uint32 sb = a & 0x1f;
 		uint32 sg = (a >> 5) & 0x3f;
 		uint32 sr = (a >> 11) & 0x1f;
@@ -1811,13 +1811,13 @@ inline void BlitDibBlockRealConstAlpha(iDib::pixel *dst, const uint8 *src, uint3
 		uint32 dr = (b >> 11) & 0x1f;
 
 		*dst = (iDib::pixel)(((*(src+2) * alpha * (sb-db)) >> 8) + db
-			| (((*(src+2) * alpha * (sg-dg)) >> 8) + dg) << 5 
+			| (((*(src+2) * alpha * (sg-dg)) >> 8) + dg) << 5
 			| (((*(src+2) * alpha * (sr-dr)) >> 8) + dr) << 11);
 
 	}
 }
 
-void 
+void
 iGfxManager::BlitMasked( SpriteId sid, SpriteId mid, iDib& srf, iPoint pos ) const
 {
 //	return;
@@ -1839,7 +1839,7 @@ iGfxManager::BlitMasked( SpriteId sid, SpriteId mid, iDib& srf, iPoint pos ) con
 
 	check( (sprPtr->type_ & SPFT_SPANNED) == 0 );	// sprite should be RAW
 	check( (mskPtr->type_ & SPFT_SPANNED) == 1 );	// while mask is spanned
-	check( (mskPtr->type_ & SPFT_ALPHA) == 0   );   // alpha not supported currently 
+	check( (mskPtr->type_ & SPFT_ALPHA) == 0   );   // alpha not supported currently
 
 	//-------------------------------------------------------
 
@@ -1971,7 +1971,7 @@ BLITWRK_BODY(RealConstAlphaBlendOp)
 BLITWRK_BODY(ConstAlphaBlendOp)
 
 #define DO_BLIT(Op) BlitWorker##Op(pixels, dst_clr, size, dstStride, src_rect, src, dst_rect, alpha, bpp, (sprPtr->type_ & SPFT_SPANNED), (sprPtr->type_ & SPFT_ALPHA), flp, efx)
-//#define DO_BLIT(Op) 
+//#define DO_BLIT(Op)
 
 void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect& srcRect /*= cInvalidRect*/, Effects efx /*= EfxNone*/, bool bTile /*= false*/, SpriteId mid /*= -1*/, uint8 alpha /*= 255*/, FlipType flp /*= FlipNone*/ ) const
 {
@@ -1993,7 +1993,7 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 	const uint8* pixels= bank_[catId].Data( sprPtr->offset_ );
 
 	iRect src_rect;
-	if(srcRect == cInvalidRect)			
+	if(srcRect == cInvalidRect)
 		src_rect = iRect( 0, 0, sprPtr->sizeW_, sprPtr->sizeH_ );
 	else
 		src_rect = srcRect;
@@ -2003,7 +2003,7 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 	iSize  size( sprPtr->sizeW_, sprPtr->sizeH_ );
 
 	iRect src = iSize(sprPtr->sizeW_, sprPtr->sizeH_);
-	iRect dst_rect;	
+	iRect dst_rect;
 	uint16* dst_clr;
 	size_t dstStride;
 
@@ -2012,7 +2012,7 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 		// sprite rect -> sprite shadow rect
 		iPoint opos = pos + origin;
 		iSize sprSz( sprPtr->sizeW_, sprPtr->sizeH_ );
-		
+
 		uint32 hhgt = (sprPtr->sizeH_ + 1) / 2;
 		check( hhgt > 1 );
 		opos.x -= hhgt * 3 / 2 - 3;
@@ -2024,18 +2024,18 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 
 		src = sprSz;
 
-		if ( (opos.x + (sint32)sprSz.w) <= 0 || (opos.y + (sint32)sprSz.h) <= 0) return;		
-		iSize siz = iSize(to.GetWidth() - pos.x, to.GetHeight() - pos.y);		
-		dst_rect = iRect(opos,siz);	
-		
+		if ( (opos.x + (sint32)sprSz.w) <= 0 || (opos.y + (sint32)sprSz.h) <= 0) return;
+		iSize siz = iSize(to.GetWidth() - pos.x, to.GetHeight() - pos.y);
+		dst_rect = iRect(opos,siz);
+
 		src_rect = iRect(sprSz);
 
-		size = sprSz;		
-		// check bounds & clip		
+		size = sprSz;
+		// check bounds & clip
 		iClipper::iClipRectRect(dst_rect,to.GetSize(),src_rect,size);
 
-		
-		// calc dest ptr		
+
+		// calc dest ptr
 		dst_clr = to.GetPtr(dst_rect);
 		dstStride = to.GetWidth();
 	} else if(efx == EfxShadowIso) {
@@ -2050,18 +2050,18 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 
 		if ( (opos.x + (sint32)sprSz.w) <= 0 || (opos.y + (sint32)sprSz.h) <= 0) return;
 		iSize siz = iSize(to.GetWidth() - opos.x,to.GetHeight() - opos.y);
-		
-		iRect dst_rect(opos,siz);	
-		dst_rect = iRect(opos,siz);	
 
-		// check bounds & clip		
+		iRect dst_rect(opos,siz);
+		dst_rect = iRect(opos,siz);
+
+		// check bounds & clip
 		iRect src_rect_old(src_rect);
 		iRect dst_rect_old(dst_rect);
 		src_rect.w = sprSz.w;
 		src_rect.h = sprSz.h;
 		//size.w =10000;
 		//size.h = 10000;
-		if (!iClipper::iClipRectRect(dst_rect,to.GetSize(),src_rect, sprSz)) return;		
+		if (!iClipper::iClipRectRect(dst_rect,to.GetSize(),src_rect, sprSz)) return;
 		// calc dest ptr
 		/*src_rect.w = src_rect_old.w;
 		src_rect.h -= (src_rect.y - src_rect_old.y) * 2;
@@ -2074,61 +2074,61 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 		dstStride = to.GetWidth();
 	} else if(efx == EfxShadow2D) {
 		pos += origin + iPoint( -1, 2 );	// shadow displacement
-		// check bounds & clip		
+		// check bounds & clip
 		dst_rect = iRect(pos, size);
 		if (!iClipper::iClipRectRect(dst_rect,to.GetSize(),src_rect,size)) return;
 
 		// calc dest ptr
 		dst_clr = to.GetPtr(dst_rect);
-		dstStride = to.GetWidth();		
-	} else 
+		dstStride = to.GetWidth();
+	} else
 #endif
-	{		
+	{
 		pos += origin;
-		dst_rect = iRect(pos,size);	
-		// check bounds & clip		
+		dst_rect = iRect(pos,size);
+		// check bounds & clip
 		if (!iClipper::iClipRectRect(dst_rect,to.GetSize(),src_rect,size)) return;
 
 		// calc dest ptr
 		dst_clr = to.GetPtr(dst_rect);
 		dstStride = to.GetWidth();
 	}
-	
+
 	// blit!
 	uint8 bpp = sprPtr->type_ & SPFT_ALPHA ? 3 : 2;	 // bytes per pixel in the source DIB
-		
-	
+
+
 	//DO_BLIT(CopyOp);
 	//return;
-	
+
 	if(efx == EfxShadowBattle || efx == EfxShadow2D || efx == EfxShadowIso) {
 		// !!
-		DO_BLIT(Shadow50Op);		
+		DO_BLIT(Shadow50Op);
 	} else if(efx == EfxGlow) {
 		if(sprPtr->type_ & SPFT_ALPHA)
-			DO_BLIT(GlowAlphaBlendOp);			
+			DO_BLIT(GlowAlphaBlendOp);
 		else
-			DO_BLIT(GlowBlendOp);			
+			DO_BLIT(GlowBlendOp);
 	} else if(efx == EfxRedGlow) {
 		if(sprPtr->type_ & SPFT_ALPHA)
-			DO_BLIT(RedGlowAlphaBlendOp);			
+			DO_BLIT(RedGlowAlphaBlendOp);
 		else
-			DO_BLIT(RedGlowBlendOp);			
+			DO_BLIT(RedGlowBlendOp);
 	}
 	else if(efx == EfxVioletGlow) {
 		if(sprPtr->type_ & SPFT_ALPHA)
-			DO_BLIT(VioletGlowAlphaBlendOp);			
+			DO_BLIT(VioletGlowAlphaBlendOp);
 		else
 			check(0);
-	
+
 	} else if(efx == EfxTransparent) {
-		DO_BLIT(Shadow25Op);		
+		DO_BLIT(Shadow25Op);
 	}
 	else if(efx == EfxDarken) {
 		if(sprPtr->type_ & SPFT_ALPHA)
-			DO_BLIT(RealAlphaBlendShadow50Op);		
+			DO_BLIT(RealAlphaBlendShadow50Op);
 		else
-			DO_BLIT(CopyShadow50Op);		
+			DO_BLIT(CopyShadow50Op);
 	} else if(sprPtr->type_ & SPFT_ALPHA) {
 		if(alpha == 255)
 			DO_BLIT(RealAlphaBlendOp);
@@ -2144,7 +2144,7 @@ void iGfxManager::BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect
 }
 
 iRect iGfxManager::ObjRect( SpriteId sid ) const
-{	
+{
 	uint32 catId = sid >> 16;
 	uint32 sprId = sid & 0xffff;
 
@@ -2153,7 +2153,7 @@ iRect iGfxManager::ObjRect( SpriteId sid ) const
 
 	const Sprite* sprPtr= bank_[catId].GetSprite( sprId );
 	const uint8* pixels= bank_[catId].Data( sprPtr->offset_ );
-	
+
 	//check(sprPtr->type_ & SPFT_ALPHA);
 	uint8 bpp = sprPtr->type_ & SPFT_ALPHA ? 3 : 2;	 // bytes per pixel in the source DIB
 
@@ -2163,23 +2163,23 @@ iRect iGfxManager::ObjRect( SpriteId sid ) const
 	sint32 maxbot = 0;
 	bool prevlineobj = false;
 
-	if (sprPtr->type_ & SPFT_SPANNED) {		
+	if (sprPtr->type_ & SPFT_SPANNED) {
 		const uint8* eptr= pixels + (*((uint32*)pixels)) + 4;	// first 4 bytes are an offset in bytes
 		const uint8* ptr = pixels + 4;
-									
+
 		for (sint32 yy=0; yy<(sint32)sprPtr->sizeH_; ++yy){
 			if(ptr != eptr) {
 				sint32 left, right;
 				bool empty;
-				ptr = Blitter<CopyOp>::GetBounds(ptr, bpp, left, right, empty);				
+				ptr = Blitter<CopyOp>::GetBounds(ptr, bpp, left, right, empty);
 				if(!empty) {
 					maxleft = iMIN<>(left, maxleft);
-					maxright = iMAX<>(right, maxright);				
+					maxright = iMAX<>(right, maxright);
 				}
 				if(!empty && maxtop == 0)
 					maxtop = yy;
 				else if(empty && prevlineobj) {
-					maxbot = yy;			
+					maxbot = yy;
 					prevlineobj = false;
 				}
 
@@ -2187,8 +2187,8 @@ iRect iGfxManager::ObjRect( SpriteId sid ) const
 					prevlineobj = true;
 			}
 			else
-				break;				
-		}	
+				break;
+		}
 		if(prevlineobj)
 			maxbot = sprPtr->sizeH_;
 	} else {
@@ -2218,7 +2218,7 @@ bool iGfxManager::IsInObj( SpriteId sid, const iPoint& pt ) const
 	sint32 maxbot = 0;
 	bool prevlineobj = false;
 
-	if (sprPtr->type_ & SPFT_SPANNED) {		
+	if (sprPtr->type_ & SPFT_SPANNED) {
 		const uint8* eptr= pixels + (*((uint32*)pixels)) + 4;	// first 4 bytes are an offset in bytes
 		const uint8* ptr = pixels + 4;
 
@@ -2226,7 +2226,7 @@ bool iGfxManager::IsInObj( SpriteId sid, const iPoint& pt ) const
 			if(ptr != eptr) {
 				sint32 left, right;
 				bool empty;
-				ptr = Blitter<CopyOp>::GetBounds(ptr, bpp, left, right, empty);				
+				ptr = Blitter<CopyOp>::GetBounds(ptr, bpp, left, right, empty);
 
 				// skip until our clicked line
 				if(yy != pt.y)
@@ -2238,8 +2238,8 @@ bool iGfxManager::IsInObj( SpriteId sid, const iPoint& pt ) const
 				return pt.x >= left && pt.x <= right;
 			}
 			else
-				break;				
-		}	
+				break;
+		}
 		if(prevlineobj)
 			maxbot = sprPtr->sizeH_;
 	} else {

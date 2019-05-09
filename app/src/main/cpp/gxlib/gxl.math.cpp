@@ -1,6 +1,6 @@
 #include "gxl.inc.h"
 
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 #include <windows.H>
 #endif
 

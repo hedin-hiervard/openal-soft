@@ -4,7 +4,7 @@
 #include "gxl.dib.h"
 
 /*
- *	
+ *
  */
 const uint32 BWPAL[32] = {
 	0x0000,0x0841,0x1082,0x18C3,0x2104,0x2945,0x3186,0x39C7,
@@ -14,7 +14,7 @@ const uint32 BWPAL[32] = {
 };
 
 /*
- *	
+ *
  */
 const uint16 RED_MASK[iDib::TypeCount] = {		0x1F<<11,	0xF<<12,	0x1F<<11 };
 const uint16 GREEN_MASK[iDib::TypeCount] = {	0x3F<<5,	0xF<<8,		0x1F<<6 };
@@ -34,7 +34,7 @@ inline void BlitDibBlockCK(iDib::pixel *dst, const iDib::pixel *src, uint32 size
 {
 	for(uint32 xx=0; xx<size; xx++)
 	{
-		if(*src != ck) 
+		if(*src != ck)
 			*dst = *src;
 		dst++;
 		src++;
@@ -51,15 +51,15 @@ inline void BlitDibBlock_RGBA(iDib::pixel *dst, const iDib::pixel *src, uint32 s
 			*dpix = (*spix & RED_MASK[iDib::RGBA]) | (*spix & GREEN_MASK[iDib::RGBA])>>1 | (*spix & BLUE_MASK[iDib::RGBA])>>3;
 		} else if ((*spix & ALPHA_MASK[iDib::RGBA]) > 0) {
 			uint16 aa = (*spix & ALPHA_MASK[iDib::RGBA])<<2;
-			uint16 RB1 = *dpix & (RED_MASK[iDib::RGB] | BLUE_MASK[iDib::RGB]); 
-			uint16 G1  = *dpix & (GREEN_MASK[iDib::RGB] ); 
-			uint16 RB2 = (*spix & RED_MASK[iDib::RGBA]) | (*spix & BLUE_MASK[iDib::RGBA])>>3; 
-			uint16 G2  = (*spix & (GREEN_MASK[iDib::RGBA] ) ) >> 1; 
-			uint16 RB = RB1 + (((RB2-RB1) * (aa)) >> 6); 
-			uint16 G  = G1 + (((G2-G1)*(aa))>>6); 
-			RB &= (RED_MASK[iDib::RGB] | BLUE_MASK[iDib::RGB]); 
-			G  &= (GREEN_MASK[iDib::RGB]); 
-			*dpix = RB | G; 
+			uint16 RB1 = *dpix & (RED_MASK[iDib::RGB] | BLUE_MASK[iDib::RGB]);
+			uint16 G1  = *dpix & (GREEN_MASK[iDib::RGB] );
+			uint16 RB2 = (*spix & RED_MASK[iDib::RGBA]) | (*spix & BLUE_MASK[iDib::RGBA])>>3;
+			uint16 G2  = (*spix & (GREEN_MASK[iDib::RGBA] ) ) >> 1;
+			uint16 RB = RB1 + (((RB2-RB1) * (aa)) >> 6);
+			uint16 G  = G1 + (((G2-G1)*(aa))>>6);
+			RB &= (RED_MASK[iDib::RGB] | BLUE_MASK[iDib::RGB]);
+			G  &= (GREEN_MASK[iDib::RGB]);
+			*dpix = RB | G;
 		}
 		spix++;
 		dpix++;
@@ -91,13 +91,13 @@ inline void BlitDibBlockConstAlpha(iDib::pixel *dst, const iDib::pixel *src, uin
 		uint32 dg = (b >> 5) & 0x3f;
 		uint32 dr = (b >> 11) & 0x1f;
 
-		
+
 		*dst = (iDib::pixel)((((alpha * (sb-db)) >> 8) + db)
-		| (((alpha * (sg-dg)) >> 8) + dg) << 5 
+		| (((alpha * (sg-dg)) >> 8) + dg) << 5
 		| (((alpha * (sr-dr)) >> 8) + dr) << 11);
-		
+
 	}
-	
+
 
 }
 
@@ -105,7 +105,7 @@ inline void BlitDibBlockRealAlpha(iDib::pixel *dst, const uint8 *src, uint32 siz
 {
 	for (uint32 xx=0; xx<size; ++xx, ++dst, ++src) {
 		const uint16 a  = *((const uint16*)src);
-		const uint16 b  = *dst;				
+		const uint16 b  = *dst;
 		uint32 sb = a & 0x1f;
 		uint32 sg = (a >> 5) & 0x3f;
 		uint32 sr = (a >> 11) & 0x1f;
@@ -114,8 +114,8 @@ inline void BlitDibBlockRealAlpha(iDib::pixel *dst, const uint8 *src, uint32 siz
 		uint32 dr = (b >> 11) & 0x1f;
 
 		*dst = (iDib::pixel)(((*(src+2) * (sb-db)) >> 8) + db
-			| (((*(src+2) * (sg-dg)) >> 8) + dg) << 5 
-			| (((*(src+2) * (sr-dr)) >> 8) + dr) << 11);		
+			| (((*(src+2) * (sg-dg)) >> 8) + dg) << 5
+			| (((*(src+2) * (sr-dr)) >> 8) + dr) << 11);
 	}
 }
 
@@ -123,7 +123,7 @@ inline void BlitDibBlockRealConstAlpha(iDib::pixel *dst, const uint8 *src, uint3
 {
 	for (uint32 xx=0; xx<size; ++xx, ++dst, ++src) {
 		const uint16 a  = *((const uint16*)src);
-		const uint16 b  = *dst;				
+		const uint16 b  = *dst;
 		uint32 sb = a & 0x1f;
 		uint32 sg = (a >> 5) & 0x3f;
 		uint32 sr = (a >> 11) & 0x1f;
@@ -132,7 +132,7 @@ inline void BlitDibBlockRealConstAlpha(iDib::pixel *dst, const uint8 *src, uint3
 		uint32 dr = (b >> 11) & 0x1f;
 
 		*dst = (iDib::pixel)(((*(src+2) * alpha * (sb-db)) >> 8) + db
-			| (((*(src+2) * alpha * (sg-dg)) >> 8) + dg) << 5 
+			| (((*(src+2) * alpha * (sg-dg)) >> 8) + dg) << 5
 			| (((*(src+2) * alpha * (sr-dr)) >> 8) + dr) << 11);
 
 	}
@@ -142,7 +142,7 @@ inline void BlitDibBlockRealConstAlpha(iDib::pixel *dst, const uint8 *src, uint3
 inline void FillDibBlock(iDib::pixel *dst, const iDib::pixel src, uint32 size)
 {
 	for (uint32 xx=0; xx<size; ++xx, ++dst) *dst = src;
-//	memset(dst, src, size * 2); 
+//	memset(dst, src, size * 2);
 }
 
 inline void FillDibBlockAlpha(iDib::pixel *dst, const iDib::pixel src, uint8 a, uint32 size)
@@ -161,7 +161,7 @@ inline void FillDibBlockAlpha(iDib::pixel *dst, const iDib::pixel src, uint8 a, 
 		uint32 dr = (b >> 11) & 0x1f;
 
 		*dst = (iDib::pixel)((((alpha * (sb-db)) >> 8) + db)
-		| (((alpha * (sg-dg)) >> 8) + dg) << 5 
+		| (((alpha * (sg-dg)) >> 8) + dg) << 5
 		| (((alpha * (sr-dr)) >> 8) + dr) << 11);
 	}
 }
@@ -366,7 +366,7 @@ void iPaletteDib::CopyRectToDibXY(iDib& dib, const iRect& srect, const iPoint& p
 }
 
 /*
- *	Primitives		
+ *	Primitives
  */
 void iDib::Fill(pixel clr, uint8 a)
 {
@@ -401,13 +401,13 @@ const uint32 hcbwGradient[32] = {
 	0xdd2e,	0xe54f,	0xed90,	0xedd0,	0xf5f1,	0xf611,	0xf632,	0xf652
 };
 
-always_inline uint32 
+always_inline uint32
 TintedShadow( uint32 pixel)
-{ 
+{
 	//static uint8 rpt = 31;
 	uint32 chnl = (pixel >> 6) & 0x1f;
 	return ( (BWPAL[chnl] & 0xf7de) >> 1 ) + ((0x39e7 & 0xf7de) >> 1);
-} 
+}
 
 void iDib::Fade(uint8 a)
 {
@@ -490,7 +490,7 @@ void iDib::HGradientRect(const iRect& rc, pixel c1, pixel c2)
 		tp++;
 	}
 
-	
+
 	uint32 h = drect.h;
 	while (h--) {
 		memcpy(dstPtr, gr, cnt * sizeof(pixel));
@@ -605,7 +605,7 @@ void iDib::Circle(const iPoint& center, uint32 radius, pixel clr, bool bFill)
 {
 	for(sint32 xx=-(sint32)radius; xx<=(sint32)radius; xx++)
 	{
-		sint32 span = sqrt((double)(radius * radius - xx * xx)); 
+		sint32 span = sqrt((double)(radius * radius - xx * xx));
 
 		if(bFill)
 			for(sint32 yy=-span; yy<=span; yy++) {
@@ -615,7 +615,7 @@ void iDib::Circle(const iPoint& center, uint32 radius, pixel clr, bool bFill)
 			PutPixel(center.x + xx, center.y - span, clr);
 			PutPixel(center.x + xx, center.y + span, clr);
 		}
-			
+
 	}
 }
 
@@ -626,7 +626,7 @@ void iDib::Triangle(const iPoint& p1, const iPoint& p2, const iPoint& p3, pixel 
 	if (p2.y-p1.y > 0) dx1=(p2.x-p1.x)/(p2.y-p1.y); else dx1=0;
 	if (p3.y-p1.y > 0) dx2=(p3.x-p1.x)/(p2.y-p1.y); else dx2=0;
 	if (p3.y-p2.y > 0) dx3=(p3.x-p2.x)/(p3.y-p2.y); else dx3=0;
-	
+
 	s=e=p1;
 	if(dx1 > dx2) {
 		for(;s.y<=p2.y;s.y++,e.y++,s.x+=dx2,e.x+=dx1)
@@ -644,7 +644,7 @@ void iDib::Triangle(const iPoint& p1, const iPoint& p2, const iPoint& p3, pixel 
 }
 
 /*
- *	
+ *
  */
 void iDib::CopyToDibXY(iDib& dib, const iPoint& pos, uint8 a) const
 {
@@ -669,16 +669,16 @@ void iDib::CopyToDibXY(iDib& dib, const iPoint& pos, uint8 a) const
 void iDib::CopyToDibXY(iDib& dib, const iPoint& pos, pixel ck) const
 {
 	if ( (pos.x + (sint32)m_Siz.w) <= 0 || (pos.y + (sint32)m_Siz.w) <= 0) return;
-	
+
 	check(m_dibType == RGB);
 	iRect src_rect(GetSize());
 	iSize siz = iSize(dib.GetWidth() - pos.x, dib.GetHeight() - pos.y);
 	iRect dst_rect(pos,siz);
 	if (!iClipper::iClipRectRect(dst_rect,iRect(0,0,dib.GetWidth(),dib.GetHeight()),src_rect,GetSize())) return;
-	
+
 	const uint16* src_clr = m_RGB+src_rect.y*m_Siz.w+src_rect.x;
 	uint16* dst_clr=dib.GetPtr()+dst_rect.y*dib.GetWidth()+dst_rect.x;
-	
+
 	for (uint32 yy=0; yy<dst_rect.h; yy++) {
 		BlitDibBlockCK(dst_clr,src_clr,src_rect.w,ck);
 		src_clr+=m_Siz.w;
@@ -717,7 +717,7 @@ void iDib::CopyRectToDibXY(iDib& dib, const iRect& srect, const iPoint& pos, uin
 
 	const uint16* src_clr = m_RGB+src_rect.y*m_Siz.w+src_rect.x;
 	uint16* dst_clr=dib.GetPtr()+dst_rect.y*dib.GetWidth()+dst_rect.x;
-	
+
 	if ( a == 255 ) {
 		for (uint32 yy=0; yy<dst_rect.h; yy++) {
 			if (m_dibType == RGB) BlitDibBlock_RGB(dst_clr,src_clr,dst_rect.w);
@@ -772,7 +772,7 @@ void iDib::BlendToDibXY(iDib& dib, const iPoint& pos, pixel ck, uint8 bval) cons
 	}
 }
 
-#if !defined(UNDER_CE) && !defined(OS_APPLE)
+#if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_ANDROID)
 void iDib::BlitToDCXY(HDC hdc, const iPoint& pos, bool bDoubleSize) const
 {
 	uint32 bi_siz = sizeof ( BITMAPINFOHEADER ) + 3*sizeof(DWORD);
@@ -786,7 +786,7 @@ void iDib::BlitToDCXY(HDC hdc, const iPoint& pos, bool bDoubleSize) const
 	bi.bmiHeader.biWidth = m_Siz.w;
 	bi.bmiHeader.biHeight = -(sint32)m_Siz.h;
 	bi.bmiHeader.biPlanes = 1;
-	bi.bmiHeader.biBitCount = 16; 
+	bi.bmiHeader.biBitCount = 16;
 	bi.bmiHeader.biCompression = BI_BITFIELDS;
 	bi.bmiHeader.biSizeImage = m_Siz.w * m_Siz.h * 2;
 	if (bDoubleSize) {

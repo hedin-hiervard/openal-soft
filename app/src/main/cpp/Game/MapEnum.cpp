@@ -15,7 +15,7 @@
 #include "gxl.inc.h"
 #include <vector>
 #include <string>
-#include "NewMapShop/NewMapShop.h"
+// #include "NewMapShop/NewMapShop.h"
 
 
 // Cotulla: ask Hedin if we need this
@@ -32,10 +32,10 @@ return false;
 /*void FilterScenarios(iScenList& scList) {
 GAME_LANG lng = gSettings.GetLanguage();
 iScenList n;
-for (uint32 xx=0; xx<scList.GetSize(); ++xx) {          
-if(scList[xx]->m_lang == lng || 
+for (uint32 xx=0; xx<scList.GetSize(); ++xx) {
+if(scList[xx]->m_lang == lng ||
 (scList[xx]->m_lang == GLNG_ENGLISH && !HasMapVersion(scList, scList[xx]->m_Id, lng))) {
-n.Add(scList[xx]);          
+n.Add(scList[xx]);
 }
 }
 scList = n;
@@ -72,7 +72,7 @@ void iMapEnum::Unserialize(iDynamicBuffer& dbuff)
     dbuff.Read(sscnt);
     if (!sscnt) return;
     m_scList.RemoveAll();
-    for (uint16 ssid=0; ssid<sscnt; ++ssid) 
+    for (uint16 ssid=0; ssid<sscnt; ++ssid)
     {
         ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
         mapInfo->Unserialize(dbuff);
@@ -98,14 +98,14 @@ std::wstring base_name(std::wstring const & path)
 void iMapEnum::EnumScenarios()
 {
     m_scList.RemoveAll();
-    
-#ifndef OS_APPLE
+
+#ifdef OS_WIN32
     iStringT strText = gBundledMapsPath + _T("*.phmd");
     WIN32_FIND_DATA wfd;
     HANDLE hFind = FindFirstFile(strText.CStr(), &wfd);
-    if (hFind != INVALID_HANDLE_VALUE) 
+    if (hFind != INVALID_HANDLE_VALUE)
     {
-        do 
+        do
         {
             if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 )
             {
@@ -117,63 +117,63 @@ void iMapEnum::EnumScenarios()
             mapInfo->m_FileName = gBundledMapsPath + wfd.cFileName;
 #ifdef HMM_COMPOVERSION
             iFilePtr pFile(xxc::OpenXFile(mapInfo->m_FileName, HMM_COMPOCODE));
-#else           
+#else
             iFilePtr pFile(OpenWin32File(mapInfo->m_FileName));
 #endif
             if ( !pFile ) continue;
             check(pFile);
-            uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));             
-            if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false)) 
-            {                   
+            uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));
+            if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false))
+            {
                 m_scList.Add(mapInfo.Giveup());
             }
         } while (FindNextFile(hFind, &wfd));
         FindClose(hFind);
     }
 #else
-    glob_t g;
-    iStringT strText = gDownloadedMapsPath + _T("*.phmd");
-    glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE, NULL, &g);
+    // glob_t g;
+    // iStringT strText = gDownloadedMapsPath + _T("*.phmd");
+    // glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE, NULL, &g);
 
-    strText = gBundledMapsPath + _T("*.phmd");
-    glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE|GLOB_APPEND, NULL, &g);
+    // strText = gBundledMapsPath + _T("*.phmd");
+    // glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE|GLOB_APPEND, NULL, &g);
 
-    for(sint32 x=0; x<g.gl_pathc; x++) {
-        ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
-        mapInfo->m_bNewGame = true;
-        mapInfo->m_FileName = CvtA2T<>(g.gl_pathv[x]);
-        std::wstring basename = base_name(mapInfo->m_FileName.CStr());
-        basename = basename.substr(0, basename.length() - 5);
-        if(!gMapShop.IsMapPackPurchased() &&
-           std::find(free_map_names.begin(), free_map_names.end(), basename) == free_map_names.end())
-            continue;
-        
-        iFilePtr pFile(OpenWin32File(mapInfo->m_FileName));
-        
-        
-        //if ( !pFile ) continue;
-        check(pFile);
-        uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc)); 
-        if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false)) 
-        {
-            iStringT str = iStringT(mapInfo->m_Id);
-            bool flag = false;
-            
-            for( sint32 y=0; y<m_scList.GetSize(); y++ )
-                if( m_scList.At(y)->m_Id == mapInfo->m_Id ){
-                    
-                    flag = true;
-                    break;
-                }
-            
-            if( !flag )
-                m_scList.Add(mapInfo.Giveup());
-        }   
-    }
-    globfree(&g);
+    // for(sint32 x=0; x<g.gl_pathc; x++) {
+    //     ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
+    //     mapInfo->m_bNewGame = true;
+    //     mapInfo->m_FileName = CvtA2T<>(g.gl_pathv[x]);
+    //     std::wstring basename = base_name(mapInfo->m_FileName.CStr());
+    //     basename = basename.substr(0, basename.length() - 5);
+    //     // if(!gMapShop.IsMapPackPurchased() &&
+    //     //    std::find(free_map_names.begin(), free_map_names.end(), basename) == free_map_names.end())
+    //     //     continue;
+
+    //     iFilePtr pFile(OpenWin32File(mapInfo->m_FileName));
+
+
+    //     //if ( !pFile ) continue;
+    //     check(pFile);
+    //     uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));
+    //     if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false))
+    //     {
+    //         iStringT str = iStringT(mapInfo->m_Id);
+    //         bool flag = false;
+
+    //         for( sint32 y=0; y<m_scList.GetSize(); y++ )
+    //             if( m_scList.At(y)->m_Id == mapInfo->m_Id ){
+
+    //                 flag = true;
+    //                 break;
+    //             }
+
+    //         if( !flag )
+    //             m_scList.Add(mapInfo.Giveup());
+    //     }
+    // }
+    // globfree(&g);
 
 #endif
-      
+
 #ifdef MAP_CACHE
     // save cache
     iFilePtr pFile(CreateWin32File(gMapsPath + _T("maps.cache")));
@@ -181,8 +181,8 @@ void iMapEnum::EnumScenarios()
     {
         Serialize(pFile.get());
     }
-#endif 
-	
+#endif
+
 	// now check against the map stat to fill in the gaps
 	for(uint32 xx=0; xx<m_scList.GetSize(); xx++)
 	{
@@ -203,17 +203,17 @@ void iMapEnum::EnumScenarios()
 	SaveStat();
 }
 
-iMapInfo* iMapEnum::GetScenListItem( uint32 nIndex ) { 
-    
-    if( nIndex < m_scList.GetSize() ) 
-        return m_scList[nIndex]; 
+iMapInfo* iMapEnum::GetScenListItem( uint32 nIndex ) {
+
+    if( nIndex < m_scList.GetSize() )
+        return m_scList[nIndex];
 
     return NULL;
 }
 
 void iMapEnum::Cleanup()
 {
-    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx)
     {
         delete m_scList[xx];
     }
@@ -224,20 +224,20 @@ void iMapEnum::Cleanup()
 bool iMapEnum::Init()
 {
 	// load the map stat file if exists
-	iFileStream pStatFile(OpenWin32File(gMapStatFilePath));	
+	iFileStream pStatFile(OpenWin32File(gMapStatFilePath));
 	if (!pStatFile.IsValid()) return true;
 
 	m_stats.RemoveAll();
 	uint32 count;
 	pStatFile.Read(count);
-    
+
     for(uint32 xx=0; xx<count; xx++) {
         iMapStatInfo ms;
         pStatFile.Read(ms.id);
         pStatFile.Read(ms.played);
         m_stats.Add(ms);
     }
-	
+
     EnumScenarios();
     return true;
 }
@@ -263,21 +263,21 @@ void iMapEnum::MarkMapStarted(const iStringT& id)
 			bAdded = true;
 		}
 	}
-	
+
 	if(!bAdded) {
 		iMapStatInfo ms;
 		ms.id = id;
 		ms.played = 1;
         m_stats.Add(ms);
 	}
-	
+
 	SaveStat();
 }
 
 void iMapEnum::SaveStat()
 {
 	// save the stat file
-	iFileStream pStatFile(CreateWin32File(gMapStatFilePath));	
+	iFileStream pStatFile(CreateWin32File(gMapStatFilePath));
 	if (!pStatFile.IsValid()) return;
 
 	pStatFile.Write(m_stats.GetSize());
@@ -297,7 +297,7 @@ void iMapEnum::Update()
 iScenList iMapEnum::Filter(uint32 mt)
 {
     iScenList sl;
-    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx)
     {
         if (m_scList[xx]->m_globalProperties & mt || m_scList[xx]->NotOfAnyType())
         {
@@ -309,25 +309,25 @@ iScenList iMapEnum::Filter(uint32 mt)
 
 void iMapEnum::Filter(iScenList &sl, uint32 mask, bool hotseat)
 {
-    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx)
     {
         if (hotseat && m_scList[xx]->HumanPlayers() <= 1)
         {
         	continue;
         }
         if (m_scList[xx]->m_globalProperties & mask || m_scList[xx]->NotOfAnyType())
-      
+
         {
             sl.Add(m_scList[xx]);
         }
-    }    
+    }
 }
 
 uint32 iMapEnum::GetCount(uint32 mask, bool hotseat)
 {
     uint32 res = 0;
 
-    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx)
     {
         if (hotseat && m_scList[xx]->HumanPlayers() <= 1)
         {
@@ -338,7 +338,7 @@ uint32 iMapEnum::GetCount(uint32 mask, bool hotseat)
         {
             res++;
         }
-    }    
+    }
     return res;
 }
 
@@ -346,13 +346,13 @@ uint32 iMapEnum::GetCount(uint32 mask, bool hotseat)
 uint32 iMapEnum::GetTutorialsNum()
 {
     uint32 res = 0;
-    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_scList.GetSize(); ++xx)
     {
         if (m_scList[xx]->m_globalProperties & GMP_GMODE_TUTORIAL)
         {
             res++;
         }
-    }  
+    }
     return res;
 }
 

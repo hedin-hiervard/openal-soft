@@ -25,16 +25,16 @@
 //			pos		= parentNode.yx + offset[ dir ]
 //			mapCell	= world[ pos ]
 //			NEVER VISITED SO FAR
-//			if ( mapCell.state == UNKNOWN ) 
+//			if ( mapCell.state == UNKNOWN )
 //				mapCell.state = OPEN
 //				mapCell.dir = dir
-//				STORE NEW NODE 
+//				STORE NEW NODE
 //				newNode = &nodes[ ++lastNode ]
 //				newNode.yx = yx
 //				CALCULATE METRICS AND HEURISTCS
 //				SUMM OF ALL g FACTORS SO FAR
 //				newNode.g = parentNode.g + ( mapCell.cost * dirCostMultiplier[dir] )
-//				SUMM OF g AND HEURISTIC 
+//				SUMM OF g AND HEURISTIC
 //				newNode.f = newNode.g + Distance( yx )
 //				PUSH IT INTO THE HEAP
 //				heapInsert( newNode ) (actuall lastNode since we operate on indices )
@@ -52,7 +52,7 @@
 // 3) G & F values are subject to overflow (since the using uint16 for storage) - need to check
 // 4) Nodes array grows up to the size of map (in special cases) since we do not remove closed nodes
 //	  could be avoided by the cost of additional memmove per checked point
-//	  OR (check that assumption) erase is possible by exchanging last node with the removed one, 
+//	  OR (check that assumption) erase is possible by exchanging last node with the removed one,
 //	  that require exchanging indexes in the heap though --
 //    (In other words we need to track index in heap of last added opened element)
 // 5) In this algorithm every map point is considired only once without checking whether we could have better proposal
@@ -64,7 +64,7 @@
 // 4) Use 'open parent directions lists' to reject unreachable destinations asap
 //    i.e. setup 8 types of edge 'direction lists' (constant) and 4 for entry&finish points
 //	  (if they has custom dir masks). Select correct 'directions list' by parent cell coordinate
-//	  To get rid of selection logic we also can precalculate 'direcionts list' index into 
+//	  To get rid of selection logic we also can precalculate 'direcionts list' index into
 //    world ( mark ) map.
 //    -------------------------------------
 //	  for_all mark in world
@@ -75,11 +75,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // A* Algorithm improvements and replacement
 // 1) Consider MA-IDA or FringeSort algorithms http://www.cs.ualberta.ca/~games/pathfind/
-//    Those could forefit the cost of maintaining sorted open list with more advanced 
-//	  and memory-hungry techniques. 
-// 2) Introduce lower-active-boundary threshould value, which limits the number of 'active' 
+//    Those could forefit the cost of maintaining sorted open list with more advanced
+//	  and memory-hungry techniques.
+// 2) Introduce lower-active-boundary threshould value, which limits the number of 'active'
 //    (sorted) open nodes by its 'g' value. Initially threshold value set on 'H' value
-//    and then updated to the total cost of the lowest-cost node that was pruned during 
+//    and then updated to the total cost of the lowest-cost node that was pruned during
 //	  the previous iteration.
 // 3) Do something else, I had enough of pathfinding for today!
 
@@ -92,7 +92,7 @@
 #define TUNE_MAXHEAPNODES	1024	// could be large as the mapsize however we keep this value capped
 #define TUNE_NODESINITIAL	1024	// initial number of nodes, could grow as large as mapsize but unlikely
 
-#define inline 
+#define inline
 
 extern "C" uint32 _msize(void* ptr);
 
@@ -138,7 +138,7 @@ struct some_table_supposed_to_be_anonymous {
 	uint32	dyx;	// direction offset in packed coordinates
 	sint8	coef;	// direction multiplier coefficient
 	uint8	dir;	// opposite direction code
-} const dtab[9] = 
+} const dtab[9] =
 {
 	{ 0xffffffff, 3, 4 },
 	{ 0xffff0000, 2, 5 },
@@ -197,7 +197,7 @@ iPathFinder::HeapInsert( HeapVal n )
 {
 	// add new node unless the heap is full
 	// if full - get rid of the worst node
-	if ( lastHeapNode < TUNE_MAXHEAPNODES ) 
+	if ( lastHeapNode < TUNE_MAXHEAPNODES )
 		lastHeapNode++;
 
 	heap[lastHeapNode] = n;
@@ -256,8 +256,8 @@ inline sint32 smin( sint32 a, sint32 b )
 
 // Compute '8-connected' map distance, used as heuristic
 // NB: See common A* heuristic definition rules
-inline uint32 Distance(sint32 sposX, sint32 sposY, sint32 dposX, sint32 dposY) 
-{ 
+inline uint32 Distance(sint32 sposX, sint32 sposY, sint32 dposX, sint32 dposY)
+{
 	// Please avoid using dumb-ass iDIF function
 	const sint32 dX = sdif(sposX,dposX);
 	const sint32 dY = sdif(sposY,dposY);
@@ -265,13 +265,13 @@ inline uint32 Distance(sint32 sposX, sint32 sposY, sint32 dposX, sint32 dposY)
 	const sint32 manhDist  = dX + dY;
 
 	const sint32 DiagCost = (14/2); //10*sqrt(2)
-	const sint32 ForwCost = (10/2); //10*1 
+	const sint32 ForwCost = (10/2); //10*1
 	//return DiagCost * diagDist + ForwCost * ( manhDist - 2 * diagDist );
 	return ForwCost * manhDist - ( 2*ForwCost - DiagCost ) * diagDist;
 }
 
-inline uint32 Distance( const SmallPnt s, sint32 dposX, sint32 dposY ) 
-{ 
+inline uint32 Distance( const SmallPnt s, sint32 dposX, sint32 dposY )
+{
 	const sint32 sposX = s.x;
 	const sint32 sposY = s.y;
 	return Distance( sposX, sposY, dposX, dposY );
@@ -279,7 +279,7 @@ inline uint32 Distance( const SmallPnt s, sint32 dposX, sint32 dposY )
 
 // check whether the direction is passable given the bitmask
 // NB: Notion of pass bits is changed to reverse, i.e. set bit = blocked
-inline bool IsDirectionPassable( const uint8 bitmask, size_t bit ) 
+inline bool IsDirectionPassable( const uint8 bitmask, size_t bit )
 {
 	return (bitmask & (1<<bit)) == 0;
 }
@@ -309,16 +309,16 @@ inline T* ReallocPODArray( T* src, size_t oldSize, size_t newSize )
 inline void* ReallocPODArray( void* src, size_t oldSize, size_t newSize )
 {
     size_t nsize = newSize;
-    if ( src == 0 ) 
+    if ( src == 0 )
     {
         return malloc( nsize );
-    } 
-    else if ( nsize == 0 ) 
+    }
+    else if ( nsize == 0 )
     {
         free( src );
         return NULL;
-    } 
-    else 
+    }
+    else
     {
         void* dst = calloc(1, nsize);
         size_t to_copy = nsize > oldSize ? oldSize : nsize;
@@ -356,7 +356,7 @@ inline uint16 CalculateCost( uint16 cost, uint16 dirMult )
 //	Diagnostic output
 //////////////////////////////////////////////////////////////////
 
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 void __cdecl debugf( const WCHAR* fmt, ... )
 {
 	va_list args;
@@ -367,7 +367,7 @@ void __cdecl debugf( const WCHAR* fmt, ... )
 	OutputDebugStringW( buf );
 }
 #else
-void debugf( const WCHAR* fmt, ... ) 
+void debugf( const WCHAR* fmt, ... )
 {
 }
 #endif
@@ -414,7 +414,7 @@ void debugf( const WCHAR* fmt, ... )
 void iPath::DumpPath() const
 {
 	debugf(L"Dumping path (%d,%d) [size=%d]:\n", m_Start.x, m_Start.y, m_Path.GetSize());
-	for (uint32 xx=0; xx<m_Path.GetSize(); ++xx) 
+	for (uint32 xx=0; xx<m_Path.GetSize(); ++xx)
     {
         uint32 angle = -1;
         if (xx != m_Path.GetSize() - 1)
@@ -438,15 +438,15 @@ sint32 iPath::GetStepCostTillValid() const
 	uint32 xx=0;
 	if (m_Path.GetSize() <= 0)
 		return 0;
-	
-	sint8 pm;	
+
+	sint8 pm;
 
 	do {
 		uint32 x = m_Path[xx].m_Pos.x;
 		uint32 y = m_Path[xx].m_Pos.y;
-		res += m_Path[xx].m_Cost;				
+		res += m_Path[xx].m_Cost;
 		iCell c = gGame.Map().GetAt(m_Path[xx].m_Pos.x, m_Path[xx].m_Pos.y);
-		pm = gGame.Map().m_PassMap.GetAt(m_Path[xx].m_Pos.x, m_Path[xx].m_Pos.y);	
+		pm = gGame.Map().m_PassMap.GetAt(m_Path[xx].m_Pos.x, m_Path[xx].m_Pos.y);
 		xx++;
 	}
 	while(xx < m_Path.GetSize() && (pm == PASSMAP_PWATER));
@@ -458,10 +458,10 @@ void iPath::ProcessShipOperations( sint32 initialMoves )
 {
 	sint32 movAcc = initialMoves;
 	bool leaving = false;
-	for (uint32 xx=0; xx<m_Path.GetSize(); ++xx) 
-	{				
+	for (uint32 xx=0; xx<m_Path.GetSize(); ++xx)
+	{
 		if(m_Path[xx].m_action == iPath::Leave) leaving = true;
-		if(m_Path[xx].m_action == iPath::Occupy || (leaving && gGame.Map().m_PassMap.GetAt(m_Path[xx].m_Pos.x, m_Path[xx].m_Pos.y) > 0)) 
+		if(m_Path[xx].m_action == iPath::Occupy || (leaving && gGame.Map().m_PassMap.GetAt(m_Path[xx].m_Pos.x, m_Path[xx].m_Pos.y) > 0))
 		{
 			m_Path[xx].m_Cost = iMAX(movAcc, 1); // set the minimum of 1 to guarantee the 'anchor' icon be red while leaving ship if we have 0 moves left
 			return;
@@ -499,7 +499,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 	nodes[1].yx		= startp.yx;
 	nodes[1].g		= 0;
 
-	uint32 node1f	= Distance( startp.yx, (uint32)dstPos.x, (uint32)dstPos.y ); 
+	uint32 node1f	= Distance( startp.yx, (uint32)dstPos.x, (uint32)dstPos.y );
 	heap[1]			= HeapCombine ( node1f, lastNode );
 
 	// enabled direction
@@ -523,7 +523,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 		SmallPnt parentPt( nodes[ parentIdx ].yx );
 		uint16 parentG = nodes[ parentIdx ].g;
 
-		if ( endp == parentPt ) break; // !!!! we reached the point.. 
+		if ( endp == parentPt ) break; // !!!! we reached the point..
 
 		// Mark as closed & remove from the open nodes heap
 		world[ parentPt.Idx(mapW) ].state = SClosed;
@@ -538,7 +538,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 		}
 
 		uint8 parentAccess = world[ parentPt.Idx(mapW) ].pass;
-		// Now check all the directions 
+		// Now check all the directions
 		for( size_t dirCode = 0; dirCode != 8; ++dirCode ) {
 			// skip inaccessible directions
 			//check( parentAccess == 0xff );
@@ -579,14 +579,14 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 
 				// NB:: check if we beyond the limits, resize array if necessary
 				// NB:: in this algorithm we do not delete unused nodes, the array might grow as large as whole map size
-				if (lastNode == maxNodesNum - 1) 
+				if (lastNode == maxNodesNum - 1)
                 {
 					nodes = (Node*)ReallocPODArray( nodes, sizeof(Node) * maxNodesNum, sizeof(Node) * maxNodesNum * 2);
 					maxNodesNum *= 2;
 					DOUT( L"### Nodes array extended to hold up to %d elements", maxNodesNum );
 				}
 				Node& newNode = nodes[ ++lastNode ];
-				// set node position and heurustuc 
+				// set node position and heurustuc
 				// NB:: check for overflow of uint16!
 				newNode.yx	= npt.yx;
 				newNode.g	= newG;
@@ -597,7 +597,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 				lastInsertIndex = HeapInsert( HeapCombine(newNodef,lastNode) );
 				nodesOpened++;
 
-				// CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED 
+				// CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED
 			} else if ( newG < wpnt.g  ) {
 				check( wpnt.state == SOpen );
 				lastInsertIndex = 0;
@@ -613,14 +613,14 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 				//check( prev != lastHeapNode+1);
 				// actually we can get into the situation when the node is not on the open list
 				// since its has limited capacity it could drop the worst 'f' elements
-				// however its not fatal (less optimal path might be generated) 
+				// however its not fatal (less optimal path might be generated)
 				if ( foundNdx > lastHeapNode ) {
 					DOUT(L"##### rare - node not on the open list\n" );
 					continue;
 				}
 
 				// we know what the node really exists
-				DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );				
+				DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );
 
 				// update world
 				wpnt.dir	= dirCode;
@@ -658,7 +658,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 
 	// -- WE WERE DONE SOMEHOW
 
-	DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );			
+	DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );
 	if ( lastHeapNode != 0 ) {
 		Node& dstNode = nodes[ HeapGetIdx(HeapRoot()) ];
 		if ( endp == dstNode.yx && dstNode.g < MAX_PATH_COST ) {
@@ -670,10 +670,10 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 				uint16	dir = dtab[ world[ idx ].dir ].dir; // reverse direction
                 uint16	cost;
 //                if (is_water)
-//                    cost = CalculateCost( (uint16)(passMap[ idx ] == PASSMAP_SWATER ? 0 : -1), dtab[ dir ].coef ); 
+//                    cost = CalculateCost( (uint16)(passMap[ idx ] == PASSMAP_SWATER ? 0 : -1), dtab[ dir ].coef );
 //                else
-                    cost = CalculateCost( (uint16)passMap[ idx ], dtab[ dir ].coef ); 
-				
+                    cost = CalculateCost( (uint16)passMap[ idx ], dtab[ dir ].coef );
+
 				path.AddMoveToPoint( cur.ToPoint(), cost );
 
 				DOUT( L"### adding point %d,%d cost %d, dir %d\n", cur.x, cur.y, cost, dir );
@@ -690,7 +690,7 @@ sint32 iPathFinder::FindPath(const iPoint& srcPos, const iPoint& dstPos, iPath& 
 //////////////////////////////////////////////////////////////////////////
 // this function used only when hero need to occupy ship (special condition with pwater)
 // src - land
-// dst - ship 
+// dst - ship
 // in this function "flag" means: 0 - pwater passable, 1 - pwater unpassable (land only mode)
 //////////////////////////////////////////////////////////////////////////
 
@@ -713,7 +713,7 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
     nodes[1].yx		= startp.yx;
     nodes[1].g		= 0;
 
-    uint32 node1f	= Distance( startp.yx, (uint32)srcPos.x, (uint32)srcPos.y ); 
+    uint32 node1f	= Distance( startp.yx, (uint32)srcPos.x, (uint32)srcPos.y );
     heap[1]			= HeapCombine ( node1f, lastNode );
 
     // enabled direction
@@ -737,30 +737,30 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
         // CLOSE this node
         SmallPnt parentPt( nodes[ parentIdx ].yx );
         uint16 parentG = nodes[ parentIdx ].g;
-                
+
         // Mark as closed & remove from the open nodes heap
      	size_t idx = parentPt.Idx(mapW);
-		world[ idx ].state = SClosed;                
+		world[ idx ].state = SClosed;
 
         // check end condition
         // check if we near point start point
         if (abs(endp.x - parentPt.x) <= 1 && abs(endp.y - parentPt.y) <= 1) break;
-        
+
 
         DOUT( L"# picked up node #%d @  %d,%d\n", HeapGetVal( HeapRoot() ), parentPt.x, parentPt.y );
         HeapRemoveRoot();
         nodesClosed++;
 
         // Check if we current path cost is too high and check other possible path if so
-        if ( parentG > MAX_PATH_COST ) 
+        if ( parentG > MAX_PATH_COST )
         {
             DOUT( L"## current path cost is too high, reject\n" );
             continue;
         }
 
         uint8 parentAccess = world[ parentPt.Idx(mapW) ].pass;
-        // Now check all the directions 
-        for( size_t dirCode = 0; dirCode != 8; ++dirCode ) 
+        // Now check all the directions
+        for( size_t dirCode = 0; dirCode != 8; ++dirCode )
         {
             // skip inaccessible directions
             //check( parentAccess == 0xff );
@@ -776,24 +776,24 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
             DOUT( L"### pos %d,%d\n", npt.x, npt.y);
 
             sint8 wcost;
-            Mark& wpnt = world[ npt.Idx(mapW) ];            
+            Mark& wpnt = world[ npt.Idx(mapW) ];
 
 
             wcost = passMap[npt.Idx(mapW)];
 
             // ship occupy condition
             // check if this point around algo start point
-            // startp & npt            
+            // startp & npt
             if (abs((sint8)startp.x - (sint8)npt.x) <= 1 && abs((sint8)startp.y - (sint8)npt.y) <= 1)
             {
                 if (wcost == PASSMAP_PWATER)
-                {                 
+                {
                     wcost = SURF_MOVE_COST[STYPE_WATER];
-                }                
+                }
             }
 
             // NB:: Optimize - too much checks performed!
-            if ( wpnt.state >= SClosed || wcost < 0 ) 
+            if ( wpnt.state >= SClosed || wcost < 0 )
             {
                 DOUT( L"#### rejected due constraints\n" );
                 continue;
@@ -813,14 +813,14 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
 
                 // NB:: check if we beyond the limits, resize array if necessary
                 // NB:: in this algorithm we do not delete unused nodes, the array might grow as large as whole map size
-                if (lastNode == maxNodesNum - 1) 
+                if (lastNode == maxNodesNum - 1)
                 {
                     nodes = (Node*)ReallocPODArray( nodes, sizeof(Node) * maxNodesNum, sizeof(Node) * maxNodesNum * 2);
                     maxNodesNum *= 2;
                     DOUT( L"### Nodes array extended to hold up to %d elements", maxNodesNum );
                 }
                 Node& newNode = nodes[ ++lastNode ];
-                // set node position and heurustuc 
+                // set node position and heurustuc
                 // NB:: check for overflow of uint16!
                 newNode.yx	= npt.yx;
                 newNode.g	= newG;
@@ -831,9 +831,9 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
                 lastInsertIndex = HeapInsert( HeapCombine(newNodef,lastNode) );
                 nodesOpened++;
 
-                // CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED 
-            } 
-            else if ( newG < wpnt.g  ) 
+                // CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED
+            }
+            else if ( newG < wpnt.g  )
             {
                 check( wpnt.state == SOpen );
                 lastInsertIndex = 0;
@@ -849,14 +849,14 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
                 //check( prev != lastHeapNode+1);
                 // actually we can get into the situation when the node is not on the open list
                 // since its has limited capacity it could drop the worst 'f' elements
-                // however its not fatal (less optimal path might be generated) 
+                // however its not fatal (less optimal path might be generated)
                 if ( foundNdx > lastHeapNode ) {
                     DOUT(L"##### rare - node not on the open list\n" );
                     continue;
                 }
 
                 // we know what the node really exists
-                DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );				
+                DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );
 
                 // update world
                 wpnt.dir	= dirCode;
@@ -895,16 +895,16 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
 
     // -- WE WERE DONE SOMEHOW
 
-    DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );			
-    if ( lastHeapNode != 0 ) 
+    DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );
+    if ( lastHeapNode != 0 )
     {
         Node& dstNode = nodes[ HeapGetIdx(HeapRoot()) ];
         SmallPnt cur(dstNode.yx);
         bool is_good = (abs(endp.x - cur.x) <= 1 && abs(endp.y - cur.y) <= 1);
         if ( is_good && dstNode.g < MAX_PATH_COST )
-        {    
+        {
             DOUT( L"# packing route from %d,%d to %d,%d\n", endp.x, endp.y, startp.x, startp.y );
-            while ( !(cur == startp) ) 
+            while ( !(cur == startp) )
             {
                 // ???should we take the opposite direction????
                 size_t  idx = cur.Idx(mapW);
@@ -914,11 +914,11 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
                 cost = passMap[idx];
 
                 if (cost == PASSMAP_SWATER || cost == PASSMAP_PWATER)
-                {                 
+                {
                     cost = SURF_MOVE_COST[STYPE_WATER];
-                }                              
-                                
-                cost = CalculateCost((uint16)cost, dtab[ dir ].coef); 
+                }
+
+                cost = CalculateCost((uint16)cost, dtab[ dir ].coef);
                 check(cost >= 0);
                 DOUT(L"### adding point %d,%d cost %d, dir %d\n", cur.x, cur.y, cost, dir);
                 path.AddMoveToPointShip(cur.ToPoint(), cost, false);
@@ -933,13 +933,13 @@ sint32 iPathFinder::FindPathToShip(const iPoint& srcPos, const iPoint& dstPos, i
             cost = passMap[idx];
 
             if (cost == PASSMAP_SWATER || cost == PASSMAP_PWATER)
-            {                 
+            {
                 cost = SURF_MOVE_COST[STYPE_WATER];
             }
 
             //path.m_Path.clear();
-                
-            cost = CalculateCost((uint16)cost, dtab[ dir ].coef); 
+
+            cost = CalculateCost((uint16)cost, dtab[ dir ].coef);
             check(cost >= 0);
             path.AddMoveToPointShip(cur.ToPoint(), cost, false);
             DOUT(L"### adding point %d,%d cost %d, dir %d\n", cur.x, cur.y, cost, dir);
@@ -982,7 +982,7 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
     else
         world[spt.Idx(mapW)].flag = false;
 
-    uint32 node1f	= Distance( startp.yx, (uint32)srcPos.x, (uint32)srcPos.y ); 
+    uint32 node1f	= Distance( startp.yx, (uint32)srcPos.x, (uint32)srcPos.y );
     heap[1]			= HeapCombine ( node1f, lastNode );
 
     // enabled direction
@@ -1007,9 +1007,9 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
         // CLOSE this node
         SmallPnt parentPt( nodes[ parentIdx ].yx );
         uint16 parentG = nodes[ parentIdx ].g;
-       
+
         // Mark as closed & remove from the open nodes heap
-        world[ parentPt.Idx(mapW) ].state = SClosed;                
+        world[ parentPt.Idx(mapW) ].state = SClosed;
         pm = passMap[parentPt.Idx(mapW)];
         if (pm == PASSMAP_PWATER || pm == PASSMAP_SWATER)
         {
@@ -1025,15 +1025,15 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
         nodesClosed++;
 
         // Check if we current path cost is too high and check other possible path if so
-        if ( parentG > MAX_PATH_COST ) 
+        if ( parentG > MAX_PATH_COST )
         {
             DOUT( L"## current path cost is too high, reject\n" );
             continue;
         }
 
         uint8 parentAccess = world[ parentPt.Idx(mapW) ].pass;
-        // Now check all the directions 
-        for( size_t dirCode = 0; dirCode != 8; ++dirCode ) 
+        // Now check all the directions
+        for( size_t dirCode = 0; dirCode != 8; ++dirCode )
         {
             // skip inaccessible directions
             //check( parentAccess == 0xff );
@@ -1049,7 +1049,7 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
             DOUT( L"### pos %d,%d\n", npt.x, npt.y);
 
             sint8 wcost;
-            Mark& wpnt = world[ npt.Idx(mapW) ];            
+            Mark& wpnt = world[ npt.Idx(mapW) ];
 
             wcost = passMap[npt.Idx(mapW)];
             if (p_onlywater)
@@ -1062,13 +1062,13 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
             else
             {
                 if (wcost == PASSMAP_SWATER || wcost == PASSMAP_PWATER)
-                {                 
+                {
                     wcost = SURF_MOVE_COST[STYPE_WATER];
                 }
             }
 
             // NB:: Optimize - too much checks performed!
-            if ( wpnt.state >= SClosed || wcost < 0 ) 
+            if ( wpnt.state >= SClosed || wcost < 0 )
             {
                 DOUT( L"#### rejected due constraints\n" );
                 continue;
@@ -1089,14 +1089,14 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
 
                 // NB:: check if we beyond the limits, resize array if necessary
                 // NB:: in this algorithm we do not delete unused nodes, the array might grow as large as whole map size
-                if ( lastNode == maxNodesNum - 1) 
+                if ( lastNode == maxNodesNum - 1)
                 {
                     nodes = (Node*)ReallocPODArray( nodes, sizeof(Node) * maxNodesNum, sizeof(Node) * maxNodesNum * 2);
                     maxNodesNum *= 2;
                     DOUT( L"### Nodes array extended to hold up to %d elements", maxNodesNum );
                 }
                 Node& newNode = nodes[ ++lastNode ];
-                // set node position and heurustuc 
+                // set node position and heurustuc
                 // NB:: check for overflow of uint16!
                 newNode.yx	= npt.yx;
                 newNode.g	= newG;
@@ -1107,9 +1107,9 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
                 lastInsertIndex = HeapInsert( HeapCombine(newNodef,lastNode) );
                 nodesOpened++;
 
-                // CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED 
-            } 
-            else if ( newG < wpnt.g  ) 
+                // CHECK IF THERE IS BETTER WAY FOR ALREADY OPENED
+            }
+            else if ( newG < wpnt.g  )
             {
                 check( wpnt.state == SOpen );
                 lastInsertIndex = 0;
@@ -1125,14 +1125,14 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
                 //check( prev != lastHeapNode+1);
                 // actually we can get into the situation when the node is not on the open list
                 // since its has limited capacity it could drop the worst 'f' elements
-                // however its not fatal (less optimal path might be generated) 
+                // however its not fatal (less optimal path might be generated)
                 if ( foundNdx > lastHeapNode ) {
                     DOUT(L"##### rare - node not on the open list\n" );
                     continue;
                 }
 
                 // we know what the node really exists
-                DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );				
+                DOUT( L"#### updated - dir:%d > %d g:%d > %d\n", wpnt.dir, dirCode, wpnt.g, newG );
 
                 // update world
                 wpnt.dir	= dirCode;
@@ -1172,13 +1172,13 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
 
     // -- WE WERE DONE SOMEHOW
 
-    DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );			
+    DOUT( L"# finished (opened=%d,closed=%d,deleted=%d,peak=%d,heapsz=%d)\n", nodesOpened, nodesClosed, nodesDeleted, nodesPeak, lastHeapNode );
     if ( lastHeapNode != 0 ) {
         Node& dstNode = nodes[ HeapGetIdx(HeapRoot()) ];
         SmallPnt cur(dstNode.yx);
         bool is_good = (abs(endp.x - cur.x) <= 1 && abs(endp.y - cur.y) <= 1);
         if ( is_good && dstNode.g < MAX_PATH_COST )
-        {    
+        {
             bool leave_ship;
             bool flag;
             // cur points to start point and moves to end point
@@ -1188,7 +1188,7 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
             uint32 pwater_count = 0;
 #endif
             DOUT( L"# packing route from %d,%d to %d,%d\n", endp.x, endp.y, startp.x, startp.y );
-            while ( !(cur == startp) ) 
+            while ( !(cur == startp) )
             {
                 // ???should we take the opposite direction????
                 size_t  idx = cur.Idx(mapW);
@@ -1213,13 +1213,13 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
                 else
                 {
                     if (cost == PASSMAP_SWATER || cost == PASSMAP_PWATER)
-                    {                 
+                    {
                         cost = SURF_MOVE_COST[STYPE_WATER];
                     }
                 }
 
                 SmallPnt tpt(cur);
-                cost = CalculateCost((uint16)cost, dtab[ dir ].coef); 
+                cost = CalculateCost((uint16)cost, dtab[ dir ].coef);
                 DOUT(L"### adding point %d,%d cost %d, dir %d\n", cur.x, cur.y, cost, dir);
                 cur = MovePoint(cur, dtab[dir].dyx );
 
@@ -1237,7 +1237,7 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
             sint16	cost;
 
             cost = passMap[idx];
-#ifdef _DEBUG            
+#ifdef _DEBUG
             if (cost == PASSMAP_PWATER) pwater_count++;
             check(pwater_count <= 1);
 #endif
@@ -1255,12 +1255,12 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
             else
             {
                 if (cost == PASSMAP_SWATER || cost == PASSMAP_PWATER)
-                {                 
+                {
                     cost = SURF_MOVE_COST[STYPE_WATER];
                 }
             }
 
-            cost = CalculateCost( (uint16)cost, dtab[ dir ].coef ); 
+            cost = CalculateCost( (uint16)cost, dtab[ dir ].coef );
 
             flag = world[cur.Idx(mapW)].flag;
             //leave_ship = old_flag == true && flag == false;
@@ -1276,7 +1276,7 @@ sint32 iPathFinder::FindPathForShip(const iPoint& srcPos, const iPoint& dstPos, 
 }
 
 //
-// NB:: Masks are inverted, i.e. 1 bit means blocked 
+// NB:: Masks are inverted, i.e. 1 bit means blocked
 void
 iPathFinder::SetupEntryExitFlags( uint16 sp, uint16 ep, uint8 exitMask, uint8 entryMask )
 {
@@ -1297,7 +1297,7 @@ iPathFinder::SetupEntryExitFlags( uint16 sp, uint16 ep, uint8 exitMask, uint8 en
 		// skip inaccessible
 		if ( !IsDirectionPassable( accessible, d ) ) continue;
 		SmallPnt neib = MovePoint( endp, dtab[ d ].dyx );
-		// 
+		//
 		size_t inv_dir = dtab[ d ].dir;
 		if ( !IsDirectionPassable( entryMask, inv_dir ) ) {
 			world[ neib.Idx( mapW ) ].pass |= (1UL<<(inv_dir));
@@ -1333,7 +1333,7 @@ iPathFinder::PrepareEmptyWorld()
 
 //
 //
-size_t			
+size_t
 iPathFinder::entryCount	= 0;
 
 size_t
@@ -1383,7 +1383,7 @@ iPathFinder::iPathFinder(const iPassMap& pmap)
 	heap[0]			= 0;
 	lastHeapNode	= 0;
 
-	// allocate world & init 
+	// allocate world & init
 	world = (Mark*)malloc( sizeof(Mark) * mapW * mapH );
 
 	PrepareEmptyWorld();

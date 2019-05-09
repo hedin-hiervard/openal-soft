@@ -61,7 +61,7 @@ public:
 	inline bool Write( uint32 d )	{ return sizeof(uint32) == f_->Write( &d, sizeof(uint32) );}
 	inline bool Write( sint32 d )	{ return sizeof(sint32) == f_->Write( &d, sizeof(sint32) );}
 	inline bool Write( float d )	{ return sizeof(float) == f_->Write( &d, sizeof(float) );}
-	
+
 
 	inline bool Read( uint8& d )	{ return sizeof(uint8) == f_->Read( &d, sizeof(uint8) ); }
 	inline bool Read( sint8& d )	{ return sizeof(sint8) == f_->Read( &d, sizeof(sint8) ); }
@@ -75,16 +75,16 @@ public:
 	inline bool Read( void* d, size_t sz )			{ return sz == f_->Read( d, sz ); }
 
 	template<typename T>
-	inline bool Write( const iStringTemplate<T>& str ) 
+	inline bool Write( const iStringTemplate<T>& str )
 	{ return Write( str.Length() ) && Write( str.CStr(), sizeof(T) * str.Length() ); }
 
 	bool Read( iStringT& str )
-	{ 
-		uint32 len; 
+	{
+		uint32 len;
 		Read( len );
 		if (len) {
 			str.Set((uint32)0, len);
-			Read( str.Str(), len * sizeof(iCharT)); 
+			Read( str.Str(), len * sizeof(iCharT));
 			str.SetLength(len);
 		} else str.SetEmpty();
 		return true;
@@ -92,12 +92,12 @@ public:
 };
 
 /*
- *	Fabric functions	
+ *	Fabric functions
  */
 iFileI* CreateWin32File(const iStringT& fname);
 iFileI* OpenWin32File(const iStringT& fname);
 
-#if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_LINUX) 
+#if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_LINUX) && !defined(OS_ANDROID)
 iFileI* CreateWinStgFile(IStream *stream);
 iFileI* OpenWinStgFile(IStream *stream);
 
@@ -148,7 +148,7 @@ namespace iFileName {
 #ifdef OS_WIN32
 	void GetAppDataPath(iStringT& str );
 #endif
-} //namespace iFileName 
+} //namespace iFileName
 
 
 #endif //GXLIB_GXL_FILE_H_

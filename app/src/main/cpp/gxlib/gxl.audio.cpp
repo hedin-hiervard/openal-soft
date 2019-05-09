@@ -6,5 +6,7 @@
 #include "gxl.audio.windows.cpp"
 #elif defined(OS_APPLE)
 #include "gxl.audio.iphone.cpp"
+#elif defined(OS_ANDROID)
+#include "gxl.audio.android.cpp"
 #endif
 

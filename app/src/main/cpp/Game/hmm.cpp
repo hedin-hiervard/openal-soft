@@ -12,12 +12,12 @@
 //#include "xxc/xxc.security.h"
 //#include "xxc/wce.detects.h"
 //
-#include <stdlib.h> 
+#include <stdlib.h>
 #include "IntroDlg.h"
 #include "lang.h"
 
 #include "Splash.h"
-#include "NewMapShop.h"
+// #include "NewMapShop.h"
 
 #include "OverlandView.h"
 #include "OverlandView.touch.h"
@@ -48,26 +48,26 @@ struct Dummy {
 Dummy _dummy;
 
 #ifdef _DEEP_DEBUG_
-#define DBG( x ) x 
-void SEO( int stream ) 
-{ 
-   _CrtSetReportMode( stream, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG ); 
-   _CrtSetReportFile( stream, _CRTDBG_FILE_STDOUT ); 
-} 
+#define DBG( x ) x
+void SEO( int stream )
+{
+   _CrtSetReportMode( stream, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
+   _CrtSetReportFile( stream, _CRTDBG_FILE_STDOUT );
+}
 
-inline void InitDBG() 
-{ 
-    DBG( SEO( _CRT_ERROR ) ); 
-    DBG( SEO( _CRT_WARN ) ); 
-    DBG( SEO( _CRT_ASSERT ) ); 
- 
-    DBG(_CrtSetDbgFlag( _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG ) | ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF )) ); 
-} 
+inline void InitDBG()
+{
+    DBG( SEO( _CRT_ERROR ) );
+    DBG( SEO( _CRT_WARN ) );
+    DBG( SEO( _CRT_ASSERT ) );
 
-inline void DoneDBG() 
-{ 
-    DBG( _CrtCheckMemory() ); 
-} 
+    DBG(_CrtSetDbgFlag( _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG ) | ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF )) );
+}
+
+inline void DoneDBG()
+{
+    DBG( _CrtCheckMemory() );
+}
 
 struct DebugCls
 {
@@ -78,9 +78,9 @@ struct DebugCls
 };
 DebugCls cls_;
 
-#else 
-#define DBG( x ) 
-#endif 
+#else
+#define DBG( x )
+#endif
 
 
 //hssSpeaker	gSpeaker;
@@ -133,7 +133,7 @@ bool            gUseIpadUI = false;
 				if ( msg.message == WM_QUIT ) return;
 				DispatchMessage( &msg );
 			}
-		} 
+		}
 		Sleep(30);
 		msec -= 30;
 	} while (!gApp.Input().EntryCount() && msec > 0);
@@ -158,7 +158,7 @@ void ShowProgressReport( uint32 curProg, bool initial = true )
 		gTextComposer.TextOut( loadingFC, gApp.Display().GetSurface(), rcPbar.TopLeft(), _T("Prepare for battle...") );
 	}
 	display.DoPaint( display.SurfMetrics() );
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	Sleep(1);
 #else
 	//usleep(0.001f);
@@ -178,7 +178,7 @@ bool EnsureMemAvail( DWORD mega )
 	}
 	if ( mst.dwAvailPhys < bytesNeeded ) {
 		// try to free up closing apps
-		HINSTANCE hAygShell = LoadLibrary( _T("aygshell.dll") );		
+		HINSTANCE hAygShell = LoadLibrary( _T("aygshell.dll") );
 		void* pCloseApps = hAygShell ? (void*)GetProcAddress( hAygShell, _T("SHCloseApps") ) : NULL;
 		if ( pCloseApps != NULL ) {
 			for( size_t ntries = 0; ntries != 2; ntries++ ) {
@@ -209,7 +209,7 @@ void SetRotated(bool bRotated)
 	gApp.SetOrientation(true, !bRotated);
 }
 
-void onMouseDown(int x, int y, MouseId mID, MouseButtonId mbID) {	
+void onMouseDown(int x, int y, MouseId mID, MouseButtonId mbID) {
 	gApp.Input().msg_OnMouseDown(x, y, mID, mbID);
 }
 
@@ -218,44 +218,44 @@ void onMouseMove(int x, int y, MouseId mID, MouseButtonId mbID) {
 }
 
 void onMouseUp(int x, int y, MouseId mID, MouseButtonId mbID) {
-	
+
 	gApp.Input().msg_OnMouseUp(x, y, mID, mbID);
 }
 
 void onMouseEntered(int x, int y, MouseId mID){
-	
+
 	if( !gMinimap && !gApp.ViewMgr().HasModalDlg() && (gGame.ActViewType() == iChildGameView::CV_OVERLAND || gGame.ActViewType() == iChildGameView::CV_HERO || gGame.ActViewType() == iChildGameView::CV_CASTLE || gGame.ActViewType() == iChildGameView::CV_MEET ||  gGame.ActViewType() == iChildGameView::CV_BATTLE ||
-                gGame.ActViewType() == iChildGameView::CV_UPGRADE) )        
+                gGame.ActViewType() == iChildGameView::CV_UPGRADE) )
 		gApp.Input().msg_OnMouseEntered(x, y, mID);
 }
 
 void onMouseLeave(int x, int y, MouseId mID){
-	
+
 //	if(gGame.ActViewType() == iChildGameView::CV_OVERLAND)
 //		gApp.Input().msg_OnMouseLeave(x, y, mID);
 }
 
 void onMouseWheelDown(sint16 line, MouseId mID){
-	
+
 	gApp.Input().msg_OnMouseWheelDown(line, mID);
 }
 
 void onMouseWheelUp(sint16 line, MouseId mID){
-	
+
 	gApp.Input().msg_OnMouseWheelUp(line, mID);
 }
 
 void onRightMouseDown(int x, int y, MouseId mID, MouseButtonId mbID){
 #if defined( PC_VERSION )
     gGame.bRightDown = true;
-#endif    
+#endif
     gApp.Input().msg_OnMouseRightDown(x, y, mID, mbID);
 }
 
 void onRightMouseUp(int x, int y, MouseId mID, MouseButtonId mbID){
 #if defined( PC_VERSION )
     gGame.bRightDown = false;
-#endif    
+#endif
     gApp.Input().msg_OnMouseRightUp(x, y, mID, mbID);
 }
 
@@ -269,7 +269,7 @@ bool IsActive()
 	return gApp.IsActive();
 }
 
-void onSuspend() 
+void onSuspend()
 {
 	gApp.Suspend();
 }
@@ -283,10 +283,10 @@ void onResize(){
 #ifdef OS_MACOS
 	gApp.UpdateSize();
 #endif
-/*	
-	iPoint cell = gGame.MainView()->Composer().GetAnchor();	
+/*
+	iPoint cell = gGame.MainView()->Composer().GetAnchor();
 	gGame.MainView()->Composer().SetAnchor(cell);
-*/	
+*/
 	//gApp.UpdateSize();
 }
 
@@ -323,12 +323,12 @@ void SetLanguage(const char *str) {
 		SetGameLanguage(GLNG_SPANISH);
 	else
 		SetGameLanguage(GLNG_ENGLISH);
-	
+
 //	SetGameLanguage(GLNG_RUSSIAN);
 }
 
 void PleerPlay(){
-#if defined( PC_VERSION )	
+#if defined( PC_VERSION )
 	gMusicMgr.Play();
 #endif
 	if(gGame.Map().CurHero())
@@ -345,9 +345,9 @@ void PleerPause(){
 
 //inline bool IsInMenu() {
 bool IsInMenu() {
-	
+
 	switch (gGame.ActViewType()){
-			
+
 		case iChildGameView::CV_GAMEMENU:
 		case iChildGameView::CV_CASTLE:
 		case iChildGameView::CV_HARBOR:
@@ -364,10 +364,10 @@ bool IsInMenu() {
 void SetToolbarInfo(int px, int py){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() ){
-	
+
 		iIsoMetric im(im_coef);
 		iPoint actPos = gGame.MainView()->Composer().ActAnchor(iPoint(px,py));
-	
+
 		gGame.MainView()->m_ncell = im.Screen2Map(actPos);
 		gGame.MainView()->m_bMouseEntered = true;
 	}
@@ -396,7 +396,7 @@ void RightUp(){
 /*
 void ExitApp() {
 
-    if(gGame.ActViewType() != iChildGameView::CV_MENU && 
+    if(gGame.ActViewType() != iChildGameView::CV_MENU &&
        gGame.ActViewType() != iChildGameView::CV_BATTLE &&
        gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN) {
         iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
@@ -410,15 +410,15 @@ void ExitApp() {
 }*/
 
 void onQuit() {
-	
+
     gGame.m_bQuit = true;
 }
 
 bool ShowSaveScreen(){
-	
+
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap  )
 		gGame.m_bSaveScreen = true;
-	
+
 	return( gGame.m_bSaveScreen );
 }
 
@@ -426,7 +426,7 @@ bool ShowLoadScreen(){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap  )
 		gGame.m_bLoadScreen = true;
-	
+
 	return( gGame.m_bLoadScreen );
 }
 
@@ -439,7 +439,7 @@ bool ExitDlgClick(){
 
     if( gApp.ViewMgr().HasModalDlg() || gGame.ActViewType() == iChildGameView::CV_GAMERESULT )
         gGame.m_bExitDlg = true;
-    
+
 	return( gGame.m_bExitDlg );
 }
 
@@ -447,7 +447,7 @@ bool SetKeyUpFlag( bool flag ){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap )
 		gGame.m_bKeyUpFlag = flag;
-	
+
 	return( gGame.m_bKeyUpFlag );
 }
 
@@ -460,12 +460,12 @@ bool SetKeyDownFlag( bool flag ){
 }
 
 bool SetKeyLeftFlag( bool flag ){
-	
-    if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap || 
+
+    if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap ||
         flag && gGame.ActViewType() == iChildGameView::CV_HERO && !gApp.ViewMgr().HasModalDlg() ||
         flag && gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() )
 		gGame.m_bKeyLeftFlag = flag;
-	
+
 	return( gGame.m_bKeyLeftFlag );
 }
 
@@ -475,15 +475,15 @@ bool SetKeyRightFlag( bool flag ){
         flag && gGame.ActViewType() == iChildGameView::CV_HERO && !gApp.ViewMgr().HasModalDlg() ||
         flag && gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() )
 		gGame.m_bKeyRightFlag = flag;
-	
+
     return( gGame.m_bKeyRightFlag );
 }
 
 bool NextPrevCastle( bool bNext ){
-    
+
     if( gGame.ActViewType() == iChildGameView::CV_HERO && !gApp.ViewMgr().HasModalDlg() ||
         gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg()){
-    
+
         if( bNext ){
 
             gGame.m_bKeyRightFlag = true;
@@ -503,25 +503,25 @@ bool Tab( bool bDown ){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap &&
        gGame.Map().CurPlayer() == gGame.Map().ActPlayer()){
-	
+
 		if( bDown ){
-		
+
 			if( !flag )
                 return( true );
-            
+
 			gGame.MainView()->HeroCastleSelectView()->SetVisible(true);
-	
+
 			if(gGame.Map().CurPlayer()) {
-		
+
 				if(gGame.Map().CurPlayer()->CurHero())
 					gGame.Map().CurPlayer()->NextHero();
 				else if(gGame.Map().CurPlayer()->HeroCount() > 0)
 					gGame.Map().CurPlayer()->SetCurHero(*gGame.Map().CurPlayer()->HeroFirst());
 				else if(gGame.Map().CurPlayer()->CastleCount() > 0)
 					gGame.Map().CurPlayer()->SetCurCastle(*gGame.Map().CurPlayer()->CastleFirst());
-			
+
 				iSize dlg_size = gGame.MainView()->HeroCastleSelectView()->GetSize(gGame.Map().CurPlayer()->HeroCount(), gGame.Map().CurPlayer()->CastleCount());
-#if defined( OS_MACOS )			
+#if defined( OS_MACOS )
 				gGame.MainView()->HeroCastleSelectView()->SetRect(gGame.MainView()->HeroCastleSelectView()->AlignChild(dlg_size, AlignCenter) + iPoint(macos_getCurScreenWidth()/2 - dlg_size.w/2, macos_getCurScreenHeight()/2 + 25 - dlg_size.h/2));
 				gGame.MainView()->HeroCastleSelectView()->SetRect(gGame.MainView()->HeroCastleSelectView()->AlignChild(dlg_size, AlignCenter) + iPoint(macos_getCurScreenWidth()/2 - dlg_size.w/2, macos_getCurScreenHeight()/2 + 25 - dlg_size.h/2));
 #else
@@ -536,21 +536,21 @@ bool Tab( bool bDown ){
 				gGame.MainView()->HeroCastleSelectView()->SetRect(gGame.MainView()->HeroCastleSelectView()->AlignChild(dlg_size, AlignCenter) + iPoint(width/2 - dlg_size.w/2, height/2 + 25 - dlg_size.h/2));
 				gGame.MainView()->HeroCastleSelectView()->SetRect(gGame.MainView()->HeroCastleSelectView()->AlignChild(dlg_size, AlignCenter) + iPoint(width/2 - dlg_size.w/2, height/2 + 25 - dlg_size.h/2));
 #endif
-			}	
+			}
 			gGame.MainView()->HeroCastleSelectView()->Update();
 			flag = false;
 		}
 		else{
-	
+
 			gGame.MainView()->HideHCSelect();
 			flag = true;
 		}
-	
+
 		gGame.MainView()->UpdateButtons();
-		
+
 		return( true );
 	}
-	
+
 	return( false );
 }
 
@@ -558,7 +558,7 @@ bool EndTurn(){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap  )
 		gGame.MainView()->m_bEndTurn = true;
-	
+
 	return( gGame.MainView()->m_bEndTurn );
 }
 
@@ -566,69 +566,69 @@ bool Enter(){
 
     if( (gApp.ViewMgr().HasModalDlg() || gGame.Map().CurPlayer() && gGame.ActViewType() == iChildGameView::CV_OVERLAND) && !gMinimap )
         gGame.m_bEnter = true;
-        
+
     return( gGame.m_bEnter );
 }
 
 bool CastleMarket(){
 
     if( gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
         gGame.CastleView()->m_bMarket = true;
     }
-    
+
     return true;
 }
 
 bool CastleTavern(){
 
     if( gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
         gGame.CastleView()->m_bTavern = true;
     }
-    
+
     return true;
 }
 
 bool CastleRecruit(){
 
     if( gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
         gGame.CastleView()->m_bRecruit = true;
     }
-    
+
     return true;
 }
 
 bool CastleBuild(){
 
     if( gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
         gGame.CastleView()->m_bBuild = true;
     }
-    
+
     return true;
 }
 
 bool Esc(){
-    
+
     if( gApp.ViewMgr().HasModalDlg() ){
-    
+
         gGame.m_bEsc = true;
     }
     else{
-    
+
         if( gMinimap ){
-            
+
             gMinimap = false;
             gGame.m_bEsc = true;
             gGame.m_bMinimapEsc = true;
         }
         else{
-        
+
             //Exit Menu
             switch (gGame.ActViewType()){
-        
+
                 case iChildGameView::CV_GAMEMENU:
                 case iChildGameView::CV_UPGRADE:
                 case iChildGameView::CV_CASTLE:
@@ -648,16 +648,16 @@ bool Esc(){
         gGame.m_bEsc = true;
     }
 
-    return( gGame.m_bEsc );    
+    return( gGame.m_bEsc );
 }
 
 bool Defender(){
 
     if( gGame.ActViewType() == iChildGameView::CV_BATTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
         if( ((iBattleView_touch*)gGame.View(iChildGameView::CV_BATTLE))->IsAni() )
             return( false );
-        
+
         ((iBattleView_touch*)gGame.View(iChildGameView::CV_BATTLE))->m_bDefender = true;
         return true;
 	}
@@ -667,15 +667,15 @@ bool Defender(){
 bool Space(){
 
 	if( Defender() ){
-     
+
 	}
     else if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && gGame.Map().CurHero() && !gGame.Map().CurHero()->Path().IsEmpty() && !gApp.ViewMgr().HasModalDlg() && !gMinimap )
 		gGame.m_bNumMove = true;
     else if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && gGame.Map().CurHero() && !gApp.ViewMgr().HasModalDlg() && !gMinimap )
         gGame.m_bShowCastle = true;
-	else 
+	else
 		return( false );
-	
+
 	return( true );
 }
 
@@ -683,51 +683,51 @@ bool CenterMap(){
 
     if(gGame.Map().CurHero())
         gGame.m_bCenter = true;
-    
+
     return( gGame.m_bCenter );
 }
 
 bool CastSpell(){
 
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap ){
-        
+
 		gGame.m_bSpell = true;
         return( true );
     }
     else if( gGame.ActViewType() == iChildGameView::CV_BATTLE ){
-    
+
         if( !((iBattleView_touch*)gGame.View(iChildGameView::CV_BATTLE))->IsAni() ){
-            
+
             ((iBattleView_touch*)gGame.View(iChildGameView::CV_BATTLE))->m_bSpell = true;
             return( true );
         }
     }
-    
+
 	return( false );
 }
 
 bool MiniMap(bool bDown){
 
 	if( !gMinimap ){
-	
+
 		if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() ){
-	
+
 			((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->MinimapRawView()->PrepareSurface();
 			((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->MinimapRawView()->SetCenterCell(gGame.MainView()->Composer().GetCenterCell());
 			((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->MinimapRawView()->SetVisible(true);
-		
+
 			((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->UpdateButtons();
 			((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->m_bMinimap = true;
 			gMinimap = true;
-		
+
 			return( true );
 		}
         else if( gGame.ActViewType() == iChildGameView::CV_CASTLE && !gApp.ViewMgr().HasModalDlg() ){
-        
+
             CastleMarket();
         }
 	}
-	else{		
+	else{
 		gMinimap = false;
 		((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->MinimapRawView()->SetVisible(false);
 		((iMainView_touch*)gGame.View(iChildGameView::CV_OVERLAND))->UpdateButtons();
@@ -736,13 +736,13 @@ bool MiniMap(bool bDown){
 }
 
 void Num( unsigned short ch ){
-	
+
 	if( gGame.ActViewType() == iChildGameView::CV_OVERLAND && !gApp.ViewMgr().HasModalDlg() && !gMinimap ){
 
 		if( gGame.Map().CurHero() ){
-	
+
 			iPoint pos = gGame.Map().CurHero()->Pos();
-		
+
 			switch (ch) {
 #if defined( OS_MACOS )
 				case 83: //Num1
@@ -797,7 +797,7 @@ void Num( unsigned short ch ){
 					pos.x -= 1;
 					break;
 #if defined( OS_MACOS )
-				case 91: 
+				case 91:
 #else
 				case 104:
 #endif
@@ -820,7 +820,7 @@ void Num( unsigned short ch ){
 			if( ch!=101 )
 #endif
 				gGame.Map().CurHero()->ResetPath();
-			
+
 			gGame.pos = pos;
 			gGame.m_bNumMove = true;
 		}
@@ -835,19 +835,19 @@ bool AutoCombat( bool bEnd ){
             ( (iBattleView*)gGame.View(iChildGameView::CV_BATTLE) )->m_bEndAutocombat = true;
         else
             ( (iBattleView*)gGame.View(iChildGameView::CV_BATTLE) )->m_bBeginAutocombat = true;
-            
+
 		return( true );
 	}
-	
+
 	return( false );
 }
 
 bool OnWait(){
-    
+
 	if( gGame.ActViewType() == iChildGameView::CV_BATTLE && !gApp.ViewMgr().HasModalDlg() ){
         //gGame.m_bWait = true;
         if( !((iBattleView_touch*)gGame.View(iChildGameView::CV_BATTLE))->IsAni() ){
-                    
+
             ( (iBattleView*)gGame.View(iChildGameView::CV_BATTLE) )->m_bWait = true;
             return( true );
         }
@@ -858,11 +858,11 @@ bool OnWait(){
 bool QuickSave(){
 
 	if(gGame.ActViewType() == iChildGameView::CV_OVERLAND &&
-       /*gGame.ActViewType() != iChildGameView::CV_MENU && 
+       /*gGame.ActViewType() != iChildGameView::CV_MENU &&
 	   gGame.ActViewType() != iChildGameView::CV_BATTLE &&*/
-	   gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN && 
+	   gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN &&
 	   !gApp.ViewMgr().HasModalDlg() && !gMinimap ){
-	
+
         gGame.m_bQuickSave = true;
 	}
 	return( gGame.m_bQuickSave );
@@ -871,19 +871,19 @@ bool QuickSave(){
 bool QuickLoad(){
 
 	if(gGame.ActViewType() == iChildGameView::CV_OVERLAND &&
-       /*gGame.ActViewType() != iChildGameView::CV_MENU && 
+       /*gGame.ActViewType() != iChildGameView::CV_MENU &&
 	   gGame.ActViewType() != iChildGameView::CV_BATTLE &&*/
-	   gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN && 
+	   gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN &&
 	   !gApp.ViewMgr().HasModalDlg() && !gMinimap ){
-		
-		gGame.m_bQuickLoad = true;		
-	}	
+
+		gGame.m_bQuickLoad = true;
+	}
 	return( gGame.m_bQuickLoad );
 }
 
 #endif
 
-#if defined(OS_MACOS) || defined( OS_IPHONE )
+#if defined(OS_MACOS) || defined( OS_IPHONE ) || defined(OS_ANDROID)
 u_int32_t GetWindowWidth();
 u_int32_t GetWindowHeight();
 #endif
@@ -893,7 +893,7 @@ bool IsIpad();
 
 int preload_resources()
 {
-    Adomatic::sharedInstance()->init("PK2", "4d01d62fb6a74af872ccd9d577ce56403386785a553d1a5ca8b9ce0eaa68c089");
+    // Adomatic::sharedInstance()->init("PK2", "4d01d62fb6a74af872ccd9d577ce56403386785a553d1a5ca8b9ce0eaa68c089");
 
 #ifdef OS_WINCE
         // check second instance of app
@@ -902,12 +902,12 @@ int preload_resources()
             return TRUE;
         }
 #endif
-        
-		
+
+
         //gTwitter.Ping();
         // Root, Save and Maps folders
         iFileName::GetAppPath(gRootPath);
-#ifndef OS_APPLE
+#ifdef OS_WIN32
         iFileName::GetAppDataPath(gAppDataPath);
         iFile::DirCreate(gAppDataPath);
         gDataPath = gRootPath +	_T("Data\\");
@@ -926,9 +926,9 @@ int preload_resources()
 #else
         libPath = docPath; // for non-iphone users, store all content in Application Support
 #endif
-        
+
         iFile::DirCreate(docPath);
-        
+
         gBundledMapsPath = gRootPath + _T("Maps/");
         gDownloadedMapsPath = libPath + _T("Maps/");
         gMapStatFilePath = libPath + _T("map.stat");
@@ -940,7 +940,7 @@ int preload_resources()
 #else
         gSavePath = docPath;
 #endif
-        
+
 #ifdef OS_IPHONE
         // for those still having all the stuff in Documents, move to Library
         iStringT OldDownloadedMapsPath = docPath + _T("Maps/");
@@ -948,7 +948,7 @@ int preload_resources()
         iStringT OldMapShopCfgFilePath = docPath + _T("mapshop.cfg");
         iStringT OldConfigFilePath = docPath + _T("PalmHeroes.cfg");
         iStringT OldSavePath = docPath + _T("Save/");
-        
+
         for (uint32 xx=0; xx<=SAVE_GAME_SLOTS; ++xx) {
             iStringT name = iFormat(_T("save%02d.phsd"),xx);
             iStringT oldname = OldSavePath + name;
@@ -957,61 +957,61 @@ int preload_resources()
         iFile::Move(OldSavePath + _T("lastses.use"), gSavePath + _T("lastses.use"));
         iFile::Move(OldSavePath + _T("lastses.phsd"), gSavePath + _T("lastses.phsd"));
         iFile::Move(OldSavePath + _T("lastses.tmp"), gSavePath + _T("lastses.tmp"));
-        
+
         iFile::Delete(OldSavePath);
-        
+
         iFile::Move(OldSavePath, gSavePath);
         iFile::Move(OldDownloadedMapsPath, gDownloadedMapsPath);
         iFile::Move(OldMapStatFilePath, gMapStatFilePath);
         iFile::Move(OldMapShopCfgFilePath, gMapShopCfgFilePath);
         iFile::Move(OldConfigFilePath, gConfigFilePath);
 #endif
-        
+
 #endif
-        
+
         iFile::DirCreate(gSavePath);
         iFile::DirCreate(gDownloadedMapsPath);
-		
+
 #ifdef MULTIPLAYER
         // update updater if applicable
         iFile::Move(gRootPath + _T("updater.exe_"), gRootPath + _T("updater.exe"));
 #endif
-        
+
         // Init log manager
 #ifdef DEBUG_LOG
         gLogMgr.Init(gRootPath+_T("game.log"));
 #endif //DEBUG_LOG
-    
-#if defined(OS_APPLE) || defined(OS_WIN32)
+
+#if defined(OS_APPLE) || defined(OS_WIN32) || defined(OS_ANDROID)
     LPCWSTR lpstrCmdLine = L"";
 #endif
-    
+
 
         if (!gSettings.Init(lpstrCmdLine)) {
             MessageBox(NULL, _T("Unable to init game settings!"), NULL, MB_OK);
         }
-    
-    gMapShop.Init("PK2R", CvtT2A<>(gDownloadedMapsPath.CStr()).Unsafe());
-    
+
+    // gMapShop.Init("PK2R", CvtT2A<>(gDownloadedMapsPath.CStr()).Unsafe());
+
         // Cotulla: is it right location? if not move
         if (!gMapEnum.Init())
         {
             return -1;
         }
-        
+
         gTutorial.Init();
-        
+
 #ifdef MULTIPLAYER
         gMPMgr.Init();
 #endif
-        
+
         // Init application
         uint32 flags = GXLF_LANDSCAPE;
         if (!gSettings.ForceNoSound())
             flags |= GXLF_ENABLESOUND;
         if (gSettings.GetEntryValue(CET_LHANDMAODE)) flags |= GXLF_LHANDER;
 #ifdef OS_WIN32
-        
+
         //flags |= GXLF_DOUBLESIZE;
         // only for Win32 build
         // GXLF_FULLSCREEN - start application in fullscreen mode
@@ -1022,10 +1022,10 @@ int preload_resources()
             //    flags |= GXLF_FULLSCREEN;
         }
 #endif
-        
+
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
-    
-#ifdef OS_IPHONE // iOS
+
+#if defined(OS_IPHONE) || defined(OS_ANDROID) // iOS
     if (!gApp.Init(&gGame, 60, flags, sz))
     {
         return -1;
@@ -1039,24 +1039,24 @@ int preload_resources()
         return -1;
     }
 #endif
-    
+
         // ShowLogo and intro image (disabled for this version)
         //iIntroDlg idlg(&gApp.ViewMgr());
         //idlg.DoModal();
-        
-        
+
+
         // Setup global sfx volume
         if (gApp.SndPlayer().Inited()) {
             gApp.SndPlayer().SetVolume(gSettings.GetEntryValue(CET_SFXVOLUME) * 25);
         }
-        
+
         // Setup initial gamma value
         gApp.Display().SetGamma(1.0f + 0.05f * gSettings.GetEntryValue(CET_DISPGAMMA));
-        
+
         // Init secret dllLib
         pSecret = (iSecret*)malloc(sizeof(iSecret));
         memset(pSecret, 0, sizeof(iSecret));
-        
+
 #ifdef SPLASH
         // show the splash screen
         iSplash prldr;
@@ -1066,13 +1066,13 @@ int preload_resources()
         if(!gMusicMgr.Init()) {
             return -1;
         }
-		
+
         // Init text composer
         if (!gTextComposer.Init(gDataPath + _T("fonts_decoded.dat"), FS_COUNT, PBKEY_COMMON, PBKEY_FNT, GFNT_FILE_HDR_KEY, GFNT_FILE_VERSION)) {
             MessageBox(NULL, _T("Unable to init text composer!"), NULL, MB_OK);
             return -1;
         }
-        
+
         // init font sizes
         InitFonts();
         // Init text resources
@@ -1080,31 +1080,31 @@ int preload_resources()
             MessageBox(NULL, _T("Unable to init text manager!"), NULL, MB_OK);
             return -1;
         }
-    
+
         gUseIpadUI = IsIpad();
-    
+
         init_creat_desc();
         init_castle_cnsts();
         init_ships();
-    
+
         // Init gfx resources and fill secret dll
         gGfxMgr.SetGamma( gSettings.GetEntryValue(CET_DISPGAMMA) );
         if (!gGfxMgr.Load(0,(gDataPath + (gUseIpadUI ? _T("ipad/") : _T("iphone/")) + _T("game.gfx")).CStr(), gSettings.MapSpriteFile()?(iGfxManager::LM_MappedFile):(iGfxManager::LM_Memory))) {
             MessageBox(NULL, _T("Unable to open sprite file!"), NULL, MB_OK);
             return -1;
         }
-    
+
         // Init sfx resources
         if (!gSfxMgr.Init(gDataPath+_T("game.sfx"))) {
             MessageBox(NULL, _T("Unable to open sound resources file!"), NULL, MB_OK);
             return -1;
         }
-        
+
         gMusicMgr.SetVolume(gSettings.GetEntryValue(CET_MSCVOLUME));
-    
+
         SetGameLanguage(gSettings.GetLanguage());
         gSettings.Save();
-        
+
         //////////////////////
         // debug: output creatures info into text file
         /*SetGameLanguage(GLNG_ENGLISH);
@@ -1113,7 +1113,7 @@ int preload_resources()
          for(uint32 xx=0; xx<CREAT_COUNT; xx++) {
          iStringT perks = _T("");
          for (uint16 nn=0; nn<CPERKS_COUNT; ++nn) {
-         if (CREAT_DESC[xx].perks & (1<<nn)) 
+         if (CREAT_DESC[xx].perks & (1<<nn))
          perks += iFormat(_T("%s:::"), gTextMgr[TRID_CPERK_DOUBLESHOT+nn]);
          }
          fprintf(f, "%s&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%d&%s&%d\n", iStringA(CvtT2A<>(gTextMgr[TRID_CREATURE_PEASANT_F1 + xx*3])).CStr(), CREAT_DESC[xx].attack,
@@ -1129,27 +1129,27 @@ int preload_resources()
 
 int pheroes_main()
     {
-        
+
         LPCWSTR lpstrCmdLine = L"";
 
 
         bool bFirstLaunch = false;
-        
+
         //determine first launch
         if(gSettings.LaunchCount() == 0)
         {
             bFirstLaunch = true;
         }
-        
-        
+
+
 #ifdef PLAYCITY
         if(bFirstLaunch)
             SetGameLanguage(GLNG_RUSSIAN);
 #endif
 
-        
+
 	// Initialize and start new game
-	if (!gGame.Init(lpstrCmdLine) ) 
+	if (!gGame.Init(lpstrCmdLine) )
     {
 		return -1;
 	}
@@ -1158,17 +1158,17 @@ int pheroes_main()
 	iLightHolder	lightHolder;
 #endif //OS_WINCE
 
-        
-        
+
+
 #ifdef SPLASH
         // remove the splash screen
         prldr.Disappear();
 #endif
-        
-        
-        
-        
-       
+
+
+
+
+
 	// Core loop
 	/*sint32 retCode =  */gApp.Run();
 

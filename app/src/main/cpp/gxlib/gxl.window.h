@@ -3,16 +3,16 @@
 
 
 /*
- *	
+ *
  */
 struct iDispMsgHnd
 {
 	virtual void msg_Suspend() = 0;
 	virtual void msg_Resume() = 0;
-#ifdef OS_APPLE
-        virtual void msg_OnPaint() = 0;
+#ifdef OS_WIN32
+  virtual void msg_OnPaint(HDC hdc) = 0;
 #else
-	virtual void msg_OnPaint(HDC hdc) = 0;
+  virtual void msg_OnPaint() = 0;
 #endif
 };
 
@@ -26,7 +26,7 @@ struct iInputMsgHnd
 };
 
 /*
- *	
+ *
  */
 class iGXApp;
 class iWindow
@@ -34,7 +34,7 @@ class iWindow
 public:
 	iWindow();
 	~iWindow();
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	bool Init(HINSTANCE hInst, LPCWSTR wndName, const iSize& siz, iGXApp* pApp );
 #else
 	bool Init(const iSize& siz, iGXApp* pApp );

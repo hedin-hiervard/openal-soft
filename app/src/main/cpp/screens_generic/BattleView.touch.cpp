@@ -23,7 +23,7 @@
 // from BattleAI.cpp
 sint32 CalcMeleeValue(iBattleGroup* pGroup, const iBattleGroup::iMeleeEntry* se, iBattleGroup* pTarget, iBattleEngine& engine);
 void CalcBestMeleeDir(iBattleGroup* pGroup, iBattleGroup* pTarget, const iBattleGroup::iMeleeEntry* me, iBattleEngine& engine, uint16& mdir, sint32 &cval, bool bForceFF);
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 void DoubleDib(const iDib& src, iDib &dst);
 #endif
 
@@ -37,15 +37,15 @@ iBattleView_touch::iBattleView_touch(): iBattleView()
 , m_bGesturesEnabled(true)
 , m_moveDisapTimer(fix32::zero)
 , m_bInfoMode(false)
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 , m_pZoomer(NULL)
 , m_pActionWheel(NULL)
 , m_bAlwaysReceiveMouse(false)
 #endif
-{	
+{
 	AddChild(m_pBtnCastSpell = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_CASTSPELL_BTN, PDGG(BTN_SPELLBOOK), PDGG(BTN_SPELLBOOK_PRESSED), iStringT(), Visible|Enabled));
-	AddChild(m_pBtnWait = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_WAIT_BTN, PDGG(BTN_END_TURN), PDGG(BTN_END_TURN_PRESSED), iStringT(), Visible|Enabled));	
-	AddChild(m_pBtnDefend = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_DEFEND_BTN, PDGG(BTN_DEFEND), PDGG(BTN_DEFEND_PRESSED), iStringT(), Visible|Enabled));	
+	AddChild(m_pBtnWait = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_WAIT_BTN, PDGG(BTN_END_TURN), PDGG(BTN_END_TURN_PRESSED), iStringT(), Visible|Enabled));
+	AddChild(m_pBtnDefend = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_DEFEND_BTN, PDGG(BTN_DEFEND), PDGG(BTN_DEFEND_PRESSED), iStringT(), Visible|Enabled));
 //	AddChild(m_pBtnInfo = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_INFO_BTN, PDGG(BTN_INFOBAR), PDGG(BTN_INFOBAR_I_PRESSED)));
 //	m_pBtnInfo->SetHoldable(true);
 
@@ -58,27 +58,27 @@ iBattleView_touch::iBattleView_touch(): iBattleView()
         AddChild(m_pBtnInfo = new iImgBtn(&gApp.ViewMgr(), this, iRect(), BCI_INFO_BTN, PDGG(BTN_INFOBAR), PDGG(BTN_INFOBAR_PRESSED)));
         m_pBtnInfo->SetHoldable(true);
     }
-    
+
 	AddChild(m_pCreatInfoView = new iCreatDescView(&gApp.ViewMgr(), this, iRect(), 50, CDV_BKND | CDV_TITLE | CDV_NOTITLE_PERKS | CDV_GLOW
 #ifndef PC_VERSION
                                                    | CDV_STATS
 #endif
                                                    , NULL));
 	m_pCreatInfoView->SetVisible(false);
-	
+
 	AddChild(m_pBtnAssaulter = new iHeroPortBtn(&gApp.ViewMgr(), this, iRect(),  BCI_ASSAULTER_BTN, false, false, AlignBottomLeft));
 	AddChild(m_pBtnDefenderHero = new iHeroPortBtn(&gApp.ViewMgr(), this, iRect(),  BCI_DEFENDER_BTN, false, false, AlignBottomRight));
 	AddChild(m_pBtnDefenderCastle = new iCastleGlyphBtn(&gApp.ViewMgr(), this, iRect(),  BCI_DEFENDER_BTN, false));
-	
+
 }
 
 void iBattleView_touch::UpdateSize()
 {
 #if defined PC_VERSION
     Recalc();
-#endif    
-	
-	iPoint offset = iPoint(0,0); 
+#endif
+
+	iPoint offset = iPoint(0,0);
     iPoint offset2 = iPoint(0,0);
     if(!gUseIpadUI)
     {
@@ -99,25 +99,25 @@ void iBattleView_touch::UpdateSize()
         devoff = iPoint(-(sint32)iIphoneBtn::sm_defSize.w * 0.5, 0);
     else
         devoff = iPoint(-(sint32)iIphoneBtn::sm_defSize.w * 2, 0);
-    
+
     m_pBtnCastSpell->SetRect(AlignChild(iIphoneBtn::sm_defSize, AlignBottom) + offset + devoff);
-	m_pBtnWait->SetRect(AlignChild(iIphoneBtn::sm_defSize, AlignBottom) + offset + 
-#ifdef OS_IPHONE
-		iPoint(iIphoneBtn::sm_defSize.w * 0.5, 0)						
+	m_pBtnWait->SetRect(AlignChild(iIphoneBtn::sm_defSize, AlignBottom) + offset +
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
+		iPoint(iIphoneBtn::sm_defSize.w * 0.5, 0)
 #else
 		iPoint()
 #endif
 						);
-	
+
     iPoint devOffset;
     if(!gUseIpadUI)
         devOffset = iPoint(iIphoneBtn::sm_defSize.w * 1.5, 0);
     else
         devOffset = iPoint(iIphoneBtn::sm_defSize.w * 2, 0);
-        
-        
+
+
     m_pBtnDefend->SetRect(AlignChild(iIphoneBtn::sm_defSize, AlignBottom) + offset + devOffset);
-    
+
 
 #ifndef PC_VERSION
     if(!gUseIpadUI)
@@ -137,18 +137,18 @@ void iBattleView_touch::BeginBattle(iBattleWrapper* pBattle, SURF_TYPE st, BATTL
 	m_sky = sky;
 	iBattleMember_Hero* pAssaulter = DynamicCast<iBattleMember_Hero*>(m_pBattle->Engine().GetBattleInfo().m_pAssaulter);
 	check(pAssaulter);
-	
+
 	m_pBtnAssaulter->SetHero(pAssaulter->GetHero());
 	if (iBattleMember_Hero* pHero = DynamicCast<iBattleMember_Hero*>(m_pBattle->Engine().GetBattleInfo().m_pDefender)) {
-		m_pBtnDefenderHero->SetHero(pHero->GetHero());		
+		m_pBtnDefenderHero->SetHero(pHero->GetHero());
 		m_pBtnDefenderCastle->SetCastle(NULL);
 	} else if (iBattleMember_Castle* pCastle = DynamicCast<iBattleMember_Castle*>(m_pBattle->Engine().GetBattleInfo().m_pDefender)){
 		if (pCastle->GetVisitor()) {
-			m_pBtnDefenderHero->SetHero(pCastle->GetVisitor());					
+			m_pBtnDefenderHero->SetHero(pCastle->GetVisitor());
 			m_pBtnDefenderCastle->SetCastle(NULL);
 		}
 		else {
-			m_pBtnDefenderCastle->SetCastle(pCastle->GetCastle());					
+			m_pBtnDefenderCastle->SetCastle(pCastle->GetCastle());
 			m_pBtnDefenderHero->SetHero(NULL);
 		}
 	} else {
@@ -188,9 +188,9 @@ void iBattleView_touch::BeginBattle(iBattleWrapper* pBattle, SURF_TYPE st, BATTL
 }
 
 bool iBattleView_touch::BeginSpellTrack(iCombatSpell* pSpell)
-{	
+{
 	m_SpellTrack = cInvalidPoint;
-	m_bCurSelFlag = false;	
+	m_bCurSelFlag = false;
 	return iBattleView::BeginSpellTrack(pSpell);
 }
 
@@ -210,18 +210,18 @@ void iBattleView_touch::EnableControls(uint32 flags)
 TODO: add remote player
 #endif
 
-	bool bCanWait = m_pBattle->Engine().CanWait();	
+	bool bCanWait = m_pBattle->Engine().CanWait();
 	bool bAutobattle = IsAutobattle();
-	bool bCanCast = pHero && pHero->ManaPts() > 0 &&  
+	bool bCanCast = pHero && pHero->ManaPts() > 0 &&
 		m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->CanCastSpell() &&
 		pHero->SpellBook().SpellsCount() > 0;
 	bool bActing = IsAni();
 	bool bSpellTracking = SpellTracking();
 
 	bool bCommon = !bEnemyTurn && !bActing && !bSpellTracking && !bModal && !m_bInfoMode && !bAutobattle;
-		
+
 	m_pBtnCastSpell->SetVisible(bCommon && bCanCast);
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	m_pBtnInfo->SetVisible(bCommon || m_bInfoMode);
 #endif
 	m_pBtnWait->SetVisible(bCommon && bCanWait);
@@ -230,7 +230,7 @@ TODO: add remote player
 	m_pBtnDefenderCastle->SetVisible(bCommon);
 	m_pBtnDefenderHero->SetVisible(bCommon);
 	m_pBtnAssaulter->SetVisible(bCommon);
-		
+
 	m_bGesturesEnabled = bCommon;
 }
 
@@ -276,8 +276,8 @@ iSimpleArray<iBattleGroup*> iBattleView_touch::FindBattleGroupsWithAttraction(co
 	if(pGroup)
 		res.Add(pGroup);
 	if(!pGroup) {
-		for(sint32 xx=-attr; xx<=attr; xx++) 
-			for(sint32 yy=-attr; yy<=attr; yy++) 
+		for(sint32 xx=-attr; xx<=attr; xx++)
+			for(sint32 yy=-attr; yy<=attr; yy++)
 				if(m_pBattle->Engine().FindGroup(cell + iPoint(xx, yy))) {
 					pGroup = m_pBattle->Engine().FindGroup(cell + iPoint(xx, yy));
 					if(pGroup)
@@ -295,7 +295,7 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 		EndAutobattle();
 		return;
 	}
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     // we clicked through the info view to disable info mode, release the button
 	if(m_pCreatInfoView->IsVisible() && m_pBtnInfo->GetScrRect().PtInRect(pos)) {
 		m_pBtnInfo->MouseDown(pos, mID, mbID);
@@ -309,12 +309,12 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 
 	// tapped on a child control, skip
 	if(iView* pView = GetChildByPos(pos)) {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         if(pView != m_pCreatInfoView)
 #endif
-			return;		
-	}	
-	
+			return;
+	}
+
 	// INFO MODE: show creat info and exit
 	if(m_bInfoMode) {
 		iBattleGroup* pGroup = m_pBattle->Engine().FindGroup(Screen2Map(pos));
@@ -331,7 +331,7 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 #ifndef PC_VERSION
                                                  | CDV_STATS
 #endif
-                                                 , pGroup);			
+                                                 , pGroup);
 			iRect cvrc = AlignRect(sz, temprc, AlignCenter);
 #ifndef PC_VERSION
             cvrc.InflateRect(DLG_GLOW_FRAME_SIZE, 5, 0, 0);
@@ -341,12 +341,12 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 			if(cvrc.x2() > m_Rect.w) cvrc.x -= (cvrc.x2() - m_Rect.w);
 			if(cvrc.y2() > m_Rect.h) cvrc.y -= (cvrc.y2() - m_Rect.h);
 			m_pCreatInfoView->SetRect(cvrc);
-			m_pCreatInfoView->SetGroup(pGroup);			
+			m_pCreatInfoView->SetGroup(pGroup);
 			Invalidate();
 		}
 		return;
 	}
-	
+
 	m_trackCell = Screen2Map(pos);
 	m_MoveEntry = m_trackCell;
 	Invalidate();
@@ -381,7 +381,7 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 			if(m_SpellTrack == cInvalidPoint || Screen2Map(pos) != m_SpellTrack) {
 				if(m_SpellTrack != m_trackCell)
 					m_bCurSelFlag = false;
-				m_SpellTrack = m_trackCell;			
+				m_SpellTrack = m_trackCell;
 			}
 		}
 
@@ -391,11 +391,11 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 				iBattleGroup* pTarget = m_pBattle->Engine().FindGroup(m_trackCell, m_pCastSpellToolBar->Spell()->AffectsToDead());
 				check(pTarget);
 				m_pCastSpellToolBar->SetTarget(pTarget);
-			} 
+			}
 		}
 		Invalidate();
 		return;
-	} 
+	}
 
 	// BATTLE TARGET SELECTION
 	iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(m_pBattle->Engine().TurnSeq().CurUnit());
@@ -425,13 +425,13 @@ void iBattleView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonI
 #ifdef PC_VERSION
 void iBattleView_touch::OnMouseEntered(const iPoint& pos, MouseId mID){
 
-    
-    if( 
+
+    if(
 #ifdef PC_VERSION
-       gGame.bRightDown || 
+       gGame.bRightDown ||
 #endif
        m_bInfoMode ){
-    
+
         iBattleGroup* pGroup = m_pBattle->Engine().FindGroup(Screen2Map(pos));
 		if(pGroup)
 
@@ -440,32 +440,32 @@ void iBattleView_touch::OnMouseEntered(const iPoint& pos, MouseId mID){
 			m_pCreatInfoView->SetVisible(true);
 			iPoint corner = iPoint(pos.x > m_Rect.w / 2 ? 0 : m_Rect.w, pos.y > m_Rect.h / 2 ? 0 : m_Rect.h);
 			iRect temprc = iRect(pos, corner);
-			iSize sz = m_pCreatInfoView->GetSize(m_Rect.w / 4, pGroup->Type(), pGroup->Count(), CDV_TITLE | CDV_BKND | CDV_LINEAR_PERKS | CDV_GLOW, pGroup);			
+			iSize sz = m_pCreatInfoView->GetSize(m_Rect.w / 4, pGroup->Type(), pGroup->Count(), CDV_TITLE | CDV_BKND | CDV_LINEAR_PERKS | CDV_GLOW, pGroup);
 			iRect cvrc = AlignRect(sz, temprc, AlignCenter);
 			if(cvrc.x < 0) cvrc.x = 0;
 			if(cvrc.y < 0) cvrc.y = 0;
 			if(cvrc.x2() > m_Rect.w) cvrc.x -= (cvrc.x2() - m_Rect.w);
 			if(cvrc.y2() > m_Rect.h) cvrc.y -= (cvrc.y2() - m_Rect.h);
 			m_pCreatInfoView->SetRect(cvrc);
-			m_pCreatInfoView->SetGroup(pGroup);			
+			m_pCreatInfoView->SetGroup(pGroup);
 			Invalidate();
-		}        
+		}
         return;
     }
     else{
-    
+
         m_pCreatInfoView->SetVisible(false);
         m_highlightedGroup = cInvalidPoint;
     }
-    
+
     iPoint cell = Screen2Map(pos);
     iPoint op = anchor;
 #ifdef PC_VERSION
     m_Entered = cInvalidPoint;
 #endif
-    
+
     if( !SpellTracking() ){
-    
+
         if (iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(m_pBattle->Engine().TurnSeq().CurUnit())){
             if (pCurCreatGroup->GetCreatGroup()->CanMove(cell.x,cell.y)) {
 #ifdef PC_VERSION
@@ -477,11 +477,11 @@ void iBattleView_touch::OnMouseEntered(const iPoint& pos, MouseId mID){
         }
     }
     else{
-    
+
         iHero* pCaster = m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->SpellCaster();
 		check(pCaster);
 		MAGIC_SCHOOL_LEVEL msl = m_pCastSpellToolBar->Spell()->GetSchoolLevel(pCaster);
-        
+
 		if (m_pCastSpellToolBar->Spell()->TargetMode(msl) == STM_CREAT_GROUP) {
 			sint32 dist;
 			iPoint targCell = FindNearestCell(m_spellTargets, pos, dist);
@@ -491,21 +491,21 @@ void iBattleView_touch::OnMouseEntered(const iPoint& pos, MouseId mID){
 #endif
                 m_SpellTrack = targCell;
             }
-                
+
 		} else {
 #ifdef PC_VERSION
-			if(m_SpellTrack == cInvalidPoint || Screen2Map(pos) != m_SpellTrack) 
+			if(m_SpellTrack == cInvalidPoint || Screen2Map(pos) != m_SpellTrack)
                 m_Entered = m_SpellTrack;
 #endif
 		}
-        
+
         if (m_pCastSpellToolBar->Spell()->TargetMode(msl) == STM_CREAT_GROUP) {
 //			sint32 res = m_spellTargets.Find(cell);
 //			if (res != -1) {
 				iBattleGroup* pTarget = m_pBattle->Engine().FindGroup(cell, m_pCastSpellToolBar->Spell()->AffectsToDead());
 				if (!pTarget) return;
 				m_pCastSpellToolBar->SetTarget(pTarget);
-//			} 
+//			}
 		}
 		Invalidate();
     }
@@ -520,16 +520,16 @@ void iBattleView_touch::OnMouseRightDown(const iPoint& pos, MouseId mID, MouseBu
         m_pCreatInfoView->SetVisible(true);
         iPoint corner = iPoint(pos.x > m_Rect.w / 2 ? 0 : m_Rect.w, pos.y > m_Rect.h / 2 ? 0 : m_Rect.h);
         iRect temprc = iRect(pos, corner);
-        iSize sz = m_pCreatInfoView->GetSize(m_Rect.w / 4, pGroup->Type(), pGroup->Count(), CDV_TITLE | CDV_BKND | CDV_LINEAR_PERKS | CDV_GLOW, pGroup);			
+        iSize sz = m_pCreatInfoView->GetSize(m_Rect.w / 4, pGroup->Type(), pGroup->Count(), CDV_TITLE | CDV_BKND | CDV_LINEAR_PERKS | CDV_GLOW, pGroup);
         iRect cvrc = AlignRect(sz, temprc, AlignCenter);
         if(cvrc.x < 0) cvrc.x = 0;
         if(cvrc.y < 0) cvrc.y = 0;
         if(cvrc.x2() > m_Rect.w) cvrc.x -= (cvrc.x2() - m_Rect.w);
         if(cvrc.y2() > m_Rect.h) cvrc.y -= (cvrc.y2() - m_Rect.h);
         m_pCreatInfoView->SetRect(cvrc);
-        m_pCreatInfoView->SetGroup(pGroup);			
+        m_pCreatInfoView->SetGroup(pGroup);
         Invalidate();
-    }        
+    }
 }
 
 void iBattleView_touch::OnMouseRightUp(const iPoint& pos, MouseId mID, MouseButtonId mbID){
@@ -544,10 +544,10 @@ bool iBattleView_touch::IsInterestingCell(iBattleGroup* pGroup, const iPoint& ce
 		iCombatSpell* pSpell = m_pCastSpellToolBar->Spell();
 		iHero* pCaster = m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->SpellCaster();
 		MAGIC_SCHOOL_LEVEL msl = pSpell->GetSchoolLevel(pCaster);
-		
+
 		iSimpleArray<iPoint> targets;
 		m_pBattle->Engine().GetValidSpellTargets(pSpell, msl, targets);
-		
+
 		for (sint32 xx=-radius; xx<radius; xx++)
 			for (sint32 yy=-radius; yy<radius; yy++)
 			{
@@ -555,15 +555,15 @@ bool iBattleView_touch::IsInterestingCell(iBattleGroup* pGroup, const iPoint& ce
 				for(uint32 i=0; i<targets.GetSize(); i++)
 					if(targets[i] == t)
 						return true;
-			}		
+			}
 		return false;
-	} 
-	
+	}
+
 	iSimpleArray<iPoint> m_targets;
 	iSimpleArray<bool> m_targetsType;
 	bool target_is_shot = false;
 	bool allow_melee = true;
-    
+
 	for (sint32 xx=-radius; xx<radius; xx++)
 		for (sint32 yy=-radius; yy<radius; yy++)
 		{
@@ -583,10 +583,10 @@ sint32 GetGroupPossibilitiesCount(const iBattleGroup* pGroup, const iPoint& cell
 	sint32 res = 0;
 	if(pGroup->GetShootEntry(cell))
 		res++;
-	
+
 	if(const iBattleGroup::iMeleeEntry* pMeleeTrack = pGroup->GetMeleeEntry(cell)) {
 		for(uint32 x=0; x<MDIR_COUNT/*mlist.GetSize()*/; x++)
-			if (pMeleeTrack->m_cfg & (1<<x)) 
+			if (pMeleeTrack->m_cfg & (1<<x))
 				res++;
 	}
 	return res;
@@ -595,8 +595,8 @@ sint32 GetGroupPossibilitiesCount(const iBattleGroup* pGroup, const iPoint& cell
 
 
 void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId mbID)
-{	
-#ifdef OS_IPHONE
+{
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	if(m_bInfoMode && mID == 0) {
 		m_pBtnInfo->MouseUp(m_pBtnInfo->GetPos(), 0, mbID);
 		if(!(m_pBtnInfo->GetButtonState() && iButton::Pressed))
@@ -606,9 +606,9 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 #endif
 	if(iView* pView = GetChildByPos(pos)) {
 		if(pView != m_pAutoBattleToolBar && pView != m_pCastSpellToolBar)
-			return;		
-	}	
-	
+			return;
+	}
+
 	// MULTI-FINGERED: return
 	if(ActiveFingers() > 1 || PerformedFingers() > 1) return;
 
@@ -617,17 +617,17 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 
 #ifdef PC_VERSION
 	// INFO MODE: hide creat info
-	if(m_bInfoMode) {		
+	if(m_bInfoMode) {
 		m_pCreatInfoView->SetVisible(false);
 		m_highlightedGroup = cInvalidPoint;
 		return;
 	}
 #endif
-    	
+
 	iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(m_pBattle->Engine().TurnSeq().CurUnit());
 	if(!pCurCreatGroup) return; //this is a small fix for crash when pressing 'autocombat' button (Hedin)
 	iBattleGroup *pGroup = pCurCreatGroup->GetCreatGroup();
-	
+
 #if defined(OS_IPHONE)
     if(!gUseIpadUI)
     {
@@ -648,7 +648,7 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
             realPos = m_pZoomer->GetRes();
             //		m_trackCell = Screen2Map(realPos);
             //		if(SpellTracking()) m_SpellTrack = Screen2Map(realPos);
-            
+
             delete m_pZoomer;
             m_pZoomer = NULL;
         } else
@@ -658,16 +658,16 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 
 	m_MoveEntry = cInvalidPoint;
 	Invalidate();
-	
+
 	iPoint curCell = Screen2Map(pos);
 
 	// SPELL CASTING: decide to cast or not
-	if (SpellTracking()) {		
+	if (SpellTracking()) {
 		if(m_SpellTrack != cInvalidPoint && Screen2Map(pos) == m_SpellTrack)  // fixed for different resolutions, Hedin, 15.01.2011
 		{
-			if( 
-#ifdef OS_IPHONE
-               1 || 
+			if(
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
+               1 ||
 #endif
                m_bCurSelFlag ) {
 				EndSpellTrack(m_SpellTrack);
@@ -680,17 +680,17 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 		}
 		Invalidate();
 		return;
-	} 
+	}
 
 	// BATTLE TARGET SELECTION
 
 	// this block is for movement confirmation mode (iPhone)
 #ifdef MOVE_CONFIRMATION
-	if(m_MoveEntry != cInvalidPoint && Screen2Map(pos) == m_MoveEntry && 
+	if(m_MoveEntry != cInvalidPoint && Screen2Map(pos) == m_MoveEntry &&
 		pGroup->CanMove(m_MoveEntry.x,m_MoveEntry.y) &&
 		!pGroup->IsGroupCell(m_trackCell))
 	{
-		if(m_bCurSelFlag) { 
+		if(m_bCurSelFlag) {
 			m_pBattle->Engine().Move(m_MoveEntry, pCurCreatGroup->GetCreatGroup()->Orient());
 			m_MoveEntry = cInvalidPoint;
 			BeginAni();
@@ -698,8 +698,8 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 			m_pMeleeTrack = NULL;
 		} else
 			m_bCurSelFlag = true;
-	} 
-	else 
+	}
+	else
 #endif
 		// this is a block for Move Entry selection or (if no confirmation) direct action
 	{
@@ -718,14 +718,14 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 			{
 				if (pGroup->GetShootEntry(curCell + iPoint(xx, yy)))
 				{
-					m_targets.Add(curCell + iPoint(xx, yy));            
+					m_targets.Add(curCell + iPoint(xx, yy));
 					m_targetsType.Add(true);
 					// if we can shot, we will shot
 					allow_melee = false;
 				}
 				if (pGroup->GetMeleeEntry(curCell + iPoint(xx, yy)))
 				{
-					m_targets.Add(curCell + iPoint(xx, yy));            
+					m_targets.Add(curCell + iPoint(xx, yy));
 					m_targetsType.Add(false);
 				}
 			}
@@ -738,7 +738,7 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 #ifdef MOVE_CONFIRMATION
 					&& m_MoveEntry != m_trackCell
 #endif
-					) 
+					)
 				{
 					best = Map2Screen(m_targets[x]).GetDelta(pos);
 					bestCell = m_targets[x];
@@ -750,7 +750,7 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 					&& (!gUseIpadUI || m_initialTrackCell == m_trackCell)
 					)
 				{
-					// Cotulla: new target select code (EasyAttack, advanced combat)               
+					// Cotulla: new target select code (EasyAttack, advanced combat)
 
 					// easy attack: ai determines the direction of attack
 					if (!gSettings.GetEntryValue(CET_ADVANCED_COMBAT))
@@ -783,10 +783,10 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
                     // SHL: plus, calc and show possible damage infobar
 					else if(bestCell != cInvalidPoint)
 					{
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                         const uint32 zmsz = AWI_SIZE * 3 / 2;
 						iPoint scrpos = Map2Screen(bestCell);
-						iRect rc(scrpos.x + sm_hexHalfWidth - zmsz / 2, scrpos.y + sm_hexHeight / 2 - zmsz / 2, zmsz, zmsz); 
+						iRect rc(scrpos.x + sm_hexHalfWidth - zmsz / 2, scrpos.y + sm_hexHeight / 2 - zmsz / 2, zmsz, zmsz);
 						m_pActionWheel = new iActionWheel(&gApp.ViewMgr(), pGroup, bestCell, gApp.Surface(), this, rc);
 						m_highlightedTarget = bestCell;
 						sint32 res = m_pActionWheel->DoModal();
@@ -819,12 +819,12 @@ void iBattleView_touch::OnMouseUp(const iPoint& pos, MouseId mID, MouseButtonId 
 						m_moveDisapTimer = fix32::zero;
 						m_bCurSelFlag = true;
 #else
-						m_pBattle->Engine().Move(m_trackCell, pCurCreatGroup->GetCreatGroup()->Orient());						
+						m_pBattle->Engine().Move(m_trackCell, pCurCreatGroup->GetCreatGroup()->Orient());
 						BeginAni();
 						m_pShootTrack = NULL;
 						m_pMeleeTrack = NULL;
 #endif
-				} 				
+				}
 	}
 
 	Invalidate();
@@ -900,7 +900,7 @@ void iBattleView_touch::OnMouseTrack(const iPoint& pos, MouseId mID, MouseButton
 	if(ActiveFingers() > 1 || PerformedFingers() > 1) return;
 
 	m_trackPos = pos;
-	m_trackCell = Screen2Map(pos);	
+	m_trackCell = Screen2Map(pos);
 	m_bCurSelFlag = false;
 
 	m_MoveEntry = m_trackCell;
@@ -927,12 +927,12 @@ void iBattleView_touch::OnMouseTrack(const iPoint& pos, MouseId mID, MouseButton
 			else
 				m_SpellTrack = cInvalidPoint;
 		} else {
-			m_SpellTrack = m_trackCell;			
+			m_SpellTrack = m_trackCell;
 		}
 		Invalidate();
 		return;
-	} 
-#ifdef OS_IPHONE
+	}
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     iBattleUnit* pCurUnit = m_pBattle->Engine().TurnSeq().CurUnit();
 	iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(pCurUnit);
 	iBattleGroup *pGroup = pCurCreatGroup->GetCreatGroup();
@@ -965,7 +965,7 @@ bool iBattleView_touch::Process(fix32 t)
 	/*	for(uint32 x=0; x<m_deleteList.GetSize(); x++)
 	delete m_deleteList[x];
 	m_deleteList.RemoveAll();
-	*/	
+	*/
 
 	return iBattleView::Process(t);
 }
@@ -974,29 +974,29 @@ void iBattleView_touch::ComposeSpellCursor()
 {
 	if(m_SpellTrack != cInvalidPoint) {
 		iPoint cop = Map2Screen(m_SpellTrack);
-        
+
         iRect rc = iRect();
         iGfxManager::FlipType flip;
 
         if( cop.x < gApp.Surface().GetWidth() / 2 ){
-        
-            cop += iPoint(25, -20);      
-            flip = iGfxManager::FlipNone;            
+
+            cop += iPoint(25, -20);
+            flip = iGfxManager::FlipNone;
             rc = iRect(cop + iPoint(75, 0), iSize(50, 50));
         }
         else{
-            
-            cop += iPoint(-30, -20);        
-            rc = iRect(cop - iPoint(50, 0), iSize(50, 50));            
+
+            cop += iPoint(-30, -20);
+            rc = iRect(cop - iPoint(50, 0), iSize(50, 50));
             flip = iGfxManager::FlipVert;
         }
-        
+
         gGfxMgr.BlitUniversal( PDGG(SPELL_CURSOR), gApp.Surface(), cop, cInvalidRect, iGfxManager::EfxShadow2D, false, -1, 255, flip);
         gGfxMgr.BlitUniversal( PDGG(SPELL_CURSOR), gApp.Surface(), cop, cInvalidRect, iGfxManager::EfxNone, false, -1, 255, flip);
-        
+
         BlitIcon(gApp.Surface(), PDGG(SPELLSCROLL_UNROLLED), rc);
         BlitIcon(gApp.Surface(), m_pCastSpellToolBar->Spell()->Icon(), rc);
-        
+
 	}
 }
 
@@ -1008,13 +1008,13 @@ bool iBattleView_touch::IsAcceptingCmds()
 
 void iBattleView_touch::SetInfoMode(bool bInfoMode) {
 	m_bInfoMode = bInfoMode;
-	
+
 	EnableControls(Nothing);
-	
+
 	if(!m_bInfoMode) {
 		m_pCreatInfoView->SetVisible(false);
 		m_highlightedGroup = cInvalidPoint;
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         m_bAlwaysReceiveMouse = false;
 #endif
 	}
@@ -1024,9 +1024,9 @@ void iBattleView_touch::RemoveCreaturePopup()
 {
 	RemoveChild(m_pCreatInfoPopup);
 	m_pCreatInfoPopup->HidePopup();
-	delete m_pCreatInfoPopup;		
+	delete m_pCreatInfoPopup;
 	gApp.ViewMgr().ReleaseViewCapture();
-	m_pCreatInfoPopup = NULL;		
+	m_pCreatInfoPopup = NULL;
 	m_bGesturesEnabled = true;
 	Invalidate();
 }
@@ -1042,7 +1042,7 @@ void iBattleView_touch::HighlightMemberButton( uint32 type, bool bHighlight )
 	}
 
 }
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 void iBattleView_touch::AfterCompose()
 {
 	if(m_pZoomer) {
@@ -1059,7 +1059,7 @@ void iBattleView_touch::AfterCompose()
 	}
 }
 #endif
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 iActionWheel::iActionWheel(iViewMgr* pViewMgr, iBattleGroup *pGroup, iPoint cell, iDib& srf, iView *pUnderView, iRect src_rect)
 #else
 iActionWheel::iActionWheel(iViewMgr* pViewMgr, iBattleGroup *pGroup, iPoint cell)
@@ -1067,13 +1067,13 @@ iActionWheel::iActionWheel(iViewMgr* pViewMgr, iBattleGroup *pGroup, iPoint cell
 : iDialog(pViewMgr)
 , m_pGroup(pGroup)
 , m_cell(cell)
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 , m_srf(srf)
 , m_pUnderView(pUnderView)
 , m_src_rect(src_rect)
 #endif
 {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     m_buf.Resize(m_src_rect.size() * 2);
 #endif
 	if(const iBattleGroup::iShootEntry *pShootTrack = pGroup->GetShootEntry(cell)) {
@@ -1102,10 +1102,10 @@ iActionWheel::iActionWheel(iViewMgr* pViewMgr, iBattleGroup *pGroup, iPoint cell
 		};
 
 		for(uint32 x=0; x<MDIR_COUNT/*mlist.GetSize()*/; x++)
-			if (pMeleeTrack->m_cfg & (1<<x)) 
+			if (pMeleeTrack->m_cfg & (1<<x))
 				AddChild(new iImgBtn(pViewMgr, this, iRect(iPoint(AWI_SIZE, AWI_SIZE) + iPoint(10, 10) + meleeOffsets[meleeCursorConv[x]], iSize(AWI_SIZE, AWI_SIZE)),
-				x, 
-				PDGG(BATTLE_CURSORS) + meleeCursorConv[x], 
+				x,
+				PDGG(BATTLE_CURSORS) + meleeCursorConv[x],
 				PDGG(BATTLE_CURSORS_PRESSED) + meleeCursorConv[x],
 				iStringT(),
 				Visible | Enabled));
@@ -1113,19 +1113,19 @@ iActionWheel::iActionWheel(iViewMgr* pViewMgr, iBattleGroup *pGroup, iPoint cell
 	}
 }
 
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 void iActionWheel::UpdateSurface()
 {
 	iDib tmp(m_src_rect.size(), iDib::RGB);
 	m_srf.CopyRectToDibXY(tmp, m_src_rect, iPoint());
-	DoubleDib(tmp, m_buf);	
+	DoubleDib(tmp, m_buf);
 }
 #endif
 
 sint32 iActionWheel::DoModal()
 {
 	iPoint p = iBattleView::Map2Screen(m_cell);
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     iRect r = AlignRect(m_src_rect.size() * 2, iRect(iPoint(), gApp.Surface().GetSize()), AlignCenter);
 #else
 	iRect r = iRect(p + iPoint(iBattleView::sm_hexHalfWidth, iBattleView::sm_hexHeight / 2) - iPoint(AWI_SIZE * 3 / 2, AWI_SIZE * 3 / 2), iSize(AWI_SIZE * 3, AWI_SIZE * 3));
@@ -1161,11 +1161,11 @@ void iActionWheel::OnCompose()
 {
 	//iRect rc = GetScrRect();
 	//gApp.Surface().FrameRect(rc, 0);
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     iRect rc = GetScrRect();
 	iRect bkrc = rc;
 	bkrc.InflateRect(10);
-	ComposeDlgBkgnd(gApp.Surface(), bkrc);	
+	ComposeDlgBkgnd(gApp.Surface(), bkrc);
 	m_buf.CopyToDibXY(m_srf, rc.point());
 #endif
 }
@@ -1176,10 +1176,10 @@ void iActionWheel::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
 	EndDialog(uid);
 }
 
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 // ============================
 
-iZoomer::iZoomer(iViewMgr* pViewMgr, iView* underView, iDib& srf, iRect src_rect): 
+iZoomer::iZoomer(iViewMgr* pViewMgr, iView* underView, iDib& srf, iRect src_rect):
 iDialog(pViewMgr), m_srf(srf), m_src_rect(src_rect), m_res(cInvalidPoint),
 m_pUnderView(underView)
 {
@@ -1213,7 +1213,7 @@ sint32 iZoomer::DoModal()
 	while (m_pMgr->App()->Cycle() && m_retCode == DRC_UNDEFINED) {}
 	iDialog* pDlg = m_pMgr->PopModalDlg();
 	check(pDlg == this);
-	
+
 	return m_retCode;
 }
 
@@ -1237,7 +1237,7 @@ void iZoomer::OnMouseTrack(const iPoint &p, MouseId mID, MouseButtonId mbID)
 {
 	iRect rc = GetScrRect();
 	if(rc.PtInRect(p))
-		m_pUnderView->OnMouseTrack(ZoomedToReal(p), mID, mbID);	
+		m_pUnderView->OnMouseTrack(ZoomedToReal(p), mID, mbID);
 }
 
 void iZoomer::OnMouseUp(const iPoint &p, MouseId mID, MouseButtonId mbID)
@@ -1254,7 +1254,7 @@ void iZoomer::OnMouseUp(const iPoint &p, MouseId mID, MouseButtonId mbID)
 
 void iZoomer::OnCreateDlg()
 {
-	
+
 }
 iSize iZoomer::GetDlgMetrics() const
 {
@@ -1266,7 +1266,7 @@ void iZoomer::OnCompose()
 	iRect rc = GetScrRect();
 	iRect bkrc = rc;
 	bkrc.InflateRect(10);
-	ComposeDlgBkgnd(m_srf, bkrc);	
+	ComposeDlgBkgnd(m_srf, bkrc);
 	m_buf.CopyToDibXY(m_srf, rc.point());
 }
 

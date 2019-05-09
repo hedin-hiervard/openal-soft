@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Settings.h"
-#include "NewMapShop.h"
 
 const uint32 CONFIG_FILE_HDR = 0xA173B7C3;
 const uint32 CONFIG_FILE_NEWHDR = 0xA173B7C4;
@@ -39,7 +38,7 @@ const sint32 CONFIG_ENTRY_DESC[CET_COUNT][3] = { // min, max, default
 
 //////////////////////////////////////////////////////////////////////////
 #ifdef OS_WINCE
-const sint32 CONFIG_DEFKEYS[BAT_COUNT] = { 
+const sint32 CONFIG_DEFKEYS[BAT_COUNT] = {
 	KEY_ENTER,	// Help mode
 	KEY_VKA,	// Hand mode
 	KEY_VKB,	// Survey map
@@ -103,8 +102,8 @@ void iSettings::SetLanguage(GAME_LANG lng)
 }
 
 
-InterfaceType iSettings::GetInterfaceType() 
-{ 
+InterfaceType iSettings::GetInterfaceType()
+{
 	return IT_TOUCH;
 }
 
@@ -114,7 +113,7 @@ bool iSettings::FirstLaunch()
 	if (!pConfigFile.IsValid()) return true;
 	uint32 hdr; pConfigFile.Read(hdr);
 	if (hdr != CONFIG_FILE_NEWHDR) return true;
-	
+
 	uint32 ver;
 	pConfigFile.Read(ver);
 	if(ver < CONFIG_FILE_VER) return true;
@@ -131,7 +130,7 @@ bool iSettings::Init(const iStringT& cmdLine)
 	m_bFogOfWar = true;
 	m_bNoSound = false;
 	m_launchCounter = 0;
-    
+
 #ifdef OS_WIN32
     m_bFullScreen = false;
 #endif
@@ -166,41 +165,41 @@ bool iSettings::Init(const iStringT& cmdLine)
 		}
 	}
 	// Read the config file
-	iFileStream pConfigFile(OpenWin32File(gConfigFilePath));	
+	iFileStream pConfigFile(OpenWin32File(gConfigFilePath));
 	if (!pConfigFile.IsValid()) return true;
 	uint32 hdr; pConfigFile.Read(hdr);
 	if (hdr != CONFIG_FILE_NEWHDR) return true;
-	
+
 	uint32 ver;
 	pConfigFile.Read(ver);
 	if(ver < CONFIG_FILE_VER) return true;
-	
+
 	for (uint32 nn = 0; nn<CET_COUNT; ++nn) pConfigFile.Read(m_cfgEntries[nn]);
 	for (uint32 nn = 0; nn<BAT_COUNT; ++nn) pConfigFile.Read(m_actionKeys[nn]);
-	pConfigFile.Read(m_ActKey);	
+	pConfigFile.Read(m_ActKey);
 	uint8 tmp;
 	pConfigFile.Read(tmp);
 	m_lang = (GAME_LANG)(GLNG_ENGLISH + tmp);
-	
+
     uint32 lc;
     if(pConfigFile.Read(lc))
         m_launchCounter = lc;
     m_launchCounter++;
-    
+
 	// set the default combat speed
-	m_cfgEntries[CET_COMBATSPEED] = CONFIG_ENTRY_DESC[CET_COMBATSPEED][2]; 
+	m_cfgEntries[CET_COMBATSPEED] = CONFIG_ENTRY_DESC[CET_COMBATSPEED][2];
 	// and hero speed
-	m_cfgEntries[CET_HEROSPEED] = CONFIG_ENTRY_DESC[CET_HEROSPEED][2]; 
+	m_cfgEntries[CET_HEROSPEED] = CONFIG_ENTRY_DESC[CET_HEROSPEED][2];
 
     Save();
-    
+
 	return true;
 }
 
 void iSettings::Save()
 {
 	//
-	iFileStream pConfigFile(CreateWin32File(gConfigFilePath));	
+	iFileStream pConfigFile(CreateWin32File(gConfigFilePath));
 	if (!pConfigFile.IsValid()) return;
 	pConfigFile.Write(CONFIG_FILE_NEWHDR);
 	pConfigFile.Write(CONFIG_FILE_VER);
@@ -211,9 +210,9 @@ void iSettings::Save()
     pConfigFile.Write(m_launchCounter);
 }
 
-void iSettings::SetEntryValue(ConfigEntryType entry, sint32 val) 
-{ 
+void iSettings::SetEntryValue(ConfigEntryType entry, sint32 val)
+{
 	if (CONFIG_ENTRY_DESC[entry][1] == -1) m_cfgEntries[entry] = iMAX<sint32>(CONFIG_ENTRY_DESC[entry][0], val);
-	else m_cfgEntries[entry] = iCLAMP<sint32>(CONFIG_ENTRY_DESC[entry][0],CONFIG_ENTRY_DESC[entry][1], val); 
+	else m_cfgEntries[entry] = iCLAMP<sint32>(CONFIG_ENTRY_DESC[entry][0],CONFIG_ENTRY_DESC[entry][1], val);
 }
 

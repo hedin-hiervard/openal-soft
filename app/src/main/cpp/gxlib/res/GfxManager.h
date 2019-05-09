@@ -26,7 +26,7 @@ public:
 
 	enum FlipType {
 		FlipNone		= 0,
-		FlipVert		
+		FlipVert
 	};
 
 	enum LoadMode {
@@ -63,16 +63,16 @@ public:
 	bool IsInObj( SpriteId sid, const iPoint& pt ) const;
 	iPoint Anchor( SpriteId sid ) const;
 	uint8 Shadow( SpriteId sid ) const;
-		
+
 	/// Includes all functionality of all other Blit* methods and provides the single interface for sprite blitting
 	void BlitUniversal( SpriteId sid, iDib& to, iPoint pos, const iRect& src = cInvalidRect, Effects efx = EfxNone, bool bTile = false, SpriteId mid = -1, uint8 alpha = 255, FlipType flp = FlipNone) const;
 
 	void Blit( SpriteId sid, iDib& to, iPoint pos ) const;
 	void BlitFlipped( SpriteId sid, iDib& to, iPoint pos ) const;
 	void Blit( SpriteId sid, iDib& to, const iRect& src, iPoint pos ) const;
-	
-	void BlitAlpha( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const; // alpha - 0-63	
-	void BlitAlphaFlipped( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const; // alpha - 0-63	
+
+	void BlitAlpha( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const; // alpha - 0-63
+	void BlitAlphaFlipped( SpriteId sid, iDib& to, iPoint pos, uint8 a ) const; // alpha - 0-63
 	void BlitAlpha( SpriteId sid, iDib& to, const iRect& src, iPoint pos, uint8 a ) const; // alpha - 0-63
 	void BlitAlphaFlipped( SpriteId sid, iDib& to, const iRect& src, iPoint pos, uint8 a ) const; // alpha - 0-63
 	void BlitEffect( SpriteId sid, iDib& to, iPoint pos, Effects efx ) const;
@@ -81,13 +81,13 @@ public:
 	void BlitTile( SpriteId sid, iDib& to, const iRect& src, const iRect& dst, uint8 alpha=255 ) const;
 	void BlitTile3( SpriteId sid, iDib& to, const iRect& src, const iRect& dst ) const;
 
-	void BlitMasked( SpriteId sid, SpriteId mid, iDib& to, iPoint pos ) const;	
+	void BlitMasked( SpriteId sid, SpriteId mid, iDib& to, iPoint pos ) const;
 
 	void MakeDib( SpriteId sid, iDib& dst );
 
 	size_t MemoryOccuped() const;
-	
-	
+
+
 	struct Sprite
 	{
 		uint16			type_;
@@ -109,9 +109,9 @@ public:
 		SpriteBank();
 		~SpriteBank();
 
-		// 
+		//
 		uint8*			data;
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 		HANDLE			hFile;
 		HANDLE			hMapping;
 #else
@@ -209,7 +209,7 @@ private:
 
 	//	void BlitWorkerCopy(const uint8* pixels, uint16* dst_clr, iSize size, const size_t dstStride, iRect& src_rect, iRect& src, iRect& dst_rect, uint8 alpha, uint8 bpp, bool spanned, bool realAlpha, FlipType flp, Effects efx) const;
 //	void BlitWorkerGlowAlphaBlend(const uint8* pixels, uint16* dst_clr, iSize size, const size_t dstStride, iRect& src_rect, iRect& src, iRect& dst_rect, uint8 alpha, uint8 bpp, bool spanned, bool realAlpha, FlipType flp, Effects efx) const;
-	
+
 };
 
 

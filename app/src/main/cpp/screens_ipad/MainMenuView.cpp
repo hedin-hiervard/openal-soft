@@ -49,8 +49,8 @@
 #include "Ctl_Save.h"
 #include "Ctl_ScenList.h"
 #include "Ctl_Settings.h"
-#include "NewMapShop.h"
-#include "Ctl_MapShop.h"
+// #include "NewMapShop.h"
+// #include "Ctl_MapShop.h"
 #include "helpers.h"
 
 #ifndef ARRAYSIZE
@@ -59,33 +59,33 @@
 
 namespace UI_IPAD
 {
-    
+
     //////////////////////////////////////////////////////////////////////////
     // iNewMenuBottomBtn (this is button at bottom of workspace (image + label under image))
     //////////////////////////////////////////////////////////////////////////
     void ComposeBadge(iDib& dib, const iPoint& pt, const iStringT& txt);
-    
+
     class iNewMenuBottomBtn : public iButton
     {
     public:
         iNewMenuBottomBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, uint32 sid, sint16 presssid, sint16 tid, uint32 state = Visible|Enabled)
         : iButton(pViewMgr, pCmdHandler, rect, uid, state), m_sid(sid), m_pressedsid(presssid), m_high(false), m_tid(tid)
         { }
-        
+
         void OnBtnDown() const { }
-        
+
         inline void SetTextTip(const iStringT &tip) { m_tip = tip; Invalidate(); };
         inline void SetTextBadge(const iStringT &badge) { m_badge = badge; Invalidate(); };
-        
+
         inline void SetHighlighted(bool high) { m_high = high; Invalidate(); }
-        
+
         void OnCompose()
         {
             iRect rect = GetScrRect();
             iSize dim = gGfxMgr.Dimension(m_sid);
             iRect dst = AlignRect(dim, rect, AlignTop);
-            
-            
+
+
             if (!m_high && !(m_state & Pressed))
             {
                 if(m_sid != -1)
@@ -102,43 +102,43 @@ namespace UI_IPAD
             }
             iTextComposer::FontConfig fc_l(newmenufc_low_text);
             iTextComposer::FontConfig fc_h(newmenufc_med_text);
-            
+
             fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
             fc_h.cmpProps.faceColor = RGB16(0, 0, 0);
-            
+
             uint16 h_lo = gTextComposer.GetCharHeight(fc_l.fontSize);
             uint16 h_hi = gTextComposer.GetCharHeight(fc_h.fontSize);
-            
+
             iRect txt_rc(rect.x, rect.y + rect.h - h_lo - h_hi - 4, rect.w, h_lo + h_hi + 4);
-            
+
             //gApp.Surface().FrameRect(txt_rc, cColor_Black);
-            
+
             gTextComposer.TextOut(fc_h, gApp.Surface(), txt_rc, gTextMgr[m_tid], txt_rc, AlignTop, iPoint());
             if (!m_tip.Empty()) {
                 gTextComposer.TextOut(fc_l, gApp.Surface(), txt_rc, m_tip, txt_rc, AlignBottom, iPoint());
             }
-            
+
             if (!m_badge.Empty()) {
                 ComposeBadge(gApp.Surface(), rect.TopRight() - iPoint(50, 5), m_badge);
             }
-            
+
             //gApp.Surface().FrameRect(rect, cColor_Black);
-            
+
         }
-        
+
         inline void SetSprite(sint16 sid, sint16 pressedSid) { m_sid = sid; m_pressedsid = pressedSid; Invalidate(); }
-        
+
     private:
         sint16 m_sid, m_tid, m_pressedsid;
         bool m_high;
         iStringT m_tip, m_badge;
     };
-    
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuBtn (big buttons at the left of menu)
     //////////////////////////////////////////////////////////////////////////
-    
-    
+
+
     class iMainMenuView::iMenuBtn : public iButton, public IViewCmdHandler
     {
     public:
@@ -146,14 +146,14 @@ namespace UI_IPAD
         : iButton(pViewMgr, this, rect, uid, (Visible|Enabled)), m_rid(rid), m_active(false), m_pCmdHandler(pCmdHandler),
         m_count(0)
         {}
-        
+
         void SetActive(bool b ) { m_active = b;};
         inline void SetCount(uint32 count) { m_count = count; }
-        
+
     private:
         void OnCompose();
         void ComposeBkg(bool pressed);
-        
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             if (cmd == CCI_BTNCLICK || cmd == CCI_BTNDBLCLICK)
@@ -161,32 +161,32 @@ namespace UI_IPAD
                 m_pCmdHandler->iCMDH_ControlCommand(pView, cmd, 0);
             }
         }
-        
+
     private:
         bool                m_active;
         uint32              m_rid; // id of text resource
         IViewCmdHandler*    m_pCmdHandler;
         uint32				m_count; // the badge with number on button
     };
-    
-    
+
+
     void iMainMenuView::iMenuBtn::ComposeBkg(bool pressed)
     {
         iDib& surf = gApp.Surface();
         bool bDecs = false;
         iRect rect = GetScrRect();
         //    rect.InflateRect(8, 8, 8, 8);
-        
+
         uint32 toffs = (bDecs)?12:10;
         if (rect.IsEmpty()) return;
-        
+
         if(rect.w <= 24 || rect.h <= 24) return; // too few space
-        
+
         // tile background
         iRect bkRect(rect);
         bkRect.DeflateRect(15, 15, 14, 14);
         bkRect -= iPoint(1,1);
-        
+
         if (!pressed)
         {
             uint16 clr = RGB16(231, 214, 189);
@@ -198,15 +198,15 @@ namespace UI_IPAD
              trc = iRect(rect.x, rect.y + 14, 14, rect.h - 28);					surf.FillRect(trc, clr);
              trc = iRect(rect.x + rect.w - 14, rect.y + 14, 12, rect.h - 28);	surf.FillRect(trc, clr);
              */
-            
+
             // top/bottom tiles
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_NU), surf, iRect(rect.x + 14, rect.y, rect.w - 14 * 2 - 1, 14));
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_ND), surf, iRect(rect.x + 14, rect.y2() - 14,rect.w - 14 * 2 - 1, 14));
-            
+
             // left/right tiles
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_NL), surf, iRect(rect.x, rect.y + 14, 14, rect.h - 14 * 2 - 1));
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_NR), surf, iRect(rect.x2() - 14, rect.y + 14, 14, rect.h - 14 * 2 - 1));
-            
+
             // corners
             gGfxMgr.Blit(PDGG(NMENU_BTN_NLU), surf, iPoint(rect.x, rect.y));
             gGfxMgr.Blit(PDGG(NMENU_BTN_NRU), surf, iPoint(rect.x2() - 14,rect.y));
@@ -221,24 +221,24 @@ namespace UI_IPAD
             trc = iRect(rect.x + 14, rect.y + rect.h - 14, rect.w - 28, 12);	surf.FillRect(trc, RGB16(242, 230, 197));
             trc = iRect(rect.x, rect.y + 14, 14, rect.h - 28);					surf.FillRect(trc, RGB16(242, 230, 197));
             trc = iRect(rect.x + rect.w - 14, rect.y + 14, 12, rect.h - 28);	surf.FillRect(trc, RGB16(242, 230, 197));
-            
+
             // top/bottom tiles
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_PU), surf, iRect(rect.x + 14, rect.y, rect.w - 14 * 2, 14));
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_PD), surf, iRect(rect.x + 14, rect.y2() - 14,rect.w - 14 * 2, 14));
-            
+
             // left/right tiles
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_PL), surf, iRect(rect.x, rect.y + 14, 14, rect.h - 14 * 2));
             gGfxMgr.BlitTile(PDGG(NMENU_BTN_PR), surf, iRect(rect.x2() - 14, rect.y + 14, 14, rect.h - 14 * 2));
-            
+
             // corners
             gGfxMgr.Blit(PDGG(NMENU_BTN_PLU), surf, iPoint(rect.x, rect.y));
             gGfxMgr.Blit(PDGG(NMENU_BTN_PRU), surf, iPoint(rect.x2() - 14,rect.y));
             gGfxMgr.Blit(PDGG(NMENU_BTN_PLD), surf, iPoint(rect.x, rect.y2() - 14));
             gGfxMgr.Blit(PDGG(NMENU_BTN_PRD), surf, iPoint(rect.x2() - 14,rect.y2() - 14));
         }
-        
+
     }
-    
+
     void ComposeBadge(iDib& dib, const iPoint& pt, const iStringT& txt)
     {
         iSize sz = gGfxMgr.Dimension(PDGG(NMENU_BADGE));
@@ -250,23 +250,23 @@ namespace UI_IPAD
             fc.fontSize--;
         gTextComposer.TextOut(fc, dib, txtrc, txt, txtrc, AlignCenter);
     }
-    
+
     void iMainMenuView::iMenuBtn::OnCompose()
     {
         bool show_pressed = false;
         iRect rc = GetScrRect();
-        
+
         iTextComposer::FontConfig fc(dlgfc_plain);
         iRect orc(rc);
         fc.fontSize = FS_PT_36b;
         fc.cmpProps.decor = iDibFont::DecNone;
-        
+
         if (m_state & Pressed)
             show_pressed = true;
-        
+
         if (m_active)
             show_pressed = !show_pressed;
-        
+
         if (show_pressed)
         {
             ComposeBkg(true);
@@ -275,34 +275,34 @@ namespace UI_IPAD
         else
         {
             ComposeBkg(false);
-            
+
             fc.cmpProps.faceColor = RGB16(248, 232, 200);//RGB16(240, 228, 192);//RGB16(232, 224, 184);
         }
         gTextComposer.TextOut(fc,gApp.Surface(),orc,gTextMgr[m_rid],orc,AlignCenter);
-        
+
         if(m_count > 0) {
             iStringT txt = iFormat(_T("%d"), m_count);
             iSize sz = gGfxMgr.Dimension(PDGG(NMENU_BADGE));
             ComposeBadge(gApp.Surface(), orc.TopRight() - iPoint(sz.w * 2 / 3, sz.h / 2), txt);
         }
     }
-    
-    
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab: public iView, public IViewCmdHandler
     {
     public:
         iMenuTab(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid)
         : iView(pViewMgr, rect, GENERIC_VIEWPORT, uid, (Visible|Enabled)), m_pCmdHandler(pCmdHandler)  {}
-        
+
         virtual void OnActivate() { };
         virtual void OnDeactivate() { };
         virtual void SetActive(bool b ) { m_active = b;};
         virtual bool Process(fix32 t) { return true; };
-        
+
     protected:
         virtual void OnCompose()
         {
@@ -311,35 +311,35 @@ namespace UI_IPAD
             //gApp.Surface().FrameRect(rc, cColor_Black);
             ComposeBkg(0, RGB16(216, 210, 192));
         }
-        
+
         virtual void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
         }
-        
+
     protected:
         void ComposeBkg(uint32 h_size, uint32 clr_top);
-        
+
         bool m_active;
         IViewCmdHandler*    m_pCmdHandler;
     };
-    
-    
-    
+
+
+
     void iMainMenuView::iMenuTab::ComposeBkg(uint32 h_size, uint32 clr)
     {
         iDib& surf = gApp.Surface();
         bool bDecs = false;
         iRect rect = GetScrRect();
         //  rect.InflateRect(8, 8, 8, 8);
-        
+
         if (rect.IsEmpty()) return;
-        
+
         if(rect.w <= 36 || rect.h <= 36) return; // too few space
-        
+
         uint32 clr_top = RGB16(216, 210, 192);
-        
+
         uint8 alpha = 255;
-        
+
         // tile background
         iRect bkRect(rect);
         bkRect.DeflateRect(5);
@@ -347,10 +347,10 @@ namespace UI_IPAD
         iRect trc;
         trc = iRect(rect.x + 11, rect.y + 2, rect.w - 22, 20);              surf.FillRect(trc, h_size ? clr_top : clr, alpha);
         trc = iRect(rect.x + 2, rect.y + 11, 12, rect.h - 22);				surf.FillRect(trc, clr, alpha);
-        
+
         trc = iRect(rect.x + 14, rect.y + rect.h - 14, rect.w - 28, 12);	surf.FillRect(trc, clr, alpha);
         trc = iRect(rect.x + rect.w - 14, rect.y + 14, 12, rect.h - 28);	surf.FillRect(trc, clr, alpha);
-        
+
         if (h_size)
         {
             iRect bkRect2(rect);
@@ -359,16 +359,16 @@ namespace UI_IPAD
             bkRect2.DeflateRect(2, 18, 2, h_size + 22);
             surf.FillRect(bkRect2, clr_top, alpha);
         }
-        
-        
+
+
         // top/bottom tiles
         gGfxMgr.BlitTile(PDGG(NMENU_WSP_NU), surf, iRect(rect.x + 18, rect.y, rect.w - 18 * 2, 18), alpha);
         gGfxMgr.BlitTile(PDGG(NMENU_WSP_ND), surf, iRect(rect.x + 18, rect.y2() - 18,rect.w - 18 * 2, 18), alpha);
-        
+
         // left/right tiles
         gGfxMgr.BlitTile(PDGG(NMENU_WSP_NL), surf, iRect(rect.x, rect.y + 18, 18, rect.h - 18 * 2), alpha);
         gGfxMgr.BlitTile(PDGG(NMENU_WSP_NR), surf, iRect(rect.x2() - 18, rect.y + 18, 18, rect.h - 18 * 2), alpha);
-        
+
         // separator
         if (h_size)
         {
@@ -377,7 +377,7 @@ namespace UI_IPAD
             gGfxMgr.Blit(PDGG(NMENU_WSP_NLL), surf, iPoint(rect.x, y_pos));
             gGfxMgr.Blit(PDGG(NMENU_WSP_NRR), surf, iPoint(rect.x2() - 18, y_pos));
         }
-        
+
         // corners
         if(h_size) {
             gGfxMgr.BlitAlpha(PDGG(NMENU_WSP_GLU), surf, iPoint(rect.x, rect.y), alpha);
@@ -390,18 +390,18 @@ namespace UI_IPAD
             gGfxMgr.BlitAlpha(PDGG(NMENU_WSP_NLD), surf, iPoint(rect.x, rect.y2() - 18), alpha);
             gGfxMgr.BlitAlpha(PDGG(NMENU_WSP_NRD), surf, iPoint(rect.x2() - 18,rect.y2() - 18), alpha);
         }
-        
+
     }
-    
-    
-    
+
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_SingleNew
     //////////////////////////////////////////////////////////////////////////
     // two stages: select map and select game settings
     // as well this dialog used for hot seat, flag m_hotseat used for this task
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_SingleNew: public iMainMenuView::iMenuTab
     {
     public:
@@ -409,67 +409,67 @@ namespace UI_IPAD
         : iMenuTab(pViewMgr, pCmdHandler, rect, uid), m_ctrl1(NULL), m_ctrl2(NULL), m_second_stage(false)
         {
             iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-            
+
             clRect.h -= 129;
-            
+
             m_hotseat = param ? true : false;
-            
+
             //clRect.DeflateRect(4, 0, 4, 0);
             AddChild(m_ctrl1 = new iScenListView(m_pMgr, this, clRect, 109, m_hotseat ? SCL_HOTSEAT : SCL_SINGLE));
             AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
-            
+
             iRect btnRc(18, m_Rect.h - 118, 100, 100);
             sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
-            
+
             /*
              iRect btnRc(18, m_Rect.h - 18 - 80, 100, 80);
              sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
              */
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
                                            PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1, Visible|Enabled));
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 204, PDGG(NMENU_BBTN_NBACK),
                                            PDGG(NMENU_BBTN_PBACK), TRID_MENU_BACK, Enabled));
             btnRc.x += 100 + off;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
                                            PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2, Visible|Enabled));
             btnRc.x = m_Rect.w - 18 - 100;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
                                            PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 205, PDGG(NMENU_BBTN_NPLAY),
                                            PDGG(NMENU_BBTN_PPLAY), TRID_MENU_START, Enabled));
             btnRc.x -= 100 + off;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 203, PDGG(NMENU_BBTN_NMULT),
                                            PDGG(NMENU_BBTN_PMULT), m_hotseat ? TRID_MENU_MULTIPLAYER : TRID_MENU_MAPS3));
-            
+
             m_ctrl2->SetVisible(false);
-            
+
             UpdateHighlights();
-            
+
             m_map_desc = _T("");
         }
-        
+
     private:
         bool Process(fix32 t)
         {
             return m_ctrl1->Process(t);
         }
-        
+
         void OnCompose()
         {
             iMenuTab::OnCompose();
             //iRect rc = GetScrRect();
             // CotullaTODO: frame debug
             ComposeBkg(100, RGB16(242, 230, 197));
-            
+
             if (IsStageTwo())
             {
                 iTextComposer::FontConfig fc_l(newmenufc_high_text);
                 fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
-                
+
                 iRect rc = GetScrRect();
                 iRect txt_rc(rc.x + 20 + 100, rc.y + rc.h - 18 - 100, rc.w - 140 - 100, 110);
                 iSize sz;
@@ -485,27 +485,27 @@ namespace UI_IPAD
                     m_map_desc.SetLength(m_map_desc.Length() - 3);
                     m_map_desc = m_map_desc + _T("...");
                 }
-                
+
                 gTextComposer.TextBoxOut(fc_l, gApp.Surface(), m_map_desc, txt_rc);
-                
+
                 //gApp.Surface().FrameRect(txt_rc, cColor_Black);
             }
         }
-        
+
         void FillTipsWithMapCounts()
         {
             uint32 adv_maps, act_maps, hot_maps, all_maps;
-            
+
             iNewMenuBottomBtn *vADV = (iNewMenuBottomBtn*)GetChildById(200);
             iNewMenuBottomBtn *vACT = (iNewMenuBottomBtn*)GetChildById(201);
             iNewMenuBottomBtn *vALL = (iNewMenuBottomBtn*)GetChildById(202);
             iNewMenuBottomBtn *vHOT = (iNewMenuBottomBtn*)GetChildById(203);
-            
+
             adv_maps = m_ctrl1->GetMapCount(iScenListView::ShowFilter_ADV);
             act_maps = m_ctrl1->GetMapCount(iScenListView::ShowFilter_ACT);
             hot_maps = m_ctrl1->GetMapCount(iScenListView::ShowFilter_MULTI);
             all_maps = m_ctrl1->GetMapCount(iScenListView::ShowFilter_ALL);
-            
+
             if (vADV) vADV->SetTextTip(iFormat(_T("%d %s"), adv_maps, gTextMgr[TRID_MENU_MAPS]));
             if (vACT) vACT->SetTextTip(iFormat(_T("%d %s"), act_maps, gTextMgr[TRID_MENU_MAPS]));
             if (vHOT) vHOT->SetTextTip(iFormat(_T("%d %s"), hot_maps, gTextMgr[TRID_MENU_MAPS]));
@@ -518,7 +518,7 @@ namespace UI_IPAD
                     vALL->SetTextBadge(_T(""));
             }
         }
-        
+
         void OnActivate()
         {
             gMapEnum.Update();
@@ -528,77 +528,77 @@ namespace UI_IPAD
                 m_ctrl1->LoadData();
                 FillTipsWithMapCounts();
             }
-            
+
             if (IsStageTwo())
                 StageOne();
         }
-        
+
         void StageTwo()
         {
             m_scProps = m_ctrl1->SelScen();
             m_map_desc = m_scProps.MapDescription();
-            
+
             m_ctrl2->SetData(m_scProps);
             m_ctrl1->SetVisible(false);
             m_ctrl2->SetVisible(true);
-            
+
             SetVisibleById(200, false);
             SetVisibleById(201, false);
             SetVisibleById(202, false);
             SetVisibleById(203, false);
             SetVisibleById(204, true);
             SetVisibleById(205, true);
-            
+
             m_second_stage = true;
-            
+
             m_ctrl2->SetData(m_scProps);
             Invalidate();
         }
-        
+
         void StageOne()
         {
             m_ctrl2->SetVisible(false);
             m_ctrl1->SetVisible(true);
-            
+
             SetVisibleById(200, true);
             SetVisibleById(201, true);
             SetVisibleById(202, true);
             SetVisibleById(203, true);
             SetVisibleById(204, false);
             SetVisibleById(205, false);
-            
+
             m_second_stage = false;
             Invalidate();
         }
-        
+
         bool IsStageTwo()
         {
             return m_second_stage;
         }
-        
+
         void SendResult(uint32 res)
         {
             if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);
         }
-        
-        
+
+
         void SetHighlightBtn(uint32 uid, bool f)
         {
             iNewMenuBottomBtn *v = (iNewMenuBottomBtn*)GetChildById(uid);
             if (v) v->SetHighlighted(f);
         }
-        
+
         void UpdateHighlights() {
             SetHighlightBtn(200, m_ctrl1->GetShowFilter() == iScenListView::ShowFilter_ADV);
             SetHighlightBtn(201, m_ctrl1->GetShowFilter() == iScenListView::ShowFilter_ACT);
             SetHighlightBtn(202, m_ctrl1->GetShowFilter() == iScenListView::ShowFilter_ALL);
             SetHighlightBtn(203, m_ctrl1->GetShowFilter() == iScenListView::ShowFilter_MULTI);
         }
-        
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             uint32 uid = pView->GetUID();
-            
+
             if (!IsStageTwo())
             {
                 if (uid == 200)
@@ -622,7 +622,7 @@ namespace UI_IPAD
                     UpdateHighlights();
                 }
             }
-            
+
             if (uid == 204)
             {
                 // back button
@@ -677,11 +677,11 @@ namespace UI_IPAD
                     m_map_desc = m_scProps.MapDescription();
                     Invalidate();
                 }
-                
+
             }
-            
+
         }
-        
+
     private:
         iMapInfo        m_scProps;
         iPHLabel*       m_mapname;
@@ -691,13 +691,13 @@ namespace UI_IPAD
         bool            m_hotseat;
         iStringT        m_map_desc;
     };
-    
-    
-    
+
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_Credits
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_Credits: public iMainMenuView::iMenuTab
     {
     public:
@@ -707,81 +707,81 @@ namespace UI_IPAD
         {
             iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
             sint32 yp = clRect.y + 100;
-            
+
             //AddChild(new iPHLabel(m_pMgr, iRect(clRect.x, yp, clRect.w, 15), iStringT(_T("Credits")), AlignTop, dlgfc_topic));
-            
+
             const iSimpleArray<iStringT>& crtext = gGame.ItemMgr().m_credits;
             m_totallines = crtext.GetSize();
         }
-        
+
         ~iMenuTab_Credits()
         {
             m_pMgr->CleanupTimers(this);
         }
-        
+
         void OnActivate()
         {
             m_pMgr->SetTimer(10, 1, this);
         }
-        
-        
+
+
         void OnDeactivate()
         {
             m_pMgr->CleanupTimers(this);
         }
-        
+
     protected:
-        
+
         void OnCompose()
         {
             iMenuTab::OnCompose();
-            
+
             iRect rc = GetScrRect();
             rc.DeflateRect(18);
-            
+
             const iSimpleArray<iStringT>& crtext = gGame.ItemMgr().m_credits;
             uint32 ypos = 0;
-            
+
             iTextComposer::FontConfig fc(newmenufc_credits);
             fc.cmpProps.decor = iDibFont::DecBorder;
             fc.cmpProps.faceColor = RGB16(0,0,0);
             fc.cmpProps.alpha = m_alpha;
-            
+
             ypos += (m_Rect.h - m_draw_count * 25 - gTextComposer.GetFontHeight(fc.fontSize)) / 3;
-            
+
             fc.fontSize = FS_PT_36b;
             gTextComposer.TextOut(fc, gApp.Surface(), iPoint(),  m_title, iRect(rc.x,rc.y + ypos, rc.w, 14), AlignTop);
-            
+
             ypos += gTextComposer.GetFontHeight(fc.fontSize);
-            
+
             fc.fontSize = FS_PT_24;
-            
+
             iTextComposer::FontConfig _fc(menufc_medium);
             _fc.cmpProps.faceColor = RGB16(255,255,255);
-            
+
             for (uint i = 0; i < m_draw_count; i++)
             {
                 OutputDebugString(crtext[m_draw_start + i].CStr());
                 OutputDebugString(L"\r\n");
-                
+
                 iStringT txt = crtext[m_draw_start + i].CStr();
-                
+
                 gTextComposer.TextOut(fc, gApp.Surface(), iPoint(), crtext[m_draw_start + i], iRect(rc.x,rc.y + ypos, rc.w, 14), AlignTop);
                 ypos += 25;
             }
-            
+
         }
-        
-        
+
+
         void CalcCurrentGroup()
         {
             uint32 i;
             const iSimpleArray<iStringT>& crtext = gGame.ItemMgr().m_credits;
-            
+
             m_curline = m_draw_start + m_draw_count;
             if (m_curline >= m_totallines)
                 m_curline = 0;
-            
+
             iStringT curline = crtext[m_curline];
             if (curline.Find(iStringT(_T("^"))) != iStringT::NOT_FOUND)
             {
@@ -790,7 +790,7 @@ namespace UI_IPAD
                 str.Replace(_T("^"), _T(""));
                 m_title = str;
             }
-            
+
             // calc number of lines to show (start of group detected by # in string)
             for (i = m_curline + 1; i < m_totallines; i++)
             {
@@ -801,22 +801,22 @@ namespace UI_IPAD
                 if (i - m_curline > 15)
                     break;
             }
-            
+
             m_draw_start = m_curline + 1;
             m_draw_count = i - m_curline - 1;
         }
-        
-        
+
+
         void OnTimer(uint32 tid)
         {
             if (tid != 1) return;
             if (!m_active) return;
-            
+
             if (m_tcounter == 0)
             {
                 CalcCurrentGroup();
             }
-            
+
             m_tcounter++;
             if (m_tcounter < 20)  // fade in (20 * 10 = 200ms)
             {
@@ -845,11 +845,11 @@ namespace UI_IPAD
                 m_tcounter = 0;
                 m_alpha = 0;
             }
-            
+
             Invalidate();
             m_pMgr->SetTimer(10, 1, this);
         }
-        
+
     private:
         iStringT m_title;
         uint32 m_totallines;
@@ -859,20 +859,20 @@ namespace UI_IPAD
         sint32 m_alpha;
         uint32 m_tcounter;
     };
-    
-    
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_DownloadMaps
     //////////////////////////////////////////////////////////////////////////
-    
+
     void ComposeMapPrice(iDib& dib, const iRect& irc, const iStringT& cost, bool bIsUpdating, bool bIsHotNew)
     {
         iTextComposer::FontConfig fc_m(newmenufc_grt_text);
-        
+
         fc_m.cmpProps.faceColor = RGB16(0, 0, 0);
-        
+
         iStringT c = cost;
-        
+
         if(bIsUpdating)
             c = iStringT(gTextMgr[TRID_SHOP_UPDATE]);
         /*else if(bIsHotNew)
@@ -881,233 +881,233 @@ namespace UI_IPAD
         iSize sz = gTextComposer.GetTextBoxSize(c, irc.w, fc_m);
         gTextComposer.TextBoxOut(fc_m, dib, c, AlignRect(sz, irc, AlignCenter));
     }
-    
-    class iMainMenuView::iMenuTab_DownloadMaps: public iMainMenuView::iMenuTab
-    {
-    public:
-        enum ShopTabState {
-            STS_BLOCKED = 0,
-            STS_LIST,
-            STS_DESC
-        };
-    public:
-        iMenuTab_DownloadMaps(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid)
-        : iMenuTab(pViewMgr, pCmdHandler, rect, uid)
-        {
-            iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-            
-            clRect.h -= 129;
-            
-            AddChild(m_ctrl = new iMapShopView(m_pMgr, this, clRect, 109));
-            
-            iRect btnRc(5, m_Rect.h - 118, m_Rect.w / 5, 100);
-            //sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 4;
-            
-            /*
-             
-             iRect btnRc(18, m_Rect.h - 18 - 80, 100, 80);
-             sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
-             */
-            
-            AddChild(m_pBtnAdv = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
-                                                       PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1));
-            AddChild(m_pBtnBack = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 205, PDGG(NMENU_BBTN_NBACK),
-                                                        PDGG(NMENU_BBTN_PBACK), TRID_MENU_BACK));
-            
-            btnRc.x += btnRc.w;
-            
-            AddChild(m_pBtnAct = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
-                                                       PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2));
-            btnRc.x += btnRc.w;
-            
-            AddChild(m_pBtnMult = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 203, PDGG(NMENU_BBTN_NMULT),
-                                                        PDGG(NMENU_BBTN_PMULT), TRID_MENU_MAPS3));
-            
-            btnRc.x += btnRc.w;
-            
-            AddChild(m_pBtnUpd = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 204, PDGG(NMENU_BBTN_NUPDATES),
-                                                       PDGG(NMENU_BBTN_PUPDATES), TRID_SHOP_UPDATES));
-            btnRc.x += btnRc.w;
-            
-            AddChild(m_pBtnAll = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
-                                                       PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
-            AddChild(m_pBtnBuy = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 206, PDGG(NMENU_BBTN_NUPDATES),
-                                                       PDGG(NMENU_BBTN_PUPDATES), TRID_MENU_PURCHASE));
-            
-            SetState(STS_LIST);
-            UpdateHighlights();
-        }
-        
-        bool Process(fix32 t)
-        {
-            return m_ctrl->Process(t);
-        }
-        
-    private:
-        
-        void OnCompose()
-        {
-            iMenuTab::OnCompose();
-            ComposeBkg(100, RGB16(242, 230, 197));
-            
-            iTextComposer::FontConfig fc_l(newmenufc_high_text);
-            fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
-        }
-        
-        void SetState(ShopTabState sts) {
-            switch(sts) {
-                case STS_BLOCKED:
-                    m_pBtnAll->SetVisible(false);
-                    m_pBtnAct->SetVisible(false);
-                    m_pBtnAdv->SetVisible(false);
-                    m_pBtnMult->SetVisible(false);
-                    m_pBtnUpd->SetVisible(false);
-                    m_pBtnBack->SetVisible(false);
-                    m_pBtnBuy->SetVisible(false);
-                    break;
-                case STS_LIST:
-                    m_pBtnAll->SetVisible(true);
-                    m_pBtnAct->SetVisible(true);
-                    m_pBtnAdv->SetVisible(true);
-                    m_pBtnMult->SetVisible(true);
-                    m_pBtnUpd->SetVisible(true);
-                    m_pBtnBack->SetVisible(false);
-                    m_pBtnBuy->SetVisible(false);
-                    break;
-                case STS_DESC:
-                    m_pBtnAll->SetVisible(false);
-                    m_pBtnAct->SetVisible(false);
-                    m_pBtnAdv->SetVisible(false);
-                    m_pBtnMult->SetVisible(false);
-                    m_pBtnUpd->SetVisible(false);
-                    m_pBtnBack->SetVisible(true);
-                    m_pBtnBuy->SetVisible(true);
-                    break;
-            }
-        }
-        
-        void FillTipsWithMapCounts()
-        {
-            uint32 adv_maps, act_maps, hot_maps, all_maps, updates;
-            
-            iNewMenuBottomBtn *vADV = (iNewMenuBottomBtn*)GetChildById(200);
-            iNewMenuBottomBtn *vACT = (iNewMenuBottomBtn*)GetChildById(201);
-            iNewMenuBottomBtn *vALL = (iNewMenuBottomBtn*)GetChildById(202);
-            iNewMenuBottomBtn *vHOT = (iNewMenuBottomBtn*)GetChildById(203);
-            iNewMenuBottomBtn *vUPD = (iNewMenuBottomBtn*)GetChildById(204);
-            
-            adv_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ADV);
-            act_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ACT);
-            hot_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_MULTI);
-            all_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ALL);
-            updates = m_ctrl->GetMapCount(MapShop::ShowFilter_UPD);
-            
-            if (vADV) vADV->SetTextTip(iFormat(_T("%d"), adv_maps));
-            if (vACT) vACT->SetTextTip(iFormat(_T("%d"), act_maps));
-            if (vHOT) vHOT->SetTextTip(iFormat(_T("%d"), hot_maps));
-            if (vALL) {
-                vALL->SetTextTip(iFormat(_T("%d"), all_maps));
-                //			uint32 newmaps = m_ctrl->GetNewMapCount();
-                //			if(newmaps > 0)
-                //				vALL->SetTextBadge(iFormat(_T("%d"), newmaps));
-                //			else
-                //				vALL->SetTextBadge(_T(""));
-                
-            }
-            if (vUPD) {
-                vUPD->SetTextTip(iFormat(_T("%d"), updates, gTextMgr[TRID_MENU_MAPS]));
-                if(updates > 0)
-                    vUPD->SetTextBadge(iFormat(_T("%d"), updates));
-                else
-                    vUPD->SetTextBadge(_T(""));
-            }
-        }
-        
-        void OnActivate()
-        {
-            if (m_ctrl) m_ctrl->LoadData(), FillTipsWithMapCounts();
-        }
-        
-        void SetHighlightBtn(uint32 uid, bool f)
-        {
-            iNewMenuBottomBtn *v = (iNewMenuBottomBtn*)GetChildById(uid);
-            if (v) v->SetHighlighted(f);
-        }
-        
-        
-        void UpdateHighlights() {
-            SetHighlightBtn(200, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ADV);
-            SetHighlightBtn(201, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ACT);
-            SetHighlightBtn(202, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ALL);
-            SetHighlightBtn(203, m_ctrl->GetShowFilter() == MapShop::ShowFilter_MULTI);
-            SetHighlightBtn(204, m_ctrl->GetShowFilter() == MapShop::ShowFilter_UPD);
-        }
-        
-        void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
-        {
-            uint32 uid = pView->GetUID();
-            
-            if (uid == 200)
-            {
-                m_ctrl->SetShowFilter(MapShop::ShowFilter_ADV);
-                UpdateHighlights();
-            }
-            else if (uid == 202)
-            {
-                m_ctrl->SetShowFilter(MapShop::ShowFilter_ALL);
-                UpdateHighlights();
-            }
-            else if (uid == 203)
-            {
-                m_ctrl->SetShowFilter(MapShop::ShowFilter_MULTI);
-                UpdateHighlights();
-            }
-            else if (uid == 201)
-            {
-                m_ctrl->SetShowFilter(MapShop::ShowFilter_ACT);
-                UpdateHighlights();
-            }
-            else if (uid == 204)
-            {
-                m_ctrl->SetShowFilter(MapShop::ShowFilter_UPD);
-                UpdateHighlights();
-            }
-            
-            else if(uid == 109) {
-                if (cmd == CCI_EDITCHANGED)
-                {
-                    // called on map count update
-                    FillTipsWithMapCounts();
-                    SetState(STS_LIST);
-                    Invalidate();
-                } else if(cmd == CCI_LBSELECTED)
-                {
-                    SetState(STS_DESC);
-                }
-            } else if(uid == 205) {
-                m_ctrl->LoadData();
-                SetState(STS_LIST);
-            } else if(uid == 206) {
-                m_ctrl->DoBuy();
-                SetState(STS_BLOCKED);
-            }
-            
-        }
-        
-        iMapShopView *m_ctrl;
-        iButton* m_pBtnBuy;
-        iButton* m_pBtnMult;
-        iButton* m_pBtnAdv;
-        iButton* m_pBtnAct;
-        iButton* m_pBtnAll;
-        iButton* m_pBtnUpd;
-        iButton* m_pBtnBack;
-    };
-    
+
+    // class iMainMenuView::iMenuTab_DownloadMaps: public iMainMenuView::iMenuTab
+    // {
+    // public:
+    //     enum ShopTabState {
+    //         STS_BLOCKED = 0,
+    //         STS_LIST,
+    //         STS_DESC
+    //     };
+    // public:
+    //     iMenuTab_DownloadMaps(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid)
+    //     : iMenuTab(pViewMgr, pCmdHandler, rect, uid)
+    //     {
+    //         iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
+
+    //         clRect.h -= 129;
+
+    //         AddChild(m_ctrl = new iMapShopView(m_pMgr, this, clRect, 109));
+
+    //         iRect btnRc(5, m_Rect.h - 118, m_Rect.w / 5, 100);
+    //         //sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 4;
+
+    //         /*
+
+    //          iRect btnRc(18, m_Rect.h - 18 - 80, 100, 80);
+    //          sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
+    //          */
+
+    //         AddChild(m_pBtnAdv = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
+    //                                                    PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1));
+    //         AddChild(m_pBtnBack = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 205, PDGG(NMENU_BBTN_NBACK),
+    //                                                     PDGG(NMENU_BBTN_PBACK), TRID_MENU_BACK));
+
+    //         btnRc.x += btnRc.w;
+
+    //         AddChild(m_pBtnAct = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
+    //                                                    PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2));
+    //         btnRc.x += btnRc.w;
+
+    //         AddChild(m_pBtnMult = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 203, PDGG(NMENU_BBTN_NMULT),
+    //                                                     PDGG(NMENU_BBTN_PMULT), TRID_MENU_MAPS3));
+
+    //         btnRc.x += btnRc.w;
+
+    //         AddChild(m_pBtnUpd = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 204, PDGG(NMENU_BBTN_NUPDATES),
+    //                                                    PDGG(NMENU_BBTN_PUPDATES), TRID_SHOP_UPDATES));
+    //         btnRc.x += btnRc.w;
+
+    //         AddChild(m_pBtnAll = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
+    //                                                    PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
+    //         AddChild(m_pBtnBuy = new iNewMenuBottomBtn(m_pMgr, this, btnRc, 206, PDGG(NMENU_BBTN_NUPDATES),
+    //                                                    PDGG(NMENU_BBTN_PUPDATES), TRID_MENU_PURCHASE));
+
+    //         SetState(STS_LIST);
+    //         UpdateHighlights();
+    //     }
+
+    //     bool Process(fix32 t)
+    //     {
+    //         return m_ctrl->Process(t);
+    //     }
+
+    // private:
+
+    //     void OnCompose()
+    //     {
+    //         iMenuTab::OnCompose();
+    //         ComposeBkg(100, RGB16(242, 230, 197));
+
+    //         iTextComposer::FontConfig fc_l(newmenufc_high_text);
+    //         fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
+    //     }
+
+    //     void SetState(ShopTabState sts) {
+    //         switch(sts) {
+    //             case STS_BLOCKED:
+    //                 m_pBtnAll->SetVisible(false);
+    //                 m_pBtnAct->SetVisible(false);
+    //                 m_pBtnAdv->SetVisible(false);
+    //                 m_pBtnMult->SetVisible(false);
+    //                 m_pBtnUpd->SetVisible(false);
+    //                 m_pBtnBack->SetVisible(false);
+    //                 m_pBtnBuy->SetVisible(false);
+    //                 break;
+    //             case STS_LIST:
+    //                 m_pBtnAll->SetVisible(true);
+    //                 m_pBtnAct->SetVisible(true);
+    //                 m_pBtnAdv->SetVisible(true);
+    //                 m_pBtnMult->SetVisible(true);
+    //                 m_pBtnUpd->SetVisible(true);
+    //                 m_pBtnBack->SetVisible(false);
+    //                 m_pBtnBuy->SetVisible(false);
+    //                 break;
+    //             case STS_DESC:
+    //                 m_pBtnAll->SetVisible(false);
+    //                 m_pBtnAct->SetVisible(false);
+    //                 m_pBtnAdv->SetVisible(false);
+    //                 m_pBtnMult->SetVisible(false);
+    //                 m_pBtnUpd->SetVisible(false);
+    //                 m_pBtnBack->SetVisible(true);
+    //                 m_pBtnBuy->SetVisible(true);
+    //                 break;
+    //         }
+    //     }
+
+    //     void FillTipsWithMapCounts()
+    //     {
+    //         uint32 adv_maps, act_maps, hot_maps, all_maps, updates;
+
+    //         iNewMenuBottomBtn *vADV = (iNewMenuBottomBtn*)GetChildById(200);
+    //         iNewMenuBottomBtn *vACT = (iNewMenuBottomBtn*)GetChildById(201);
+    //         iNewMenuBottomBtn *vALL = (iNewMenuBottomBtn*)GetChildById(202);
+    //         iNewMenuBottomBtn *vHOT = (iNewMenuBottomBtn*)GetChildById(203);
+    //         iNewMenuBottomBtn *vUPD = (iNewMenuBottomBtn*)GetChildById(204);
+
+    //         adv_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ADV);
+    //         act_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ACT);
+    //         hot_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_MULTI);
+    //         all_maps = m_ctrl->GetMapCount(MapShop::ShowFilter_ALL);
+    //         updates = m_ctrl->GetMapCount(MapShop::ShowFilter_UPD);
+
+    //         if (vADV) vADV->SetTextTip(iFormat(_T("%d"), adv_maps));
+    //         if (vACT) vACT->SetTextTip(iFormat(_T("%d"), act_maps));
+    //         if (vHOT) vHOT->SetTextTip(iFormat(_T("%d"), hot_maps));
+    //         if (vALL) {
+    //             vALL->SetTextTip(iFormat(_T("%d"), all_maps));
+    //             //			uint32 newmaps = m_ctrl->GetNewMapCount();
+    //             //			if(newmaps > 0)
+    //             //				vALL->SetTextBadge(iFormat(_T("%d"), newmaps));
+    //             //			else
+    //             //				vALL->SetTextBadge(_T(""));
+
+    //         }
+    //         if (vUPD) {
+    //             vUPD->SetTextTip(iFormat(_T("%d"), updates, gTextMgr[TRID_MENU_MAPS]));
+    //             if(updates > 0)
+    //                 vUPD->SetTextBadge(iFormat(_T("%d"), updates));
+    //             else
+    //                 vUPD->SetTextBadge(_T(""));
+    //         }
+    //     }
+
+    //     void OnActivate()
+    //     {
+    //         if (m_ctrl) m_ctrl->LoadData(), FillTipsWithMapCounts();
+    //     }
+
+    //     void SetHighlightBtn(uint32 uid, bool f)
+    //     {
+    //         iNewMenuBottomBtn *v = (iNewMenuBottomBtn*)GetChildById(uid);
+    //         if (v) v->SetHighlighted(f);
+    //     }
+
+
+    //     void UpdateHighlights() {
+    //         SetHighlightBtn(200, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ADV);
+    //         SetHighlightBtn(201, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ACT);
+    //         SetHighlightBtn(202, m_ctrl->GetShowFilter() == MapShop::ShowFilter_ALL);
+    //         SetHighlightBtn(203, m_ctrl->GetShowFilter() == MapShop::ShowFilter_MULTI);
+    //         SetHighlightBtn(204, m_ctrl->GetShowFilter() == MapShop::ShowFilter_UPD);
+    //     }
+
+    //     void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
+    //     {
+    //         uint32 uid = pView->GetUID();
+
+    //         if (uid == 200)
+    //         {
+    //             m_ctrl->SetShowFilter(MapShop::ShowFilter_ADV);
+    //             UpdateHighlights();
+    //         }
+    //         else if (uid == 202)
+    //         {
+    //             m_ctrl->SetShowFilter(MapShop::ShowFilter_ALL);
+    //             UpdateHighlights();
+    //         }
+    //         else if (uid == 203)
+    //         {
+    //             m_ctrl->SetShowFilter(MapShop::ShowFilter_MULTI);
+    //             UpdateHighlights();
+    //         }
+    //         else if (uid == 201)
+    //         {
+    //             m_ctrl->SetShowFilter(MapShop::ShowFilter_ACT);
+    //             UpdateHighlights();
+    //         }
+    //         else if (uid == 204)
+    //         {
+    //             m_ctrl->SetShowFilter(MapShop::ShowFilter_UPD);
+    //             UpdateHighlights();
+    //         }
+
+    //         else if(uid == 109) {
+    //             if (cmd == CCI_EDITCHANGED)
+    //             {
+    //                 // called on map count update
+    //                 FillTipsWithMapCounts();
+    //                 SetState(STS_LIST);
+    //                 Invalidate();
+    //             } else if(cmd == CCI_LBSELECTED)
+    //             {
+    //                 SetState(STS_DESC);
+    //             }
+    //         } else if(uid == 205) {
+    //             m_ctrl->LoadData();
+    //             SetState(STS_LIST);
+    //         } else if(uid == 206) {
+    //             m_ctrl->DoBuy();
+    //             SetState(STS_BLOCKED);
+    //         }
+
+    //     }
+
+    //     iMapShopView *m_ctrl;
+    //     iButton* m_pBtnBuy;
+    //     iButton* m_pBtnMult;
+    //     iButton* m_pBtnAdv;
+    //     iButton* m_pBtnAct;
+    //     iButton* m_pBtnAll;
+    //     iButton* m_pBtnUpd;
+    //     iButton* m_pBtnBack;
+    // };
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_SingleLoad
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_SingleLoad: public iMainMenuView::iMenuTab
     {
     public:
@@ -1115,47 +1115,47 @@ namespace UI_IPAD
         : iMenuTab(pViewMgr, pCmdHandler, rect, uid)
         {
             iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-            
+
             clRect.h -= 129;
-            
+
             AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, false) );
-            
+
             iRect btnRc(m_Rect.w - 18 - 100, m_Rect.h - 118, 100, 100);
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NLOAD),
                                            PDGG(NMENU_BBTN_PLOAD), TRID_LOAD, Visible|Enabled));
-            
+
             m_map_desc = _T("");
         }
-        
+
     private:
         bool Process(fix32 t)
         {
             return m_ctrl->Process(t);
         }
-        
+
         void OnActivate()
         {
             // reload saved games list on activate tab
             if (m_ctrl) m_ctrl->LoadData();
         }
-        
-        
+
+
         void OnCompose()
         {
             iMenuTab::OnCompose();
             ComposeBkg(100, RGB16(242, 230, 197));
-            
+
             iTextComposer::FontConfig fc_l(newmenufc_high_text);
             fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
-            
+
             iRect rc = GetScrRect();
             iRect txt_rc(rc.x + 20, rc.y + rc.h - 18 - 100, rc.w - 140, 100);
             //gApp.Surface().FrameRect(txt_rc, cColor_Black);
             gTextComposer.TextBoxOut(fc_l, gApp.Surface(), m_map_desc, txt_rc);
         }
-        
-        
+
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             uint32 uid = pView->GetUID();
@@ -1174,7 +1174,7 @@ namespace UI_IPAD
                         gGame.StartNewGame(scenProps, false, false);
                         SetVisible(false);
                         rs = ResContinueNoHide;
-                        
+
                         if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, rs);
                     } else if(m_ctrl->GetAutoSave()) {
                         Result rs;
@@ -1184,7 +1184,7 @@ namespace UI_IPAD
                         gGame.StartNewGame(scenProps, false, false);
                         SetVisible(false);
                         rs = ResContinueNoHide;
-                        
+
                         if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, rs);
                     }
                 }
@@ -1196,15 +1196,15 @@ namespace UI_IPAD
                 }
             }
         }
-        
+
         iSaveGameView *m_ctrl;
         iStringT m_map_desc;
     };
-    
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_SingleSave
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_SingleSave: public iMainMenuView::iMenuTab
     {
     public:
@@ -1212,45 +1212,45 @@ namespace UI_IPAD
         : iMenuTab(pViewMgr, pCmdHandler, rect, uid)
         {
             iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-            
+
             clRect.h -= 129;
-            
+
             AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, true) );
-            
+
             iRect btnRc(m_Rect.w - 18 - 100, m_Rect.h - 118, 100, 100);
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NSAVE),
                                            PDGG(NMENU_BBTN_PSAVE), TRID_SAVE, Visible|Enabled));
-            
+
         }
-        
+
     private:
         bool Process(fix32 t)
         {
             return m_ctrl->Process(t);
         }
-        
+
         void OnActivate()
         {
             // reload saved games list on activate tab
             if (m_ctrl) m_ctrl->LoadData();
         }
-        
+
         void OnCompose()
         {
             iMenuTab::OnCompose();
             ComposeBkg(100, RGB16(242, 230, 197));
-            
+
             iTextComposer::FontConfig fc_l(newmenufc_high_text);
             fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
-            
+
             iRect rc = GetScrRect();
             iRect txt_rc(rc.x + 20, rc.y + rc.h - 18 - 100, rc.w - 140, 100);
             //gApp.Surface().FrameRect(txt_rc, cColor_Black);
             //gTextComposer.TextBoxOut(fc_l, gApp.Surface(), m_map_desc, txt_rc);
         }
-        
-        
+
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             uint32 uid = pView->GetUID();
@@ -1280,16 +1280,16 @@ namespace UI_IPAD
                 }
             }
         }
-        
+
         iSaveGameView *m_ctrl;
     };
-    
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_SingleTutorial
     //////////////////////////////////////////////////////////////////////////
     // two stages: select map and select game settings
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_SingleTutorial: public iMainMenuView::iMenuTab
     {
     public:
@@ -1297,42 +1297,42 @@ namespace UI_IPAD
         : iMenuTab(pViewMgr, pCmdHandler, rect, uid), m_ctrl1(NULL), m_ctrl2(NULL), m_second_stage(false)
         {
             iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-            
+
             clRect.h -= 129;
             //clRect.DeflateRect(4, 0, 4, 0);
             AddChild(m_ctrl1 = new iScenListView(m_pMgr, this, clRect, 109, SCL_TUTORIAL));
             AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
-            
+
             iRect btnRc(18, m_Rect.h - 118, 100, 100);
             sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
                                            PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1, Visible|Enabled));
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 204, PDGG(NMENU_BBTN_NBACK),
                                            PDGG(NMENU_BBTN_PBACK), TRID_MENU_BACK, Enabled));
             btnRc.x += 100 + off;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
                                            PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2, Visible|Enabled));
             btnRc.x = m_Rect.w - 18 - 100;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
                                            PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 205, PDGG(NMENU_BBTN_NPLAY),
                                            PDGG(NMENU_BBTN_PPLAY), TRID_MENU_START, Enabled));
             btnRc.x -= 100 + off;
-            
+
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 203, PDGG(NMENU_BBTN_NMULT),
                                            PDGG(NMENU_BBTN_PMULT), TRID_MENU_MAPS3));
-            
+
             m_ctrl2->SetVisible(false);
-            
+
             if (gMapEnum.GetTutorialsNum() == 1)
             {
                 StageTwo();
             }
         }
-        
+
     private:
         void OnCompose()
         {
@@ -1342,7 +1342,7 @@ namespace UI_IPAD
             ComposeBkg(100, RGB16(242, 230, 197));
             //gApp.Surface().FrameRect(rc, cColor_Black);
         }
-        
+
         void OnActivate()
         {
             if (gMapEnum.GetTutorialsNum() == 1)
@@ -1350,20 +1350,20 @@ namespace UI_IPAD
                 StageTwo();
                 return;
             }
-            
+
             if (IsStageTwo())
             {
                 StageOne();
             }
         }
-        
+
         void StageTwo()
         {
             if (gMapEnum.GetTutorialsNum() == 1)
             {
                 // we have only one map, find it
                 iScenList sl;
-                
+
                 //gMapEnum.Filter(sl, iMapInfo::MTTutorial);
                 // check(sl.GetSize() == 1);
                 m_scProps = *sl[0];
@@ -1372,51 +1372,51 @@ namespace UI_IPAD
             {
                 m_scProps = m_ctrl1->SelScen();
             }
-            
+
             m_ctrl2->SetData(m_scProps);
             m_ctrl1->SetVisible(false);
             m_ctrl2->SetVisible(true);
-            
+
             SetVisibleById(200, false);
             SetVisibleById(201, false);
             SetVisibleById(202, false);
             SetVisibleById(203, false);
             SetVisibleById(204, true);
             SetVisibleById(205, true);
-            
+
             m_second_stage = true;
-            
+
             m_ctrl2->SetData(m_scProps);
             Invalidate();
         }
-        
+
         void StageOne()
         {
             m_ctrl2->SetVisible(false);
             m_ctrl1->SetVisible(true);
-            
+
             SetVisibleById(200, true);
             SetVisibleById(201, true);
             SetVisibleById(202, true);
             SetVisibleById(203, true);
             SetVisibleById(204, false);
             SetVisibleById(205, false);
-            
+
             m_second_stage = false;
             Invalidate();
         }
-        
+
         bool IsStageTwo()
         {
             return m_second_stage;
         }
-        
+
         void SendResult(uint32 res)
         {
             if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);
         }
-        
-        
+
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             uint32 uid = pView->GetUID();
@@ -1468,10 +1468,10 @@ namespace UI_IPAD
                         SendResult(ResSingle);
                     }
                 }
-                
+
             }
         }
-        
+
     private:
         iMapInfo        m_scProps;
         iPHLabel*       m_mapname;
@@ -1479,12 +1479,12 @@ namespace UI_IPAD
         iScenPropsView *m_ctrl2;
         bool            m_second_stage;
     };
-    
-    
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMenuTab_Settings
     //////////////////////////////////////////////////////////////////////////
-    
+
     class iMainMenuView::iMenuTab_Settings: public iMainMenuView::iMenuTab
     {
     public:
@@ -1495,7 +1495,7 @@ namespace UI_IPAD
             clRect.DeflateRect(18);
             AddChild(m_ctrl = new iSettingsView(m_pMgr, this, clRect, 109));
         }
-        
+
     private:
         virtual void OnCompose()
         {
@@ -1506,17 +1506,17 @@ namespace UI_IPAD
         {
             m_ctrl->OnActivate();
         }
-        
+
         void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
         {
             // CotullaTODO: not used, remove?
         }
-        
+
         iSettingsView *m_ctrl;
     };
-    
-    
-    
+
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMainMenuView (one view used for main, single and multi menus)
     //////////////////////////////////////////////////////////////////////////
@@ -1525,7 +1525,7 @@ namespace UI_IPAD
     //#else
     //static uint32 s_buttons_trid_main[5] =
     //#endif
-    
+
     static uint32 s_buttons_trid_main[] =
     {
         TRID_MENU_DOWNLOADMAPS,
@@ -1537,7 +1537,7 @@ namespace UI_IPAD
         , TRID_MENU_EXITGAME
 #endif
     };
-    
+
     //#if defined(PC_VERSION) && !defined(MACOS_SNOWLEO) && !defined(OS_WIN32) && !defined(SHOP_FULL_VERSION)
     //static uint32 s_buttons_trid_single[6] =
     //#else
@@ -1554,7 +1554,7 @@ namespace UI_IPAD
         , TRID_MENU_EXITGAME
 #endif
     };
-    
+
     static uint32 s_buttons_trid_ingame[] =
     {
         TRID_MENU_EXITTOMAINMENU,
@@ -1582,7 +1582,7 @@ namespace UI_IPAD
         , TRID_MENU_EXITGAME
 #endif
     };
-    
+
     static uint32 s_buttons_trid_singlemap[] =
     {
         TRID_MENU_NEWGAME,
@@ -1591,8 +1591,8 @@ namespace UI_IPAD
         TRID_MENU_CREDITS,
         TRID_MENU_HELP
     };
-    
-    
+
+
     static uint32 s_buttons_trid_singlemap_in_game[] =
     {
         TRID_MENU_NEWGAME,
@@ -1601,40 +1601,40 @@ namespace UI_IPAD
         TRID_MENU_GAMESETTINGS,
         TRID_MENU_CREDITS,
     };
-    
-    
+
+
 #ifndef PC_VERSION
 #define TAB_HEIGHT 470
 #else
 #define TAB_HEIGHT 570
 #endif
-    
+
     // tab entry can be NULL, if result have not ResTab
 #define DEF_TAB_ENTRY(id, classname)    \
     pBtn = new (classname)(m_pMgr, this, iRect(sx,sy,510, TAB_HEIGHT), (id)); \
     AddChild(pBtn); \
     m_tabs.Add(pBtn);   \
     m_results.Add(ResTab);
-    
+
 #define DEF_TAB_ENTRY_PARAM(id, classname, param)    \
     pBtn = new (classname)(m_pMgr, this, iRect(sx,sy,510,TAB_HEIGHT), (id), (param)); \
     AddChild(pBtn); \
     m_tabs.Add(pBtn);   \
     m_results.Add(ResTab);
-    
+
 #define DEF_RES_ENTRY(res)    \
     m_tabs.Add(NULL);   \
     m_results.Add((res));
-    
+
     void iMainMenuView::OnCompose()
     {
         iRect rc = GetScrRect();
         //   gApp.Surface().FrameRect(rc, cColor_Red);
-        
+
     }
-    
-    
-    
+
+
+
     void iMainMenuView::FillControlsForType()
     {
         iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
@@ -1642,7 +1642,7 @@ namespace UI_IPAD
         uint32* p_buttons_trid;
         uint n_buttons_count;
         iMenuTab* pBtn;
-        
+
         if (m_type == TypeMain)
         {
             p_buttons_trid = s_buttons_trid_main;
@@ -1657,42 +1657,42 @@ namespace UI_IPAD
         {
             p_buttons_trid = s_buttons_trid_ingame;
             n_buttons_count = ARRAYSIZE(s_buttons_trid_ingame);
-        }    
+        }
         else if (m_type == TypeMulti)
         {
             p_buttons_trid = s_buttons_trid_multi;
             n_buttons_count = ARRAYSIZE(s_buttons_trid_multi);
-        } 
+        }
         else if (m_type == TypeSingleMap)
         {
             p_buttons_trid = s_buttons_trid_singlemap;
             n_buttons_count = ARRAYSIZE(s_buttons_trid_singlemap);
-        } 
+        }
         else if (m_type == TypeSingleMapInGame)
         {
             p_buttons_trid = s_buttons_trid_singlemap_in_game;
             n_buttons_count = ARRAYSIZE(s_buttons_trid_singlemap_in_game);
-        } 
-        
+        }
+
         const sint32 w = 930, h = 400;
-        
-        sx = (m_Rect.w - w) / 2; 
+
+        sx = (m_Rect.w - w) / 2;
         sy = (m_Rect.h - h) / 2;
-        for (uint32 xx = 0; xx < n_buttons_count; ++xx) 
+        for (uint32 xx = 0; xx < n_buttons_count; ++xx)
         {
             iMenuBtn* pBtn = new iMenuBtn(m_pMgr, this, iRect(sx,sy,376,70), p_buttons_trid[xx], 200 + xx);
             AddChild(pBtn);
             m_buttons.Add(pBtn);
             sy += 100;
         }
-        
+
         sx += 44 + 376;
         //    sx = 15 + 380 + 44; // 456;
         sy = (m_Rect.h - h) / 2;
-        
+
         if (m_type == TypeMain)
         {
-            DEF_TAB_ENTRY(302, iMenuTab_DownloadMaps);
+            //DEF_TAB_ENTRY(302, iMenuTab_DownloadMaps);
             DEF_RES_ENTRY(ResSingle);
             DEF_TAB_ENTRY_PARAM(301, iMenuTab_SingleNew, 1); // iMenuTab_SingleNew
             DEF_RES_ENTRY(ResTutorial); // iMenuTab_SingleTutorial
@@ -1749,93 +1749,93 @@ namespace UI_IPAD
             DEF_TAB_ENTRY(302, iMenuTab_Settings); // iMenuTab_GameSettings
             DEF_TAB_ENTRY(303, iMenuTab_Credits); // iMenuTab_Credits
         }
-        
-        
-        
+
+
+
         //check(m_tabs.GetSize() == n_buttons_count && m_results.GetSize() == n_buttons_count);
         //pBtn = new iMenuTab(m_pMgr, this, iRect(sx,sy, 500,550), 300 + xx);
     }
-    
+
 #undef DEF_TAB_ENTRY
 #undef DEF_RES_ENTRY
-    
-    
-    
+
+
+
     iMainMenuView::iMainMenuView(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, Type tp, bool fInGame, uint32 uid)
     : IMainMenuView(pViewMgr, rect, GENERIC_VIEWPORT, uid, Visible|Enabled), m_pCmdHandler(pCmdHandler), m_activebtn(-1), m_fInGame(fInGame)
 #if defined( PC_VERSION )
     , m_bLoad( false )
     , m_bSave( false )
 #endif
-    {       
+    {
         m_type = tp;
-        
-        FillControlsForType();        
+
+        FillControlsForType();
         UpdateControls();
     }
-    
-    
+
+
     bool iMainMenuView::Process(fix32 t)
     {
-        for (uint32 xx = 0; xx < m_tabs.GetSize(); ++xx) 
-        {        
+        for (uint32 xx = 0; xx < m_tabs.GetSize(); ++xx)
+        {
             if (m_tabs[xx]) m_tabs[xx]->Process(t);
         }
-        
-        
+
+
         if((m_type == TypeMain || m_type == TypeSingle)
            /*!m_bDoneUpdatingBadges*/) {
-#if defined(OS_WIN32) || defined(OS_MACOS)
-            m_buttons[0]->SetCount(gMapEnum.GetUnplayedNum());
-#else
-            m_buttons[0]->SetCount(gMapShop.GetUpdateCount());
-            
-#endif
+// #if defined(OS_WIN32) || defined(OS_MACOS)
+//             m_buttons[0]->SetCount(gMapEnum.GetUnplayedNum());
+// #else
+//             m_buttons[0]->SetCount(gMapShop.GetUpdateCount());
+
+// #endif
         }
-#if defined( PC_VERSION )	
+#if defined( PC_VERSION )
         if( m_bLoad ){
-            
+
             m_bLoad = false;
-            
+
             m_activebtn = 2;
             UpdateControls();
         }
-        
+
         if( m_bSave ){
-            
+
             m_bSave = false;
             m_activebtn = 1;
             UpdateControls();
         }
-#endif	
+#endif
         return true;
     }
-    
-    
+
+
     void iMainMenuView::OnActivate(bool bActivate)
     {
         if(!bActivate) return;
-        
-        for (uint32 xx = 0; xx < m_tabs.GetSize(); ++xx) 
-        {        
+
+        for (uint32 xx = 0; xx < m_tabs.GetSize(); ++xx)
+        {
             if (m_tabs[xx]) m_tabs[xx]->OnActivate();
-        }    
+        }
         m_bDoneUpdatingBadges = false;
         m_activebtn = -1;
         UpdateControls();
     }
-    
-    
+
+
     void iMainMenuView::UpdateControls()
     {
-        for (uint32 xx = 0; xx < m_buttons.GetSize(); ++xx) 
-        {          
+        for (uint32 xx = 0; xx < m_buttons.GetSize(); ++xx)
+        {
             iMenuBtn* pBtn = m_buttons[xx];
             iMenuTab* pTab = m_tabs[xx];
             if (xx == m_activebtn)
             {
                 pBtn->SetActive(true);
-                if (pTab) 
+                if (pTab)
                 {
                     pTab->SetVisible(true);
                     pTab->SetActive(true);
@@ -1845,7 +1845,7 @@ namespace UI_IPAD
             else
             {
                 pBtn->SetActive(false);
-                if (pTab) 
+                if (pTab)
                 {
                     pTab->SetVisible(false);
                     pTab->SetActive(false);
@@ -1853,27 +1853,27 @@ namespace UI_IPAD
                 }
             }
         }
-        
+
     }
-    
-    
+
+
     bool iMainMenuView::KeyUp(sint32 key)
     {
-        if(key == KEY_ENTER) 
+        if(key == KEY_ENTER)
         {
-            //ReportRes(DRC_OK);		
+            //ReportRes(DRC_OK);
         }
         return false;
     }
-    
-    
+
+
     void iMainMenuView::ReportResult(uint32 res)
     {
         // End dialog
-        if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);    
-        //    EndDialog(res); 
+        if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);
+        //    EndDialog(res);
     }
-    
+
     void iMainMenuView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
     {
         uint32 uid = pView->GetUID();
@@ -1882,16 +1882,16 @@ namespace UI_IPAD
             sint32 newactive = uid - 200;
             if (newactive == m_activebtn)
                 m_activebtn  = -1; // hide workspace
-            else            
+            else
                 m_activebtn = newactive; // show workspace
-            
+
             UpdateControls();
-            
-            if (m_results[newactive] != ResTab)        
+
+            if (m_results[newactive] != ResTab)
                 ReportResult(m_results[newactive]);
 #if defined(PC_VERSION)
             if( uid == 204 && m_type != iMainMenuView::TypeInGame ){
-                
+
                 gGame.Quit();
             }
 #endif
@@ -1902,82 +1902,82 @@ namespace UI_IPAD
             ReportResult(param);
         }
     }
-    
-    
+
+
     //////////////////////////////////////////////////////////////////////////
     // iMainMenuDlg (dialog used as base for new menu)
     // this dialog created from iMainMenuView::NewStart()
     // and all work (start new game, change game settings) done inside workspaces
     // so we just return continue or not
     //////////////////////////////////////////////////////////////////////////
-    
+
     iNewMenuDlg::iNewMenuDlg(iViewMgr* pViewMgr)
     : INewMenuDlg(pViewMgr), m_type(iMainMenuView::TypeMain), m_ctrl(NULL)
     {}
-    
+
     iSize iNewMenuDlg::GetDlgMetrics() const
     {
         return gApp.ViewMgr().Metrics();
     }
-    
+
     void iNewMenuDlg::UpdateSize()
     {
         // m_ctrl->SetRect(GetScrRect());
     }
-    
+
     void iNewMenuDlg::OnCreateDlg()
     {
         //iRect clRect = ClientRect();
         iRect src = GetScrRect();
-        
+
 #ifdef PC_VERSION
         src = iRect(iPoint(), GetDlgMetrics());
 #endif
-        
+
         //clRect.h -= 20;
         //clRect.DeflateSize(50);
-        AddChild(m_ctrl = new iMainMenuView(m_pMgr, this, src, m_type, m_in_game, 109) );	
+        AddChild(m_ctrl = new iMainMenuView(m_pMgr, this, src, m_type, m_in_game, 109) );
     }
-    
+
     void iNewMenuDlg::Center()
     {
         iRect rect = AlignRect(GetDlgMetrics(), m_pMgr->Metrics(), AlignCenter);
 #ifdef PC_VERSION
         rect -= iPoint(0, 30);
-#endif  
+#endif
         OnPlace(rect);
         SetRect(rect);
     }
-    
+
     iSize iNewMenuDlg::ClientSize() const
     {
-        return iSize(gApp.ViewMgr().Metrics()); 
+        return iSize(gApp.ViewMgr().Metrics());
     }
-    
+
     void iNewMenuDlg::DoCompose(const iRect& rect)
     {
         iRect rc(rect);
     }
-    
+
     bool iNewMenuDlg::KeyUp(sint32 key)
     {
         return false;
     }
-    
+
     bool iNewMenuDlg::Process(fix32 t)
     {
         return m_ctrl->Process(t);
     }
-    
+
     void iNewMenuDlg::OnCompose()
     {
         iRect rc = GetScrRect();
         //    gApp.Surface().FrameRect(rc, cColor_Blue);
-        
+
         // CotullaTODO: frame debug
         //gApp.Surface().FrameRect(rc, cColor_Black);
     }
-    
+
     void iNewMenuDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
     {
         uint32 uid = pView->GetUID();
@@ -1985,7 +1985,7 @@ namespace UI_IPAD
         {
             // End dialog
             //SetVisible(false);
-            EndDialog(param); 
+            EndDialog(param);
         }
     }
 }

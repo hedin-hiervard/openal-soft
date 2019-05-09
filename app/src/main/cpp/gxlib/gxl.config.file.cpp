@@ -5,7 +5,7 @@
 
 bool ParseConfigFile(const iStringT& fname, IConfigReaderProc& readerProc)
 {
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	FILE* file = _tfopen(fname.CStr(),_T("rt"));
 #else
 	FILE* file = fopen(CvtT2A<>(fname.CStr()), "r");

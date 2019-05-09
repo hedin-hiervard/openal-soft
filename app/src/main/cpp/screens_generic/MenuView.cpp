@@ -69,9 +69,9 @@ public:
 		}
 
 	private:
-		TextResId	m_TextKey;		
+		TextResId	m_TextKey;
 	};
-	
+
 public:
 	iMainMenuDlg(iViewMgr* pViewMgr, iMenuView::MenuLocation loc) : iDialog(pViewMgr), m_loc(loc) {}
 
@@ -85,26 +85,26 @@ private:
 	void OnCreateDlg()
 	{
 		iRect rc = GetDlgMetrics(); rc.h = DEF_BTN_HEIGHT+2;
-	
-		
+
+
 		if(m_loc == iMenuView::ML_MAIN) {
 #ifdef SINGLEPLAYER
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_SINGLEPLAYER, 100, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
-			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_MULTIPLAYER, 109, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;		
+			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_MULTIPLAYER, 109, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 
 #ifndef OS_IPHONE
-			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_GAMESETTINGS, 107, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;		
+			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_GAMESETTINGS, 107, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_CREDITS, 103, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 
 #ifndef OS_IPHONE
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_EXITGAME, 104, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #else
-			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_HELP, 105, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;		
+			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_HELP, 105, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
 #ifdef IPHONE_LITE
-			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_REG_FULLVER, 115, Visible|Enabled));		
+			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_REG_FULLVER, 115, Visible|Enabled));
 #endif
 		} else if(m_loc == iMenuView::ML_SINGLE) {
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_NEWSCENARIO, 100, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
@@ -113,7 +113,7 @@ private:
 #endif
 #ifndef IPHONE_LITE
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_LOADGAME, 101, (Visible|Enabled))); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
-#endif	
+#endif
 #ifdef SINGLEPLAYER
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_TUTORIAL, 111, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
@@ -124,7 +124,7 @@ private:
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_ONLINE, 106, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
 #ifdef SINGLEPLAYER
-			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_MULTIPLAYER, 110, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;		
+			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_MENU_MULTIPLAYER, 110, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 #endif
 			AddChild(new iMainMenuBtn(m_pMgr, this, rc, TRID_HKEY_NAME_BACK, 108, Visible|Enabled)); rc.y+=DEF_BTN_HEIGHT+BTN_DIST;
 		}
@@ -140,11 +140,11 @@ private:
 	}
 
 	iSize GetDlgMetrics() const
-	{ 
+	{
 #ifndef MULTIPLAYER
-		return iSize(150,5*(DEF_BTN_HEIGHT+2) + 12); 
+		return iSize(150,5*(DEF_BTN_HEIGHT+2) + 12);
 #else
-		return iSize(150,5*(DEF_BTN_HEIGHT+2) + 12 + 35); 
+		return iSize(150,5*(DEF_BTN_HEIGHT+2) + 12 + 35);
 #endif
 	}
 
@@ -152,7 +152,7 @@ private:
 };
 
 /*
- *	
+ *
  */
 
 iMenuView::iMenuView()
@@ -169,12 +169,12 @@ iMenuView::iMenuView()
 
 void iMenuView::Start()
 {
-	if(m_bStarted) return; 
+	if(m_bStarted) return;
 
 #ifdef OS_IPHONE
 	m_startTime = GetTickCount();
 #endif
-	
+
 	/*if (gEnterNewKey) {
 		if (registered) {
 			iTextDlg tdlg(&gApp.ViewMgr(), gTextMgr[TRID_REG_SUCCEDED], gTextMgr[TRID_REG_DONE], PID_GREEN);
@@ -217,12 +217,12 @@ void iMenuView::Start()
 							scenProps.ReorderPlayers();
 							gGame.StartNewGame(scenProps, true, true);
 							return;
-						} 
+						}
 					} else {
 						break;
 					}
 				}
-				else { 
+				else {
 					m_loc = ML_SINGLE;
 					break;
 				}
@@ -238,17 +238,17 @@ void iMenuView::Start()
 					scenProps.ReorderPlayers();
 					gGame.StartNewGame(scenProps, false, false);
 					break;
-				//} 
+				//}
 			} else {
 				continue;
 			}
 		} else if (res == 102) {
-#ifndef OS_IPHONE
-			iDlg_HallOfFame dlg(&gApp.ViewMgr(), gRootPath + _T("PalmHeroes.hsc"));
-#else
-			iDlg_HallOfFame dlg(&gApp.ViewMgr(), gSavePath + _T("PalmHeroes.hsc"));			
-#endif
-			dlg.DoModal();
+// #ifndef OS_IPHONE
+// 			iDlg_HallOfFame dlg(&gApp.ViewMgr(), gRootPath + _T("PalmHeroes.hsc"));
+// #else
+// 			iDlg_HallOfFame dlg(&gApp.ViewMgr(), gSavePath + _T("PalmHeroes.hsc"));
+// #endif
+// 			dlg.DoModal();
 		} else if (res == 103) {
 			StartCredits();
 			break;
@@ -271,8 +271,8 @@ void iMenuView::Start()
 			if(gMPMgr.ConnectToServer())
 				break;
 			else {
-				iTextDlg dlg(&gApp.ViewMgr(), gTextMgr[TRID_FAILURE], gTextMgr[TRID_FAILED_CONNECTING], PID_NEUTRAL);						
-				dlg.DoModal();					
+				iTextDlg dlg(&gApp.ViewMgr(), gTextMgr[TRID_FAILURE], gTextMgr[TRID_FAILED_CONNECTING], PID_NEUTRAL);
+				dlg.DoModal();
 			}
 		}
 #endif
@@ -296,7 +296,7 @@ void iMenuView::Start()
 					scenProps.ReorderPlayers();
 					gGame.StartNewGame(scenProps, true, true);
 					return;
-				} 
+				}
 			} else {
 				continue;
 			}
@@ -311,7 +311,7 @@ void iMenuView::Start()
 					scenProps.ReorderPlayers();
 					gGame.StartNewGame(scenProps, true, true);
 					return;
-				} 
+				}
 			} else {
 				continue;
 			}
@@ -335,7 +335,7 @@ void OpenTutorialLink();
 // Cotulla: new code for new menu, old code is saved
 void iMenuView::NewStart(bool fInGame)
 {
-    if(m_bStarted) return; 
+    if(m_bStarted) return;
 
 #ifdef OS_IPHONE
     m_startTime = GetTickCount();
@@ -356,7 +356,7 @@ void iMenuView::NewStart(bool fInGame)
     m_bStarted = true;
 
     IMainMenuView::Type tp;
-	
+
 	if(fInGame)
 #ifdef ROYAL_BOUNTY
 		tp = iMainMenuView::TypeSingleMapInGame;
@@ -372,7 +372,7 @@ void iMenuView::NewStart(bool fInGame)
 
     while (1)
     {
-        sint32 res;        
+        sint32 res;
 
         if(gUseIpadUI)
         {
@@ -381,7 +381,7 @@ void iMenuView::NewStart(bool fInGame)
         {
             m_dlg = new UI_IPHONE::iNewMenuDlg(&gApp.ViewMgr());
         }
-        
+
         m_dlg->SetType(tp, fInGame);
         res = m_dlg->DoModal();
 
@@ -397,7 +397,7 @@ void iMenuView::NewStart(bool fInGame)
         {
 			m_bStarted = false;
             return;
-        }        
+        }
         else if (res == IMainMenuView::ResMain)
         {
             tp = IMainMenuView::TypeMain;
@@ -413,7 +413,7 @@ void iMenuView::NewStart(bool fInGame)
 		{
 //#ifdef OS_IPHONE
 			//OpenTutorialLink();
-            
+
             // now we need to start new game for a Break map
             gTutorial.ResetDontShow();
             gGame.StartTutorialMap();
@@ -442,7 +442,7 @@ void iMenuView::StopCredits()
 bool iMenuView::Process(fix32 t)
 {
 	static fix32 timer = fix32::zero;
-	
+
 	timer += t;
 	if (m_crComposer.IsCreaditsStarted() && m_crComposer.IsCreaditsEnd()) StopCredits();
 	//if(timer >= fix32(0.005f)) {
@@ -463,18 +463,18 @@ void iMenuView::OnCompose()
 #if 0
 	gTextComposer.TextOut(
 			iTextComposer::FontConfig(iTextComposer::FS_MEDIUM, iDibFont::ComposeProps(cColor_White, cColor_Black, iDibFont::DecBorder ) ),
-			gApp.Surface(), iPoint(), _T("›ÍÒÍÎ˛ÁË‚Ì‡ˇ ‚ÂÒËˇ ‰Îˇ ˜ËÚ‡ÚÂÎÂÈ ÊÛÌ‡Î‡ Mobi (www.mobi.ru)"), 
+			gApp.Surface(), iPoint(), _T("›ÍÒÍÎ˛ÁË‚Ì‡ˇ ‚ÂÒËˇ ‰Îˇ ˜ËÚ‡ÚÂÎÂÈ ÊÛÌ‡Î‡ Mobi (www.mobi.ru)"),
 			iRect(0,m_Rect.y2()-15,m_Rect.w, 15), AlignCenter);
 #endif
-	
+
 #if 0
 	gTextComposer.TextOut(
 						  iTextComposer::FontConfig(iTextComposer::FS_LARGE, iDibFont::ComposeProps(cColor_Red, cColor_Black, iDibFont::DecBorder ) ),
-						  gApp.Surface(), iPoint(), _T("Please support the development by donating at: "), 
+						  gApp.Surface(), iPoint(), _T("Please support the development by donating at: "),
 						  iRect(0,m_Rect.y2()-40,m_Rect.w, 15), AlignCenter);
 	gTextComposer.TextOut(
 						  iTextComposer::FontConfig(iTextComposer::FS_LARGE, iDibFont::ComposeProps(cColor_Red, cColor_Black, iDibFont::DecBorder ) ),
-						  gApp.Surface(), iPoint(), _T("http://iphone.palmheroes.com"), 
+						  gApp.Surface(), iPoint(), _T("http://iphone.palmheroes.com"),
 						  iRect(0,m_Rect.y2()-20,m_Rect.w, 15), AlignCenter);
 #endif
 
@@ -482,8 +482,8 @@ void iMenuView::OnCompose()
 #if MULTIPLAYER
 	gTextComposer.TextOut(
 						  iTextComposer::FontConfig(iTextComposer::FS_LARGE, iDibFont::ComposeProps(cColor_Red, cColor_Black, iDibFont::DecBorder ) ),
-						  gApp.Surface(), iPoint(), _T("MULTIPLAYER BETA"), 
-						  iRect(0,m_Rect.y2()-10,m_Rect.w, 10), AlignCenter);	
+						  gApp.Surface(), iPoint(), _T("MULTIPLAYER BETA"),
+						  iRect(0,m_Rect.y2()-10,m_Rect.w, 10), AlignCenter);
 #endif
 */
 #ifdef PLAYCITY
@@ -504,7 +504,7 @@ void iMenuView::AfterCompose()
 		gApp.Surface().FillRect(gApp.Surface().GetSize(), cColor_Black, 255-255*(ticks - m_startTime)/len);
 	}
 #endif
-*/	
+*/
 }
 #ifdef PC_VERSION
 void iMenuView::UpdateSize()
@@ -530,7 +530,7 @@ void iMenuView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param
 void iMenuView::OnActivate(bool bActivate)
 {
 	if(bActivate) {
-		iStringT tmp = gMusicPath + 
+		iStringT tmp = gMusicPath +
 #ifdef ROYAL_BOUNTY
 		_T("Tabuk.mp3");
 #else

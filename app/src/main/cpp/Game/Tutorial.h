@@ -9,7 +9,7 @@
 #ifndef pheroes_Tutorial_h
 #define pheroes_Tutorial_h
 
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || (OS_ANDROID)
 enum TUT_MSG
 {
     TUT_MAP_CONTROLS,
@@ -96,7 +96,7 @@ public:
     void ResetDontShow();
 private:
     void Save();
-    
+
 private:
     bool m_bDisabled[TUT_COUNT];
 };

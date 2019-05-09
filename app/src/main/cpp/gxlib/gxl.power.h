@@ -8,10 +8,10 @@ public:
 	~iLightHolder() { RestoreBacklight(); }
 
 private:
-	
-	void HoldBacklight() 
+
+	void HoldBacklight()
 	{
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 		HKEY key;
 		DWORD dwDesc = REG_OPENED_EXISTING_KEY;
 		if (RegOpenKeyEx(HKEY_CURRENT_USER,TEXT("ControlPanel\\Backlight"), 0,KEY_ALL_ACCESS,&key) == ERROR_SUCCESS) {
@@ -36,9 +36,9 @@ private:
 #endif
 	}
 
-	void RestoreBacklight() 
+	void RestoreBacklight()
 	{
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 		HKEY key;
 
 		if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("ControlPanel\\Backlight"), 0,KEY_ALL_ACCESS,&key) == ERROR_SUCCESS) {

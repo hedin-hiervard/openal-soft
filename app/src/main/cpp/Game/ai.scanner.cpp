@@ -2,18 +2,19 @@
 
 #ifdef _DEEP_DEBUG_
 #	define new DEBUG_NEW
-#endif 
+#endif
 
 #include "ai.scanner.h"
 #include "ai.explore.h"
 #include "dbg.h"
 
-#if defined( OS_APPLE )
+#if defined( OS_APPLE ) || defined(OS_ANDROID)
 void DebugOutput(const char * str);
 #endif
 void DebugOutputT(iStringT str) {
 	const char * s = CvtT2A<>(str.CStr());
-#if defined( OS_APPLE )
+
+#if defined( OS_APPLE ) || defined(OS_ANDROID)
 	DebugOutput(s);
 #endif
 }
@@ -131,7 +132,7 @@ void iDistMapProcessor::UpdatePassMap(const iPoint& pos, sint32 armyPower, sint3
 		for (sint32 xx=0; xx<m_passMap.GetWidth(); ++xx){
 			sint32 res;
 			iBaseMapObject* pObj = gGame.Map().m_CoverMap.GetAt(xx,yy);
-			
+
 			if (pObj && pObj->Pos() == iPoint(xx,yy)) {
 				if (iCastle* pCastle = DynamicCast<iCastle*>(pObj)) {
 					if (pCastle->Owner() != owner && pCastle->Garrison().ArmyPower() > armyPower) res = -1;
@@ -188,7 +189,7 @@ void iDistMapProcessor::UpdatePassMap(const iPoint& pos, sint32 armyPower, sint3
 								// check for target visitor
 								uint8 tgtIdx = pTeleport->OutIndex();
 								if (iHero* pTgtVisitor = DynamicCast<iHero*>(gGame.Map().m_CoverMap.GetAt(pTgt->Pos().x,pTgt->Pos().y))) {
-									// target teleport has visitor									
+									// target teleport has visitor
 									if (pTgtVisitor->Pos() == pos) {
 										// myself
 										m_tobjMap.GetAt(xx,yy) = (tgtIdx << 4);
@@ -232,7 +233,7 @@ void iDistMapProcessor::UpdatePassMap(const iPoint& pos, sint32 armyPower, sint3
 						m_tobjMap.GetAt(xx,yy) = 1;
 					}
 				} else if (iShip* pShip = DynamicCast<iShip*>(pObj)) {
-					// CtllTODO: finish ship code here 
+					// CtllTODO: finish ship code here
 					res = -1;
 				} else if (iHero* pHero = DynamicCast<iHero*>(pObj)) {
 					if (iMapCnst* pCnst = pHero->GetLocation()) {
@@ -323,7 +324,7 @@ void iDistMapProcessor::UpdatePassMap(const iPoint& pos, sint32 armyPower, sint3
 							res = 5;
 						} else if (pHero->Army().ArmyPower() > armyPower) {
 							// Enemy hero with stronger army
-							res = -1;							
+							res = -1;
 						} else {
 							// Enemy hero with weaker army
 							m_tobjMap.GetAt(xx,yy) = 1;
@@ -365,13 +366,13 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 	// Add first cell
 	bool bFirstShip = bInShip || m_passMap.GetAt(pos.x,pos.y) == PASSMAP_SWATER || m_passMap.GetAt(pos.x,pos.y) == PASSMAP_PWATER;
 	m_openCells.Insert(iOpenCell((sint16)pos.x, (sint16)pos.y, 0, bFirstShip), 0);
-	m_distMap.GetAt((sint16)pos.x, (sint16)pos.y).move = 0;		
+	m_distMap.GetAt((sint16)pos.x, (sint16)pos.y).move = 0;
 	m_distMap.GetAt((sint16)pos.x, (sint16)pos.y).ship = bFirstShip;
 
 
-	// Propagate 
+	// Propagate
 	while (m_openCells.Size()) {
-		iOpenCell cell = m_openCells.Pop();		
+		iOpenCell cell = m_openCells.Pop();
 		// Check for teleport
 		if (m_tobjMap.GetAt(cell.posX,cell.posY) & 0xF8) {
 			// Retreive target teleport index
@@ -392,7 +393,7 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 		if (m_tobjMap.GetAt(cell.posX,cell.posY) & 0xF0) {
 			// Retreive target teleport index
 			sint32 tidx = (m_tobjMap.GetAt(cell.posX,cell.posY) >> 4);
-			iSimpleArray<iBaseMapObject*> list = gGame.Map().FindTeleportDestinations(NULL, (uint8)tidx);			
+			iSimpleArray<iBaseMapObject*> list = gGame.Map().FindTeleportDestinations(NULL, (uint8)tidx);
 			for(uint32 xx=0; xx < list.GetSize(); xx++) {
 				iBaseMapObject* pTarget = list[xx];
 				if(pTarget->Pos().x != cell.posX || pTarget->Pos().y != cell.posY) {
@@ -421,15 +422,15 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 				// if you need ship to get to some land, you can't build your path FURTHER to sea, to avoid cyclic boardings/landings
 				// i.e. ship changing during dist map build is prohibited
 				if(cell.ship && m_passMap.GetAt(cell.posX, cell.posY) > 0 && m_passMap.GetAt(nCell.posX,nCell.posY) < 0)
-					continue; 
+					continue;
 
 				// if you landed from ship, you can't just continue to sea (no Jesus allowed)
 				if(cell.ship && m_passMap.GetAt(cell.posX, cell.posY) == PASSMAP_PWATER && m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_SWATER)
-					continue; 
+					continue;
 
 				// if you didn't come by ship, you can't get from PWATER to land to avoid 'beachwalking'
 				if(!cell.ship && m_passMap.GetAt(cell.posX, cell.posY) == PASSMAP_PWATER && m_passMap.GetAt(nCell.posX,nCell.posY) > 0)
-					continue; 
+					continue;
 
 
 
@@ -441,31 +442,31 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 				iMark& dmark = m_distMap.GetAt(nCell.posX,nCell.posY);
 				iMark& oldmark = m_distMap.GetAt(cell.posX,cell.posY);
 				// this is in order to prevent ships from passing through PWATER (near the shore)
-				// check the previous TWO cells 
-								
+				// check the previous TWO cells
+
 				uint8 dir = oldmark.dir & 0x7;
 				iPoint beforeold = iPoint(cell.posX + nOffs[dir][0], cell.posY + nOffs[dir][1]);
-			
-				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_SWATER && 
+
+				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_SWATER &&
 					m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_PWATER &&
 					m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_SWATER)
 					continue;
 
-				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_PWATER && 
+				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_PWATER &&
 					m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_SWATER &&
 					m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_PWATER)
 					continue;
 
-				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_PWATER && 
+				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_PWATER &&
 					m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_PWATER &&
 					m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_PWATER)
-					continue;											
-										
+					continue;
 
-				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_SWATER && 
+
+				if(m_passMap.GetAt(beforeold.x, beforeold.y) == PASSMAP_SWATER &&
 					m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_PWATER &&
 					m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_PWATER)
-					continue;	
+					continue;
 
 				// Touch object first
 				sint32 touchCost = 0;
@@ -473,23 +474,23 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 				if (tobj > 0) {
 
 					// we can't touch from the ship - skip that way, only exception - touch ship from ship (attack)
-					if(m_passMap.GetAt(nCell.posX, nCell.posY) != PASSMAP_SWATER && 
+					if(m_passMap.GetAt(nCell.posX, nCell.posY) != PASSMAP_SWATER &&
 						(m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_SWATER ||
 						m_passMap.GetAt(cell.posX,cell.posY) == PASSMAP_PWATER))
 						continue;
 
 					touchCost += 5;
 					if (!(nid&0x1)) touchCost += 2;
-				} 				
+				}
 
 				// enough points to touch and new cell is not marked by more optimal index
 				uint16 nval = nCell.val + 5;
-				if (!(nid&0x1)) nval += 2;		
+				if (!(nid&0x1)) nval += 2;
 				if ( tobj && nval <= totalMoves && dmark.touch > nval) {
 					dmark.touch = nval;
 					dmark.dir = (nid+4) & 0x7;
 					// if water or partial water, to pass further we need ship
-					dmark.ship = nCell.ship = dmark.ship = cell.ship || m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_SWATER;				
+					dmark.ship = nCell.ship = dmark.ship = cell.ship || m_passMap.GetAt(nCell.posX,nCell.posY) == PASSMAP_SWATER;
 
 				}
 
@@ -498,7 +499,7 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 					continue;
 				}
 
-				// Calculate move cost				
+				// Calculate move cost
 				sint32 moveCost = (m_passMap.GetAt(nCell.posX,nCell.posY));
 
 				// to replace -128 and -127 with actual move cost over the water
@@ -517,7 +518,7 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 						dmark.dir = ((nid+4) & 0x7);
 						// if water or partial water, to pass further we need ship
 						sint8 pm =  m_passMap.GetAt(nCell.posX,nCell.posY);
-						nCell.ship = dmark.ship = cell.ship || pm == PASSMAP_SWATER;					
+						nCell.ship = dmark.ship = cell.ship || pm == PASSMAP_SWATER;
 						//_LOG(iFormat(_T("Updating path to (%d, %d) from (%d, %d), need ship %d\n"), nCell.posX, nCell.posY, cell.posX, cell.posY, dmark.ship).CStr());
 						m_openCells.Insert(nCell, -nCell.val);
 				}
@@ -532,7 +533,7 @@ void iDistMapProcessor::MakeDistMap(const iPoint& pos, sint32 armyPower, sint32 
 iTargetScanner::iTargetScanner(iHero* pActHero, const iDangerMap& dangerMap)
 : m_pActHero(pActHero)
 , m_pHero(pActHero)
-, m_dangerMap(dangerMap) 
+, m_dangerMap(dangerMap)
 , m_distMap(iSize(gGame.Map().m_PassMap.GetWidth(),gGame.Map().m_PassMap.GetHeight()))
 , m_pOwner(DynamicCast<iAI_Player*>(pActHero->Owner()))
 , m_origin(pActHero->Pos())
@@ -545,7 +546,7 @@ iTargetScanner::iTargetScanner(iHero* pActHero, const iDangerMap& dangerMap)
 iTargetScanner::iTargetScanner(const iHero* pHero, const iDangerMap& dangerMap, iAI_Player* pOwner, const iPoint& origin, sint32 armyPower)
 : m_pActHero(NULL)
 , m_pHero(pHero)
-, m_dangerMap(dangerMap) 
+, m_dangerMap(dangerMap)
 , m_distMap(iSize(gGame.Map().m_PassMap.GetWidth(),gGame.Map().m_PassMap.GetHeight()))
 , m_pOwner(pOwner)
 , m_origin(origin)
@@ -572,23 +573,23 @@ iPoint iTargetScanner::SelectTarget(const iVisItemList& mapItems, const iShPoint
 
 	// Prepare dist map
 	m_distMap.MakeDistMap(m_origin, m_armyPower, m_pActHero->MoveCostBonus(), m_pActHero->InShip(), m_pOwner->PlayerId(), moves);
-	
-	
+
+
 	// Process objects
 	{
 		TSP_BOUNDTIMER(tspProcessObject);
 		for (xx=0; xx<mapItems.Size(); ++xx) {
-			if (ProcessObject(mapItems[xx].value, nPriority, flags) == Process && 
-				nPriority < priority && 
+			if (ProcessObject(mapItems[xx].value, nPriority, flags) == Process &&
+				nPriority < priority &&
 				(bHasShip || !m_distMap.NeedShip(mapItems[xx].value->Pos().x, mapItems[xx].value->Pos().y))) {
 					priority = nPriority;
 					target = mapItems[xx].value->Pos();
 					bShip = m_distMap.NeedShip(mapItems[xx].value->Pos().x, mapItems[xx].value->Pos().y);
-					 
+
 			}
 		}
 	}
-	
+
 	// Process discover points
 	{
 		TSP_BOUNDTIMER(tspDiscoverPoint);
@@ -596,17 +597,17 @@ iPoint iTargetScanner::SelectTarget(const iVisItemList& mapItems, const iShPoint
 			TSP_INCCOUNT(tspDiscoverPoint);
 			sint16 px = SHPOINT_X(discoverPoints[xx]), py = SHPOINT_Y(discoverPoints[xx]);
 			if (gGame.Map().GetCellObj(iPoint(px, py))) continue;
-			if (m_distMap.MoveCost(px, py) == 0x3FFF) continue;			
+			if (m_distMap.MoveCost(px, py) == 0x3FFF) continue;
 			nPriority = m_distMap.MoveCost(px, py);
 			if(!bHasShip && m_distMap.NeedShip(px, py)) continue;
 			// this increases the discover area on land, but breaks Royal bounty map logics
 			//if(m_distMap.NeedShip(px, py)) nPriority *= 10;
 			if(m_distMap.NeedShip(px, py)) nPriority /= 10;
-			
+
 			uint16 pe = gGame.Map().GetPathEl(px, py);
 			if (pe != 0xFFFF && gGame.ItemMgr().m_PathElProts[pe]->Type() == PET_ROAD) nPriority /= 2;
-			
-			if ( nPriority < priority &&	
+
+			if ( nPriority < priority &&
 				//m_distMap.NeedShip(px, py) &&
 				(bHasShip || !m_distMap.NeedShip(px, py))) {
 					priority = nPriority;
@@ -633,7 +634,7 @@ iPoint iTargetScanner::SelectTarget(const iVisItemList& mapItems, const iShPoint
 				else if (prc < 90) nPriority /= 4;
 				else if (prc < 100) nPriority /= 5;
 				else if (prc == 100) nPriority /= 15;
-				if (nPriority < priority 
+				if (nPriority < priority
 					&& (bHasShip || !m_distMap.NeedShip(uspt.x, uspt.y))) {
 						priority = nPriority;
 						target = uspt;
@@ -666,7 +667,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 		_LOG(iFormat(_T("\t\t- Ignoring current location at (%d,%d)\n"),pObj->Pos().x, pObj->Pos().y).CStr());
 		return Reject;
 	}
-	
+
 	if (iOwnCnst* pOwnCnst = DynamicCast<iOwnCnst*>(pObj)) {
 		// OwnCnst
 		_LOG(iFormat(_T("\t\tOwnCnst %s at (%d,%d), ship: %s: "),gTextMgr[pOwnCnst->Proto()->NameKey()], pOwnCnst->Pos().x, pOwnCnst->Pos().y, ships[bNeedShip]).CStr());
@@ -742,7 +743,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				return Reject;
 			}
 
-			const iHero* pDangerActor = m_dangerMap.CellDangerActor((sint16)pCastle->Pos().x, (sint16)pCastle->Pos().y);			
+			const iHero* pDangerActor = m_dangerMap.CellDangerActor((sint16)pCastle->Pos().x, (sint16)pCastle->Pos().y);
 			//dmp.MakeDistMap(pCastle->Pos(), pCastle->Garrison().ArmyPower(), 0, false, m_pHero->Owner()->PlayerId(), 50);
 
 			// Need protection ?
@@ -878,13 +879,13 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 					_LOG(_T("Declined (dweling creatures is to weak or its too far)\n"));
 					return Reject;
 				}
-			} 
+			}
 		}
-		else if (pVisCnst->Proto()->Type() == VCNST_WARACADEMY) 
+		else if (pVisCnst->Proto()->Type() == VCNST_WARACADEMY)
 		{
 			uint32 i;
 			// War academy (upgrade for creatures)
-			iVisCnst_WarAcademy* pDwelling = (iVisCnst_WarAcademy*)pVisCnst;                    
+			iVisCnst_WarAcademy* pDwelling = (iVisCnst_WarAcademy*)pVisCnst;
 			iMineralSet ms;
 			uint32 count;
 			CREATURE_TYPE type, new_type;
@@ -897,7 +898,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				count = cg.Count();
 				if (count == 0) continue;
 				type = cg.Type();
-				new_type = cg.GetUpgradedType(iCreatGroup::UW_FIRST);                    
+				new_type = cg.GetUpgradedType(iCreatGroup::UW_FIRST);
 				if (new_type == CREAT_UNKNOWN) continue;
 
 				m_pOwner->PayMaster().RequestMinerals(CREAT_DESC[type].upgradecost * count, 2, ms);
@@ -905,14 +906,14 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				{
 					// enough money to upgrade full this group
 					break;
-				}                        
-			}                
+				}
+			}
 
 			if (i == 7)
 			{
 				_LOG(_T("Declined (no creatures in the army or no resources)\n"));
 				return Reject;
-			} 
+			}
 
 			uint32 new_power = count * CREAT_DESC[new_type].pidx;
 
@@ -930,7 +931,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				return Reject;
 			}
 
-		} 
+		}
 		else if (pVisCnst->Proto()->Type() == VCNST_HARBOR) {
 			if(!m_pOwner->Admiral().NeedProceedToHarbor(dynamic_cast<IHarbor*>(pVisCnst))) {
 				_LOG(_T("Declined (no order from Admiral)\n"));
@@ -939,7 +940,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				_LOG(_T("Accepted (Admiral ordered to proceed to harbor)\n"));
 				return Process;
 			}
-		} 
+		}
 		else if (pVisCnst->Proto()->Type() == VCNST_SHRINE) {
 			// Shrine
 			iVisCnst_Shrine* pShrine = (iVisCnst_Shrine*)pVisCnst;
@@ -1006,7 +1007,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 				const iFogMap& fm = m_pOwner->FogMap();
 				iSimpleArray<iBaseMapObject*> list = gGame.Map().FindTeleportDestinations(DynamicCast<iVisCnst_NewTeleport*>(pVisCnst), tidx);
 				bool ok = false;
-								
+
 				for(uint32 zz=0; zz<list.GetSize(); zz++) {
 					iBaseMapObject *pTarget = list[zz];
 					// if teleport with hidden target, then process it as cell to explore
@@ -1015,7 +1016,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 						ok = true;
 					}
 				}
-				if(!ok) {					 
+				if(!ok) {
 					_LOG(_T("Declined (We already process new teleport as space wrapper)\n"));
 					return Reject;
 				}
@@ -1032,13 +1033,13 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 		*/
 
 	//	_LOG(iFormat(_T("Accepted: (Distance = %d, Index = %d)\n"), moveCost, priority).CStr());
-		
+
 		// if this is our current position, return Reject, otherwise we will get stuck in Wooden sign without any sense
 		if(m_pHero->Pos() == pObj->Pos())
 			return Reject;
 		else
 			return Process;
-	} 
+	}
 	else if (iMapGuard* pGuard = DynamicCast<iMapGuard*>(pObj)) {
 		// MapGuard
 		_LOG(iFormat(_T("\t\tMapGuard %d of %s at (%d,%d), ship: %s: "),pGuard->Creatures().Count(), gTextMgr[TRID_CREATURE_PEASANT_F3 + pGuard->Creatures().Type()*3], pGuard->Pos().x, pGuard->Pos().y, ships[bNeedShip]).CStr());
@@ -1117,7 +1118,7 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 
 		_LOG(iFormat(_T("Accepted: (Distance = %d, Index = %d)\n"), touchCost, priority).CStr());
 		return Process;
-	} 
+	}
 	else if (iMapItem_Mineral* pMineral = DynamicCast<iMapItem_Mineral*>(pObj)) {
 		// Mineral
 		_LOG(iFormat(_T("\t\t%s at (%d,%d), ship: %s: "),gTextMgr[TRID_MAPRES_GOLD+pMineral->MineralType()], pMineral->Pos().x, pMineral->Pos().y, ships[bNeedShip]).CStr());
@@ -1247,16 +1248,16 @@ iTargetScanner::Result iTargetScanner::ProcessObject(iBaseMapObject* pObj, sint3
 		_LOG(iFormat(_T("\t\t%s at (%d,%d), ship: %s: "),gTextMgr[TRID_MAPRES_KEYGUARD], pObj->Pos().x, pObj->Pos().y, ships[bNeedShip]).CStr());
 		_LOG(_T("There is no reason to parse KeyGuard.\n"));
 		return Reject;
-	} 
-	else if (iShip* pShip = DynamicCast<iShip*>(pObj)) 
-	{        
+	}
+	else if (iShip* pShip = DynamicCast<iShip*>(pObj))
+	{
 		if(!pShip->IsLoaded()) {
 			_LOG(iFormat(_T("\t\t%s at (%d,%d): "),gTextMgr[TRID_OBJ_SHIP], pObj->Pos().x, pObj->Pos().y).CStr());
 			_LOG(_T("There is no order from Admiral to board this ship!\n"));
 		} else {
 			return ProcessObject(pShip->Hero(), priority, flags); // repeat with the passenger
 		}
-		return Reject;		
+		return Reject;
 	}
 
 	check(0);
@@ -1274,7 +1275,7 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
 	sint16 px = (sint16)target.x;
 	sint16 py = (sint16)target.y;
 	if (m_distMap.IsTouchPoint(px, py)) {
-		sint32 cost = m_distMap.TouchCost(px, py);		
+		sint32 cost = m_distMap.TouchCost(px, py);
 		if(cost == 0x3fff)
 			return cInvalidPoint;
 		iPoint npos(px, py);
@@ -1285,8 +1286,8 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
 		// the point previous to touch point can't be on partial water, or we'll get stuck
 		if(m_pOwner->PassMap().GetAt(px, py) == PASSMAP_PWATER)
 			return cInvalidPoint;
-		sint32 ncost = cost - m_distMap.MoveCost(px,py);	
-		tpath.AddMoveToPoint(npos, ncost, m_pOwner->PassMap().GetAt(px, py) == PASSMAP_SWATER && !bInShip);		
+		sint32 ncost = cost - m_distMap.MoveCost(px,py);
+		tpath.AddMoveToPoint(npos, ncost, m_pOwner->PassMap().GetAt(px, py) == PASSMAP_SWATER && !bInShip);
 	}
 	bool bStartFromTeleport = false;
 	uint32 iter = 0;
@@ -1302,7 +1303,7 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
 
 		if (dir & 0x8) {
 			// teleport
-			//! teleport == NULL			
+			//! teleport == NULL
 			if(iVisCnst_Teleport* pTeleport = gGame.Map().FindTeleport(px, py)) {
                check(pTeleport && pTeleport->GetOrigin() != -1);
                iVisCnst_Teleport* pOrigin = gGame.Map().GetTeleport(pTeleport->GetOrigin());
@@ -1311,18 +1312,18 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
                py = pOrigin->Pos().y;
             } else if(iVisCnst_NewTeleport* pTeleport = gGame.Map().FindNewTeleport(px, py)) {
 
-				iSimpleArray<iBaseMapObject*> list = gGame.Map().FindTeleportOrigins(pTeleport, pTeleport->InIndex());				
-				for(uint32 xx=0; xx<list.GetSize(); xx++) 
+				iSimpleArray<iBaseMapObject*> list = gGame.Map().FindTeleportOrigins(pTeleport, pTeleport->InIndex());
+				for(uint32 xx=0; xx<list.GetSize(); xx++)
 					if(m_distMap.MoveCost(list[xx]->Pos().x, list[xx]->Pos().y) != 0x3FFF) {
 						px = list[xx]->Pos().x;
-						py = list[xx]->Pos().y;				
-					}			
+						py = list[xx]->Pos().y;
+					}
 			} else { // this is map marker, so there is no path
 				return cInvalidPoint;
 			}
 			bStartFromTeleport = true;
-		} else 
- 
+		} else
+
 		{
 			px += nOffs[dir][0];
 			py += nOffs[dir][1];
@@ -1330,7 +1331,7 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
 		}
 
 		sint32 ncost = cost - m_distMap.MoveCost(px,py);
-		tpath.AddMoveToPoint(npos, ncost, gGame.Map().m_PassMap.GetAt(px, py) == PASSMAP_SWATER && !bInShip);		
+		tpath.AddMoveToPoint(npos, ncost, gGame.Map().m_PassMap.GetAt(px, py) == PASSMAP_SWATER && !bInShip);
 	}
 
 	// If first step is teleport, then add origin point
@@ -1359,7 +1360,7 @@ iPoint iTargetScanner::MakePath(const iPoint& target, iPath& path)
 		// if current step is object to touch, then stop
 		if ( m_distMap.IsTouchPoint(pos.x, pos.y)){
 			return pos;
-		}		
+		}
 		opos = pos;
 	}
 
@@ -1414,13 +1415,13 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 							}
 							path.SetTargetAction((iPath::Action)m_pActHero->GetTarget(dst.x, dst.y).action);
 							m_pActHero->SetPath(path);
-							return m_pActHero->Step();						
+							return m_pActHero->Step();
 						} else {
 							_LOG(_T("Ship required to attack danger hero, so, lets wait\n"));
 							return false;
 						}
-					} else {							
-						_LOG(_T("Danger hero is too far, so, we have more important tasks\n"));							
+					} else {
+						_LOG(_T("Danger hero is too far, so, we have more important tasks\n"));
 					}
 				} else if (ap >= dval) {
 					// our army is similar to enemy, so, lets wait
@@ -1486,12 +1487,12 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 #if 1
 	for (sint32 yy=0; yy<pm.GetHeight(); ++yy ) {
 		for (sint32 xx=0; xx<pm.GetWidth(); ++xx ) {
-			if (pm.GetAt(xx,yy) != -1 && fm.IsVisBound(xx,yy) && pm.GetAt(xx,yy) != PASSMAP_PWATER) 
+			if (pm.GetAt(xx,yy) != -1 && fm.IsVisBound(xx,yy) && pm.GetAt(xx,yy) != PASSMAP_PWATER)
 				discoverPoints.Add(MAKE_SHPOINT(xx,yy));
 		}
 	}
 #else
-	DiscoverMap( pm, fm, 	
+	DiscoverMap( pm, fm,
 #endif
 		_LOG(iFormat(_T("Found %d point(s)\n"),discoverPoints.GetSize()).CStr());
 
@@ -1501,7 +1502,7 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 	_LOG(_T("\t\t:::Scan objects (1 turn):::\n"));
 
     iPoint target = SelectTarget(mapItems, discoverPoints, m_pActHero->Moves() + m_pActHero->TotalMoves(), PRF_NORMAL, priority, bShip);
-	
+
 	if (target == cInvalidPoint) {
 		_LOG(_T("\t\t:::Scan objects (6 turns):::\n"));
 		target = SelectTarget(mapItems, discoverPoints, m_pActHero->Moves() + m_pActHero->TotalMoves()*6, PRF_NORMAL,priority, bShip);
@@ -1512,17 +1513,17 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 	}
 
 	bool bNeedShip = bShip; // need ship to get to target
-				
-	if (target != cInvalidPoint) {		
+
+	if (target != cInvalidPoint) {
 		// we need ship and don't have one
-		if(!m_pActHero->InShip() && bNeedShip && !m_pOwner->Admiral().IsShipAvailable(m_pActHero)) {			
+		if(!m_pActHero->InShip() && bNeedShip && !m_pOwner->Admiral().IsShipAvailable(m_pActHero)) {
 			_LOG(iFormat(_T("\t\tReport to admiral: ship required to get to (%d, %d)\n"), target.x, target.y).CStr());
-			m_pOwner->Admiral().DoHeroRequiresShip(m_pActHero); 
-			return m_pOwner->Admiral().Process(); // true means continue hero iteration this turns, makes sense only if Admiral made some designations 
+			m_pOwner->Admiral().DoHeroRequiresShip(m_pActHero);
+			return m_pOwner->Admiral().Process(); // true means continue hero iteration this turns, makes sense only if Admiral made some designations
 		}
 		const iShip* pShip;
 		// target requires ship to get to: acquire one from admiral
-		if((pShip = m_pOwner->Admiral().IsShipAvailable(m_pActHero)) && !pShip->IsLoaded() && !m_pActHero->InShip() && bNeedShip) {			
+		if((pShip = m_pOwner->Admiral().IsShipAvailable(m_pActHero)) && !pShip->IsLoaded() && !m_pActHero->InShip() && bNeedShip) {
 			target = pShip->Pos();
 			_LOG(iFormat(_T("\tProceeding to board ship at (%d,%d)\n"), pShip->Pos().x, pShip->Pos().y).CStr());
 			iPath path(m_pActHero->Pos());
@@ -1548,7 +1549,7 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 			m_pActHero->MakePath(path, target.x, target.y);
 			if(path.IsEmpty())
 			return false; // oops
-			*/		
+			*/
 			if (iBaseMapObject* pMapObj =gGame.Map().m_CoverMap.GetAt(target.x,target.y)) {
 				_LOG(iFormat(_T("\tSelect object at (%d,%d), cost: %d\n"), target.x, target.y, path.PathCost()).CStr());
 				if (path.IsEmpty()) {
@@ -1589,14 +1590,14 @@ bool iTargetScanner::DefineTask(const iVisItemList& mapItems)
 			} else {
 				// if we are at harbor object need to ask admiral first
 				IHarbor *hrb = dynamic_cast<IHarbor*>(m_pActHero->GetLocation());
-				if(hrb && m_pOwner->Admiral().Process())					
+				if(hrb && m_pOwner->Admiral().Process())
 					return true;
 
 				_LOG(iFormat(_T("\tActivate current location at (%d,%d)\n"), target.x, target.y).CStr());
 				return m_pActHero->SetPath();
 			}
 		}
-	} else {		
+	} else {
 		_LOG(_T("\tFound nothing, so, lets wait ...\n"));
 		return false;
 	}

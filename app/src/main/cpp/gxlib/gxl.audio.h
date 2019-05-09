@@ -1,13 +1,13 @@
 #ifndef GXLIB_GXL_AUDIO_H_
 #define GXLIB_GXL_AUDIO_H_
 
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 #include "mmsystem.h"
 //#include <AudioToolbox/AudioToolbox.h>
 #else
 
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
+// #include <OpenAL/al.h>
+// #include <OpenAL/alc.h>
 #include <gxl.common.def.h>
 #include <gxl.ctr.array.h>
 
@@ -22,7 +22,7 @@ public:
 	};
 
 	// Stream
-	class iStream 
+	class iStream
 	{
 	public:
 		friend class iSoundPlayer;
@@ -43,7 +43,7 @@ public:
 		void Reset();
 		void Cleanup();
 		uint32 FillBuffer(sint32* pProcBuff, uint32 bufSamples);
-		sint32 GetVolume() const { return m_volume; }
+		sint32 GetVolume() const;
 		void SetVolume(sint32 volume);
 
 	protected:
@@ -71,7 +71,7 @@ public:
 	// Init/close
 	bool Init();
 	void Close();
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	bool Inited() const { return m_hWaveOut != NULL; }
 #else
 	bool Inited() const { return true; }
@@ -80,7 +80,7 @@ public:
 	bool IsBusyStream(sint32 streamId) const;
 
 	// Volume
-	sint32 GetVolume() const { return m_volume; }
+	sint32 GetVolume() const;
 	void SetVolume(sint32 volume);
 	sint32 GetStreamVolume(sint32 streamId);
 	void SetStreamVolume(sint32 streamId, sint32 volume);
@@ -90,20 +90,20 @@ public:
 	uint32 ReplaceSample(uint32 streamId, uint32 sid);
 	uint32 LoadSample(sint8* pSample, uint32 smpLen, uint32 flags = 0);
 	void Stop(uint32 streamId);
-	
-	
+
+
 protected:
 
 	// Mixer thread
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	static DWORD __stdcall MixerThread(LPVOID pData);
 #else
 	static DWORD  MixerThread(LPVOID pData);
 
-#endif 
+#endif
 private:
 	uint32		m_nextBuffer;
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	typedef struct {
 		sint8* data;
 		uint32 smpLen;
@@ -119,16 +119,16 @@ private:
 	CRITICAL_SECTION 	m_csGuard;
 	iSimpleArray<sampleInfo> m_sampleLibrary;
 #else
-	ALCcontext* mContext; // stores the context (the 'air')
-	ALCdevice* mDevice; // stores the device
-//	sint32		sourceID;
-	iSimpleArray<uint32> sourcePool;
-	ALfloat		m_volume;
-	//NSMutableArray * bufferStorageArray; // stores the buffer ids from openAL
-	//NSMutableDictionary * soundDictionary; // stores our soundkeys
+// 	ALCcontext* mContext; // stores the context (the 'air')
+// 	ALCdevice* mDevice; // stores the device
+// //	sint32		sourceID;
+// 	iSimpleArray<uint32> sourcePool;
+// 	ALfloat		m_volume;
+// 	//NSMutableArray * bufferStorageArray; // stores the buffer ids from openAL
+// 	//NSMutableDictionary * soundDictionary; // stores our soundkeys
 	uint32 AcquireFreeSource();
 #endif
-	
+
 };
 
 

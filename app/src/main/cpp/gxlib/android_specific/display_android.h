@@ -1,0 +1,5 @@
+#ifndef GXLIB_android_SPECIFIC_DISPLAY_android_H_
+#define GXLIB_android_SPECIFIC_DISPLAY_android_H_
+void *display_android_begin_draw();
+void display_android_end_draw();
+#endif //GXLIB_android_SPECIFIC_DISPLAY_android_H_

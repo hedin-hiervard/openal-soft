@@ -7,7 +7,7 @@
 //#include "xxc/xxc.file.h"
 #include "serialize.h"
 #include "gxl.inc.h"
-#include "NewMapShop.h"
+// #include "NewMapShop.h"
 #include "Ctl_MapShop.h"
 
 #include "Misc_ios.h"
@@ -30,18 +30,18 @@ public:
     iSortBtn3(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, sint16 sid, sint16 pressedSid, sint16 tid, uint32 state = Visible|Enabled, Alignment align = AlignTopLeft)\
     : iButton(pViewMgr, pCmdHandler, rect, uid, state), m_sid(sid), m_align(align), m_pressedSid(pressedSid), m_high(false), m_tid(tid)
     {}
-    
+
     void OnBtnDown() const { }
-    
+
     inline void SetHighlighted(bool high) { m_high = high; Invalidate(); }
     inline void SetAlign(Alignment align) { m_align = align; Invalidate(); }
-    
+
     void OnCompose()
     {
         iRect rect = GetScrRect();
         iSize dim = gGfxMgr.Dimension(m_sid);
         iRect dst = AlignRect(dim, rect, m_align);
-        
+
         if(!m_high && !(m_state & Pressed)) {
             if(m_sid != -1) {
                 gGfxMgr.Blit(m_sid, gApp.Surface(), dst);
@@ -59,9 +59,9 @@ public:
         fc.cmpProps.faceColor = RGB16(0, 0, 0);
         gTextComposer.TextOut(fc,gApp.Surface(),rect,gTextMgr[m_tid],rect,AlignCenter, iPoint());
     }
-    
+
     inline void SetSprite(sint16 sid, sint16 pressedSid) { m_sid = sid; m_pressedSid = pressedSid; Invalidate(); }
-    
+
 private:
     sint16 m_sid, m_pressedSid, m_tid;
     Alignment m_align;
@@ -83,13 +83,11 @@ public:
         // fill lines
         RefillColors();
     }
-    
+
     inline uint32 LBItemHeight() const { return 75; }
-    inline uint32 LBItemsCount() const { return gMapShop.GetProducts().size()
-		+ 1
-		; /* first is "restore purchases" */
+    inline uint32 LBItemsCount() const { return 0; }
 	}
-    
+
     void RefillColors()
     {
         m_clrdata.RemoveAll();
@@ -102,14 +100,14 @@ public:
                 m_clrdata.Add((i % 2) ? 1 : 0);
         }
     }
-    
+
 private:
     void ComposeLBBackground(const iRect& rect)
     {
         iRect rc = rect;
         //gApp.Surface().Darken25Rect(rc);
     }
-    
+
     void ExComposeLBItem(iDib &dib, sint32 iIdx, bool bSel, const iRect& irc)
     {
         if(iIdx == 0) {
@@ -119,13 +117,13 @@ private:
             if(bSel)
                 fc_b.cmpProps.faceColor = RGB16(0, 0, 0);
             gTextComposer.TextOut(fc_b, dib, irc.point(), gTextMgr[TRID_SHOP_RESTORE_PURCHASES], irc, AlignCenter);
-        } 
+        }
         else
         {
             const MapShop::ProductInfo& it = gMapShop.GetProducts()[iIdx
                                                                     - 1 // restore purchases
                                                                     ];
-            
+
             iStringT cost;
             if(it.cost <= 0)
                 cost = gTextMgr[TRID_SHOP_FREE];
@@ -137,18 +135,18 @@ private:
             iStringT t;
             if(it.max_totalPlayers > 0)
                 iFormat(_T("%d-%d"), it.min_totalPlayers, it.max_totalPlayers);
-            
+
             iStringT size;
             if(it.max_size != -1)
                 size = iFormat(_T("%s"), gTextMgr[TRID_SHORT_MAPSIZ_SMALL + it.max_size]);
             iStringT author = UTF8TOISTRINGT(it.author);
             if(author.Length() > 70)
                 author = author.Left(70) + _T("...");
-            
+
             ComposeMapHeader(dib, irc, size, h, t, UTF8TOISTRINGT(it.name), author, cost, it.update, false, (iIdx % 2) == 0, bSel, true);
         }
     }
-    
+
 private:
     iSimpleArray<bool>  m_clrdata;
 };
@@ -165,9 +163,9 @@ iMapShopView::iMapShopView(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, con
 m_pCmdHandler(pCmdHandler), m_pLB(NULL), m_state(StateIdle), m_filter(0)
 {
     iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-    
+
 //    m_CountADV = 0, m_CountACT = 0, m_CountALL = 0, m_CountMULTI = 0, m_CountUPD = 0;
-    
+
     // Listbox header
     AddChild(m_pBtnSort1 = new iSortBtn3(m_pMgr, this, iRect(0, 0, 129, 47), 500,
                                          PDGG(NMENU_SORT_NL), PDGG(NMENU_SORT_PL), TRID_MENU_SORTING1, Visible | Enabled));
@@ -177,7 +175,7 @@ m_pCmdHandler(pCmdHandler), m_pLB(NULL), m_state(StateIdle), m_filter(0)
                                          PDGG(NMENU_SORT_NM), PDGG(NMENU_SORT_PM), TRID_MENU_SORTING3,Visible | Enabled));
     AddChild(m_pBtnSort4 = new iSortBtn3(m_pMgr, this, iRect(clRect.w - 129, 0, 129, 47), 503,
                                          PDGG(NMENU_SORT_NR), PDGG(NMENU_SORT_PR), TRID_SHOP_PRICE,Visible | Enabled));
-    
+
     // Listbox
     m_pLB = new iShopListBox(m_pMgr, this, iRect(3, 47, clRect.w - 3 * 2, clRect.h - 47), 100);
     AddChild(m_pLB);
@@ -213,7 +211,7 @@ void iMapShopView::LoadData()
 		m_filter = MapShop::ShowFilter_UPD;
 	else
         check(0);
-    
+
     gMapShop.QueryAppstore();
     gMapShop.SetFilter(m_ShowFilter);
     m_state = StateLoad;
@@ -239,16 +237,16 @@ void iMapShopView::UpdateMapCount()
 bool iMapShopView::Process(fix32 t)
 {
     MapShop::ShopStatus ss = gMapShop.GetStatus();
-    
+
     bool show_list = false;
     bool showBtnBack = false;
-    
+
     switch (m_state)
     {
         case StateIdle:
             showBtnBack = show_list = true;
             break;
-            
+
         case StateNoMoney:
         case StateNoConnection:
         case StateLoadError:
@@ -258,9 +256,9 @@ bool iMapShopView::Process(fix32 t)
             showBtnBack = true;
             break;
         case StateRestorePurchases:
-            
+
             show_list = showBtnBack = false;
-            
+
             switch(ss)
         {
             case MapShop::SS_READY:
@@ -307,7 +305,7 @@ bool iMapShopView::Process(fix32 t)
                 break;
         }
             break;
-            
+
         case StateLoad:
         case StateLoading:
             switch (ss)
@@ -342,10 +340,10 @@ bool iMapShopView::Process(fix32 t)
         }
             break;
     }
-    
+
 	m_pLB->Process(t);
     if (show_list != m_pLB->IsVisible()) SetLBVisible(show_list);
-    
+
     return showBtnBack;
 }
 
@@ -354,12 +352,12 @@ bool iMapShopView::Process(fix32 t)
 void iMapShopView::CheckHeaderButton(uint32 id)
 {
     iSortBtn3 *p1, *p2, *p3, *p4;
-    
+
     p1 = (iSortBtn3*)GetChildById(500);
     p2 = (iSortBtn3*)GetChildById(501);
     p3 = (iSortBtn3*)GetChildById(502);
     p4 = (iSortBtn3*)GetChildById(503);
-    
+
     p1->SetHighlighted(id == 500);
     p2->SetHighlighted(id == 501);
     p3->SetHighlighted(id == 502);
@@ -404,12 +402,12 @@ void iMapShopView::SortScenarios(SortBy sort_by)
             break;
     }
     m_sort = sort_by;
-    
+
     if (sort_by == Name || sort_by == RevName) uid = 500;
     else if (sort_by == Size || sort_by == RevSize) uid = 501;
     else if (sort_by == Author || sort_by == RevAuthor) uid = 502;
     else if (sort_by == Price || sort_by == RevPrice) uid = 503;
-    
+
     CheckHeaderButton(uid);
     Invalidate();
 }
@@ -424,7 +422,7 @@ void iMapShopView::OnCompose()
             iRect rc = GetScrRect();
             iTextComposer::FontConfig fc_b(newmenufc_big_text);
             fc_b.cmpProps.faceColor = RGB16(0, 0, 0);
-            
+
             iStringT str(_T("Все куплено"));
             iSize sz = gTextComposer.GetTextBoxSize(str, rc.w - 10, fc_b);
             gTextComposer.TextBoxOut(fc_b, gApp.Surface(), str, AlignRect(sz, rc, AlignCenter));
@@ -432,10 +430,10 @@ void iMapShopView::OnCompose()
         return;
     }
     iRect rc = GetScrRect();
-    
+
     iTextComposer::FontConfig fc_b(newmenufc_big_text);
     fc_b.cmpProps.faceColor = RGB16(0, 0, 0);
-    
+
     if (m_state == StateLoading)
     {
         iStringT str(gTextMgr[TRID_SHOP_UPDATING_LIST]);
@@ -447,11 +445,11 @@ void iMapShopView::OnCompose()
 		iStringT str(gTextMgr[TRID_SHOP_PROCESSING_PURCHASE]);
 		iSize sz = gTextComposer.GetTextBoxSize(str, rc.w - 10, fc_b);
         gTextComposer.TextBoxOut(fc_b, gApp.Surface(), str, AlignRect(sz, rc, AlignCenter) + iPoint(0,-70));
-        
+
         int pr = gMapShop.GetDownloadProgress();
-        
+
         if( pr > 0 ){
-            
+
             iStringT prtxt = iFormat(_T("%d "), pr);
             prtxt += _T("\%");
             sz = gTextComposer.GetTextBoxSize(prtxt, rc.w - 10, fc_b);
@@ -484,9 +482,9 @@ void iMapShopView::OnCompose()
     } else if(m_state == StateDesc)
 	{
 		if(m_selScen == -1) return;
-        
+
         iRect rr = GetScrRect();
-        
+
 		iRect rc = AlignRect(iSize(m_pLB->GetSize().w
 #ifdef OS_IPHONE
                                    -50
@@ -494,7 +492,7 @@ void iMapShopView::OnCompose()
                                    , m_pLB->LBItemHeight()), GetScrRect(), AlignTop) + iPoint(0, 20);
         //		void ComposeMapHeader(iDib& dib, const iRect& irc, MAP_SIZE size, uint32 humanplayers, uint32 totalplayers, const iStringT& name, const iStringT& author, bool bIsPack, bool bIsUpdating, bool bIsHotNew, bool bEven, bool bSel, bool bBackground);
 		const MapShop::ProductInfo& it = gMapShop.GetProducts()[m_selScen];
-        
+
 		sint32 w = gTextComposer.GetTextSize(UTF8TOISTRINGT(it.name), newmenufc_big_text).w;
 #ifdef OS_IPHONE
 		w += 100;
@@ -513,7 +511,7 @@ void iMapShopView::OnCompose()
         iStringT t;
         if(it.min_totalPlayers > 0)
             h = iFormat(_T("%d-%d"), it.min_totalPlayers, it.max_totalPlayers);
-        
+
         iStringT sizes;
         if(it.min_size != -1)
         {
@@ -522,14 +520,14 @@ void iMapShopView::OnCompose()
             else
                 sizes = iFormat(_T("%s"), gTextMgr[TRID_SHORT_MAPSIZ_SMALL + it.max_size]);
         }
-        
+
         iStringT author = UTF8TOISTRINGT(it.author);
         if(author.Length() > 50)
             author = author.Left(50) + _T("...");
 
         trc.InflateSize(150, 0);
 		ComposeMapHeader(gApp.Surface(), trc, sizes, h, t, UTF8TOISTRINGT(it.name), author, _T(""), it.update, false, false, false, false);
-        
+
 		sint32 offs = 45;
         if(!gUseIpadUI)
             offs = 0;
@@ -538,19 +536,19 @@ void iMapShopView::OnCompose()
         //		txtrc.DeflateRect(m_pLB->GetSize().w / 4, 0);
 		iTextComposer::FontConfig fc_l(newmenufc_high_text);
         fc_l.cmpProps.faceColor = RGB16(0, 0, 0);
-        
-		
+
+
 		gTextComposer.TextBoxOut(fc_l, gApp.Surface(), UTF8TOISTRINGT(gMapShop.GetProducts()[m_selScen].desc), txtrc);
 	}
     else if(m_state == StateRestorePurchases){
-        
+
         iStringT str(gTextMgr[TRID_SHOP_PROCESSING_PURCHASE]);
 		iSize sz = gTextComposer.GetTextBoxSize(str, rc.w - 10, fc_b);
         gTextComposer.TextBoxOut(fc_b, gApp.Surface(), str, AlignRect(sz, rc, AlignCenter) + iPoint(0,-70));
-        
-        
+
+
         int pr = gMapShop.GetDownloadProgress();
-        
+
         if( pr > 0 ){
             iStringT prtxt = iFormat(_T("%d%d"), pr);
             sz = gTextComposer.GetTextBoxSize(prtxt, rc.w - 10, fc_b);
@@ -568,15 +566,15 @@ void iMapShopView::AfterCompose()
      // draw list box shadow
      iPoint pt;
      iRect &lrc = m_pLB->GetScrRect();
-     
+
      pt = lrc.TopLeft();
      gGfxMgr.Blit(PDGG(NMENU_LIST_SHDT), gApp.Surface(), pt);
-     
+
      pt = lrc.BottomLeft();
      pt.MoveY(-46);
      gGfxMgr.Blit(PDGG(NMENU_LIST_SHDB), gApp.Surface(), pt);
      }*/
-    
+
 }
 
 void iMapShopView::SendResult(uint32 res)
@@ -587,13 +585,13 @@ void iMapShopView::SendResult(uint32 res)
 void iMapShopView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
 {
     uint32 uid = pView->GetUID();
-    
+
     // disable all actions if something in the processing
     if (m_state != StateIdle)
     {
         return;
     }
-    
+
     if (uid == DRC_OK || uid == DRC_CANCEL)
     {
         SendResult(uid);
@@ -631,7 +629,7 @@ void iMapShopView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
             {
                 //m_MapToBuy = m_List[param-1].m_PID;
                 if(param == 0) {
-                    
+
                     m_state = StateRestorePurchases;
                     if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_LBSELECTED, 1);
                     gMapShop.RestorePurchases();
@@ -644,7 +642,7 @@ void iMapShopView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
             }
         }
     }
-    
+
     void iMapShopView::DoBuy()
     {
         if(m_MapToBuy != "")
@@ -652,12 +650,12 @@ void iMapShopView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
         else
             LoadData();
     }
-    
+
     //    const MapShop::ProductInfo& iMapShopView::CurMap() const
     //    {
     ////        if(m_state != StateDesc) return NULL;
     //
     //        return gMapShop.GetProducts()[m_selScen];
     //    }
-    
+
     // END OF FILE

@@ -7,7 +7,7 @@
 #elif defined(OS_WIN32)
 #include "gxl.memdc.h"
 
-#endif 
+#endif
 /*
  * iDisplay
  */
@@ -33,11 +33,11 @@ private:
 	iMemoryDC			m_memDC;
 	bool				m_bVGA;
 #endif //OS_WINCE
-	
+
 	iDib				m_BackBuff;
 	float				m_gamma;
 	iSize				m_Siz;
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	HWND				m_hWnd;
 #endif
 	uint32				m_Flags;
@@ -53,19 +53,19 @@ public:
 	void SetGamma(float gamma);
 	void SetOrientation(bool bLandscape, bool bLefthander);
 	void Destroy();
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 	void msg_OnPaint(HDC hdc);
 #else
 	void msg_OnPaint();
 #endif
 	void msg_Suspend();
 	void msg_Resume();
-	
+
 #if defined( OS_MACOS )
 	void msg_Resize();
 #endif
-	
-#ifndef OS_APPLE
+
+#ifdef OS_WIN32
 	void DoPaint(const iRect& rc, HDC hdc = 0);
 #else
 	void DoPaint(const iRect& rc);
@@ -73,7 +73,7 @@ public:
 	inline iDib& GetSurface() { return m_BackBuff; }
 	inline iSize SurfMetrics() const { return m_BackBuff.GetSize(); }
 #if defined (OS_WINCE)
-    // switch FullScreen <-> QVGA 
+    // switch FullScreen <-> QVGA
     // for example 240x400 <-> 240x320
     void SwitchResolution(bool full);
     void DoScreenPaint(HDC hdc);

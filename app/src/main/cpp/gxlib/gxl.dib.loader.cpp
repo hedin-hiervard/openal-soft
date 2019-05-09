@@ -15,6 +15,9 @@
 #include "gxl.dib.loader.iphone.cpp"
 #endif
 
+#ifdef OS_ANDROID
+#include "gxl.dib.loader.android.cpp"
+#endif
 
 iDibReader::iDibReader()
 : pimpl( new iDibReaderImpl() )
@@ -32,7 +35,7 @@ bool iDibReader::Init()
 
 
 bool iDibReader::FromFile(iDib& dib, const iStringT& fname) const
-{ 
+{
 	if (!iFile::Exists(fname)) return false;
 	IMG_TYPE it;
 	if (fname.Right(4).CompareIgnoreCase(_T(".bmp")) == 0) it = IT_BMP;
@@ -47,7 +50,7 @@ bool iDibReader::FromFile(iDib& dib, const iStringT& fname) const
 }
 
 bool iDibReader::FromFile(iPaletteDib& dib, const iStringT& fname) const
-{ 
+{
 	if (!iFile::Exists(fname)) return false;
 	IMG_TYPE it;
 	if (fname.Right(4).CompareIgnoreCase(_T(".bmp")) == 0) it = IT_BMP;

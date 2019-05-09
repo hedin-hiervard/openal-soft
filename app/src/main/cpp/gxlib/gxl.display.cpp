@@ -4,7 +4,7 @@
 #if defined (OS_WINCE) && !defined (GXL_NOGAPI)
 //#	include <gx.h>
 #include "gapi_help.h"
-#endif 
+#endif
 
 #include "gxl.display.h"
 
@@ -39,6 +39,8 @@ always_inline iDib::pixel BlitPixel(iDib::pixel pix)
 #include "gxl.display.iphone.cpp"
 #elif defined OS_MACOS
 #include "gxl.display.macos.cpp"
+#elif defined OS_ANDROID
+#include "gxl.display.android.cpp"
 #endif // OS_WINCE
 
 

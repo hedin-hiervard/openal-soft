@@ -5,13 +5,13 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-always_inline uint32 
+always_inline uint32
 Darken50( uint32 pixel )
 {
 	return (pixel & 0xf7de) >> 1;
 }
 
-always_inline uint32 
+always_inline uint32
 Darken25( uint32 pixel )
 {
 	pixel = (pixel & 0xf7de) >> 1;
@@ -21,17 +21,17 @@ Darken25( uint32 pixel )
 
 extern const uint32 BWPAL[32];
 
-always_inline uint32 
+always_inline uint32
 DarkenBWBlend( uint32 a, uint32 b )
 { return ( (a & 0xf7de) >> 1 ) + ((b & 0xf7de) >> 1); }
 
-always_inline uint32 
+always_inline uint32
 DarkenBW( uint32 pixel )
-{ 
+{
 	//static uint8 rpt = 31;
 	uint32 chnl = (pixel >> 6) & 0x1f;
 	return DarkenBWBlend(BWPAL[chnl], 0x39e7 );
-} 
+}
 
 
 /*
@@ -67,7 +67,7 @@ public:
 	~iDib();
 
 	iDib& operator = ( const iDib& other );
-	
+
 	inline bool IsValidPos(sint32 x, sint32 y)
 	{ return (x>=0 && y>=0 && x<(sint32)m_Siz.w && y<(sint32)m_Siz.h);}
 
@@ -142,7 +142,7 @@ public:
 	void CopyRectToDibXY(iDib& dib, const iRect& srect, const iPoint& pos, uint8 a = 255) const;
 	void BlendToDibXY(iDib& dib, const iPoint& pos, pixel ck, uint8 bval) const;
 
-#if !defined(UNDER_) && !defined(OS_APPLE) && !defined(OS_LINUX)
+#if !defined(UNDER_) && !defined(OS_APPLE) && !defined(OS_LINUX) && !defined(OS_ANDROID)
 	void BlitToDCXY(HDC hdc, const iPoint& pos, bool bDoubleSize=false) const;
 
 #endif
@@ -170,7 +170,7 @@ const iDib::pixel cColor_Blue192	= 0x0018;
 const iDib::pixel cColor_Yello		= 0xFFE0;
 const iDib::pixel cColor_Yello192	= 0xBDE0;
 
-// 
+//
 class iGradient
 {
 public:
@@ -215,7 +215,7 @@ public:
 
 	uint16* GetPtr()
 	{ return m_Palette; }
-	
+
 
 private:
 	uint16	m_Palette[256];
@@ -238,7 +238,7 @@ public:
 	void Init(const iSize& siz);
 	void CopyToDibXY(iDib& dib, const iPoint& pos, const iPalette& pal, uint8 alpha=255) const;
 	void CopyRectToDibXY(iDib& dib, const iRect& srect, const iPoint& pos, const iPalette& pal, uint8 alpha=255) const;
-	
+
 	// inlines
 	inline uint32 GetBuffLen() const
 	{ return m_Siz.w * m_Siz.h * sizeof(pixel); }

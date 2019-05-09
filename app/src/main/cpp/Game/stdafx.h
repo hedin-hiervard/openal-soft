@@ -4,7 +4,7 @@
 extern  bool            gUseIpadUI;
 
 #if defined(OS_IPHONE) || defined(OS_MACOS)
-#define OS_APPLE 
+#define OS_APPLE
 #endif //(OS_IPHONE || OS_MACOS)
 
 #if defined(OS_MACOS) && !defined (MACOS_LION)
@@ -29,7 +29,7 @@ extern  bool            gUseIpadUI;
 
 #pragma warning(disable:4786)
 
-#ifndef OS_APPLE
+#ifdef OS_WIN32
 #include <windows.h>
 
 #endif
