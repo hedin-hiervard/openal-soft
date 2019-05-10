@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "android_common.h"
+#include <string>
+
+void log(const std::string& msg);
 
 void DebugOutput(const char * str) {
+  log(str);
 }
 
 // const char * GetBundlePath() {
@@ -57,14 +61,6 @@ void DebugOutput(const char * str) {
 //     return( rect.size.height );
 // #endif
 // }
-
-u_int32_t GetWindowWidth() {
-  return 800;
-}
-
-u_int32_t GetWindowHeight(){
-  return 600;
-}
 
 bool IsIpad()
 {

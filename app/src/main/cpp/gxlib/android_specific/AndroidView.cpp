@@ -21,11 +21,6 @@ void onMouseUp(int x, int y, MouseId mID, MouseButtonId mbID);
 void onMouseMove(int x, int y, MouseId mID, MouseButtonId mbID);
 void onQuit();
 
-
-void * Android_getSurface() {
-	return _textureBuffer;
-}
-
 void Android_updateScreenRect(unsigned short* screen, int x1, int y1, int x2, int y2) {
 	// [_lock lock];
 
