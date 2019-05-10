@@ -32,10 +32,10 @@ class Square {
         """
             uniform mat4 uMVPMatrix;
 
-            varying vec2 vTexCoords;
-
             attribute vec4 aPosition;
             attribute vec4 aTexPosition;
+
+            varying vec2 vTexCoords;
 
             void main() {
               vTexCoords = aTexPosition.xy;
@@ -53,8 +53,8 @@ class Square {
             varying vec2 vTexCoords;
 
             void main() {
-                gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
-               // gl_FragColor = texture2D(uTexture, vTexCoords);
+               // gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+                gl_FragColor = texture2D(uTexture, vTexCoords);
             }
         """
 
@@ -159,7 +159,7 @@ class Square {
 
         // TEXTURE
         mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture")
-        GLES20.glUniform1i(mTextureHandle, texture)
+        GLES20.glUniform1i(mTextureHandle, 0)
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")

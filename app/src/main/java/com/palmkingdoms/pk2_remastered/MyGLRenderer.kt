@@ -69,6 +69,12 @@ class MyGLRenderer : GLSurfaceView.Renderer {
             GLES20.glGenTextures(1, textures)
             mainTexture = textures[0]
         }
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTexture)
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
 
         GLES20.glEnable(GLES20.GL_TEXTURE_2D)
         activity?.textureBuffer = ByteBuffer.allocateDirect(textureHeight * textureWidth * 2)
@@ -78,7 +84,7 @@ class MyGLRenderer : GLSurfaceView.Renderer {
 
         activity?.textureBuffer?.position(0)
         for(i in 0 .. textureHeight * textureWidth * 2 - 1) {
-            activity?.textureBuffer?.put(64.toByte())
+            activity?.textureBuffer?.put(120.toByte())
         }
 
         activity?.textureBuffer?.position(0)
@@ -98,10 +104,8 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
-
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-
         mSquare = Square()
     }
 
