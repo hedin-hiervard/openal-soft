@@ -28,28 +28,44 @@ import com.palmkingdoms.pk2_remastered.MyGLRenderer
  */
 class Square {
 
-    private val vertexShaderCode = // This matrix member variable provides a hook to manipulate
-// the coordinates of the objects that use this vertex shader
-        "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
-                "void main() {" +
-// The matrix must be included as a modifier of gl_Position.
-                // Note that the uMVPMatrix factor *must be first* in order
-                // for the matrix multiplication product to be correct.
-                "  gl_Position = uMVPMatrix * vPosition;" +
-                "}"
+    private val vertexShaderCode =
+        """
+            uniform mat4 uMVPMatrix;
 
-    private val fragmentShaderCode = "precision mediump float;" +
-            "uniform vec4 vColor;" +
-            "void main() {" +
-            "  gl_FragColor = vColor;" +
-            "}"
+            varying vec2 vTexCoords;
+
+            attribute vec4 aPosition;
+            attribute vec4 aTexPosition;
+
+            void main() {
+              vTexCoords = aTexPosition.xy;
+              gl_Position = uMVPMatrix * aPosition;
+            }
+        """
+
+    private val fragmentShaderCode =
+        """
+            precision mediump float;
+
+            uniform vec4 uColor;
+            uniform sampler2D uTexture;
+
+            varying vec2 vTexCoords;
+
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+               // gl_FragColor = texture2D(uTexture, vTexCoords);
+            }
+        """
 
     private val vertexBuffer: FloatBuffer
+    private val texBuffer: FloatBuffer
     private val drawListBuffer: ShortBuffer
     private val mProgram: Int
     private var mPositionHandle: Int = 0
+    private var mTexPositionHandle: Int = 0
     private var mColorHandle: Int = 0
+    private var mTextureHandle: Int = 0
     private var mMVPMatrixHandle: Int = 0
 
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3) // order to draw vertices
@@ -71,6 +87,16 @@ class Square {
         vertexBuffer = bb.asFloatBuffer()
         vertexBuffer.put(squareCoords)
         vertexBuffer.position(0)
+
+        // initialize texture buffer
+        val bb2 = ByteBuffer.allocateDirect(
+            // (# of coordinate values * 4 bytes per float)
+            texCoords.size * 4
+        )
+        bb2.order(ByteOrder.nativeOrder())
+        texBuffer = bb2.asFloatBuffer()
+        texBuffer.put(texCoords)
+        texBuffer.position(0)
 
         // initialize byte buffer for the draw list
         val dlb = ByteBuffer.allocateDirect(
@@ -104,28 +130,36 @@ class Square {
      * @param mvpMatrix - The Model View Project matrix in which to draw
      * this shape.
      */
-    fun draw(mvpMatrix: FloatArray) {
+    fun draw(mvpMatrix: FloatArray, texture: Int) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram)
 
+        // POSITION
         // get handle to vertex shader's vPosition member
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition")
-
-        // Enable a handle to the triangle vertices
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition")
         GLES20.glEnableVertexAttribArray(mPositionHandle)
-
-        // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(
             mPositionHandle, COORDS_PER_VERTEX,
             GLES20.GL_FLOAT, false,
             vertexStride, vertexBuffer
         )
 
-        // get handle to fragment shader's vColor member
-        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor")
+        // TEX POSITION
+        mTexPositionHandle = GLES20.glGetAttribLocation(mProgram, "aTexPosition")
+        GLES20.glEnableVertexAttribArray(mTexPositionHandle)
+        GLES20.glVertexAttribPointer(
+            mTexPositionHandle, COORDS_PER_VERTEX,
+            GLES20.GL_FLOAT, false,
+            vertexStride, texBuffer
+        )
 
-        // Set color for drawing the triangle
+        // COLOR
+        mColorHandle = GLES20.glGetUniformLocation(mProgram, "uColor")
         GLES20.glUniform4fv(mColorHandle, 1, color, 0)
+
+        // TEXTURE
+        mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture")
+        GLES20.glUniform1i(mTextureHandle, texture)
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
@@ -154,6 +188,13 @@ class Square {
             -0.5f, -0.5f, 0.0f, // bottom left
             0.5f, -0.5f, 0.0f, // bottom right
             0.5f, 0.5f, 0.0f
+        ) // top right
+
+        internal var texCoords = floatArrayOf(
+            0.0f, 0.0f, 0.0f, // top left
+            0.0f, 1.0f, 0.0f, // bottom left
+            1.0f, 1.0f, 0.0f, // bottom right
+            1.0f, 0.0f, 0.0f
         ) // top right
     }
 

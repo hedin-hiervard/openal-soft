@@ -23,6 +23,8 @@ import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.util.Log
 import com.palmkingdoms.pk2_remastered.Square
+import java.nio.ByteBuffer
+import java.nio.IntBuffer
 
 /**
  * Provides drawing instructions for a GLSurfaceView object. This class
@@ -42,6 +44,9 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     private val mProjectionMatrix = FloatArray(16)
     private val mViewMatrix = FloatArray(16)
     private val mRotationMatrix = FloatArray(16)
+    private var mainTexture: Int = -1
+    private var textureWidth: Int = 0
+    private var textureHeight: Int = 0
 
     /**
      * Returns the rotation angle of the triangle shape (mTriangle).
@@ -52,6 +57,45 @@ class MyGLRenderer : GLSurfaceView.Renderer {
      * Sets the rotation angle of the triangle shape (mTriangle).
      */
     var angle: Float = 0.toFloat()
+
+    fun createTexture() {
+        textureWidth = 128
+        textureHeight = 128
+
+        Log.i("PK2", "texture size: %d x %d".format(textureWidth, textureHeight))
+
+        if(mainTexture == -1) {
+            val textures = IntBuffer.allocate(1)
+            GLES20.glGenTextures(1, textures)
+            mainTexture = textures[0]
+        }
+
+        GLES20.glEnable(GLES20.GL_TEXTURE_2D)
+        activity?.textureBuffer = ByteBuffer.allocateDirect(textureHeight * textureWidth * 2)
+    }
+
+    fun updateTexture() {
+
+        activity?.textureBuffer?.position(0)
+        for(i in 0 .. textureHeight * textureWidth * 2 - 1) {
+            activity?.textureBuffer?.put(64.toByte())
+        }
+
+        activity?.textureBuffer?.position(0)
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTexture)
+        GLES20.glTexImage2D(
+            GLES20.GL_TEXTURE_2D,
+            0,
+            GLES20.GL_RGB,
+            textureWidth,
+            textureHeight,
+            0,
+            GLES20.GL_RGB,
+            GLES20.GL_UNSIGNED_SHORT_5_6_5,
+            activity?.textureBuffer
+        )
+    }
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
 
@@ -74,7 +118,7 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0)
 
         // Draw square
-        mSquare!!.draw(mMVPMatrix)
+        mSquare!!.draw(mMVPMatrix, mainTexture)
     }
 
     override fun onSurfaceChanged(unused: GL10, width: Int, height: Int) {
@@ -87,7 +131,8 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
-
+        createTexture()
+        updateTexture()
     }
 
     companion object {
