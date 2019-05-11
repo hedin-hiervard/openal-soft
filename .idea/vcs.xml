@@ -2,8 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/fileaccessor" vcs="hg4idea" />
-    <mapping directory="$PROJECT_DIR$/fileaccessor/src/main/cpp/lib/minizip" vcs="hg4idea" />
-    <mapping directory="$PROJECT_DIR$/fileaccessor/src/main/cpp/lib/zipper" vcs="hg4idea" />
+    <mapping directory="$PROJECT_DIR$/fileaccessor" vcs="Git" />
   </component>
 </project>
