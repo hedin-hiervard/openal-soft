@@ -9,17 +9,45 @@
 uint getSizeNextPOT(uint size);
 void pheroes_main();
 
-JavaVM* vm = NULL;
-jobject obj = NULL;
-jmethodID log_mid;
-jmethodID update_surface_mid;
-
+JavaVM* JVM = NULL;
+jobject activity_obj = NULL;
 u_int32_t surface_width;
 u_int32_t surface_height;
+
+jmethodID log_java_method_id;
+jmethodID get_apk_path_method_id;
+jmethodID get_cache_dir_method_id;
+jmethodID get_library_dir_method_id;
+jmethodID get_documents_dir_method_id;
+jmethodID get_log_dir_method_id;
+jclass class_fa;
 
 char* _textureBuffer = NULL;
 int _textureWidth;
 int _textureHeight;
+
+
+JNIEnv* getJNIEnv() {
+    JNIEnv *env;
+    JVM->AttachCurrentThread(&env, NULL);
+    return env;
+}
+
+std::string jstring2string(jstring jstr)
+{
+    if (jstr == NULL)
+    {
+        return "";
+    }
+
+    JNIEnv *env = getJNIEnv();
+
+    const char* chars = env->GetStringUTFChars(jstr, NULL);
+    std::string ret(chars);
+    env->ReleaseStringUTFChars(jstr, chars);
+
+    return ret;
+}
 
 void Android_initSurface() {
     _textureWidth = getSizeNextPOT(surface_width);
@@ -31,23 +59,21 @@ void Android_initSurface() {
 }
 
 void log(const std::string& msg) {
-    void *p;
-    JNIEnv *env = (JNIEnv*)p;
-    vm->AttachCurrentThread(&env, NULL);
+    JNIEnv* env = getJNIEnv();
     jstring jmsg = env->NewStringUTF(msg.c_str());
-    env->CallVoidMethod(obj, log_mid, jmsg);
+    env->CallVoidMethod(activity_obj, log_java_method_id, jmsg);
     env->DeleteLocalRef(jmsg);
 }
 
 void updateSurface() {
-    void *p;
-    vm->GetEnv(&p, JNI_VERSION_1_6);
-    JNIEnv *env = (JNIEnv*)p;
-    int size = _textureWidth * _textureHeight * 2;
-    jbyteArray jdata = env->NewByteArray(size);
-    env->SetByteArrayRegion(jdata, 0, size, (jbyte*)_textureBuffer);
-    env->CallVoidMethod(obj, update_surface_mid, jdata);
-    env->DeleteLocalRef(jdata);
+    // void *p;
+    // vm->GetEnv(&p, JNI_VERSION_1_6);
+    // JNIEnv *env = (JNIEnv*)p;
+    // int size = _textureWidth * _textureHeight * 2;
+    // jbyteArray jdata = env->NewByteArray(size);
+    // env->SetByteArrayRegion(jdata, 0, size, (jbyte*)_textureBuffer);
+    // env->CallVoidMethod(obj, update_surface_mid, jdata);
+    // env->DeleteLocalRef(jdata);
 }
 
 u_int32_t GetWindowWidth() {
@@ -118,17 +144,33 @@ void* main_thread(void* param) {
     return NULL;
 }
 
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JVM = vm;
+    JNIEnv *env;
+    vm->AttachCurrentThread(&env, NULL);
+
+    return JNI_VERSION_1_6;
+}
+
 VOID_METHOD(onStart)(
         JNIEnv *env,
         jobject t
-)
-{
-    env->GetJavaVM(&vm);
-    obj = env->NewGlobalRef(t);
+) {
+    activity_obj = env->NewGlobalRef(t);
     jclass cls = env->GetObjectClass(t);
-    log_mid = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
-    update_surface_mid = env->GetMethodID(cls, "updateSurface", "([B)V");
+    log_java_method_id = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
+
+    class_fa = env->FindClass("com/palmkingdoms/pk2_remastered/FileAccessor");
+    class_fa = (jclass)env->NewGlobalRef(class_fa);
+
+    get_apk_path_method_id = env->GetStaticMethodID(class_fa, "getApkPath", "()Ljava/lang/String;");
+    get_library_dir_method_id = env->GetStaticMethodID(class_fa, "getLibraryDirectory", "()Ljava/lang/String;");
+    get_cache_dir_method_id = env->GetStaticMethodID(class_fa, "getCacheDirectory", "()Ljava/lang/String;");
+    get_documents_dir_method_id = env->GetStaticMethodID(class_fa, "getDocumentsDirectory", "()Ljava/lang/String;");
+    get_log_dir_method_id = env->GetStaticMethodID(class_fa, "getLogDirectory", "()Ljava/lang/String;");
+
     log("started, running main loop");
+
     pthread_t thread;
     pthread_create(&thread, NULL, &main_thread, NULL);
 }
@@ -136,8 +178,6 @@ VOID_METHOD(onStart)(
 VOID_METHOD(onQuit)(
         JNIEnv *env,
         jobject /* this */
-)
-{
+) {}
 
-}
 }

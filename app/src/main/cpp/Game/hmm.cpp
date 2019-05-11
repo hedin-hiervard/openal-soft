@@ -35,6 +35,7 @@
 #include "MinimapView.h"
 #include "Dlg_Chest.h"
 #include "iosdk/iosdk.h"
+#include "FileAccessor/FileAccessor.h"
 
 using namespace iosdk;
 
@@ -1134,7 +1135,7 @@ int pheroes_main()
         log("main started");
         LPCWSTR lpstrCmdLine = L"";
 
-
+        fileaccessor::FileAccessor::sharedFileAccessor()->init("Palm Kingdoms 2 Remastered", "iosoftware");
         bool bFirstLaunch = false;
 
         //determine first launch

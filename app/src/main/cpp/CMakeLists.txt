@@ -1,14 +1,4 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
-
-# Sets the minimum version of CMake required to build the native library.
-
 cmake_minimum_required(VERSION 3.4.1)
-
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
 
 set(source
   ./Common/lang_cze.cpp
@@ -247,15 +237,45 @@ set(source
   ./screens_iphone/OverlandUI.cpp
   ./screens_iphone/UpgradeView.cpp
   ./iosdk/analytics/android/Analytics.cpp
+
+  # fileaccessor
+  fileaccessor/android/FileAccessor_android.cpp
+  fileaccessor/android/io_android.cpp
+  fileaccessor/FileAccessor.cpp
+  fileaccessor/zip/io_zip.cpp
+  fileaccessor/posix/paths_posix.cpp
+  fileaccessor/posix/io_posix.cpp
+  fileaccessor/paths.cpp
+
+  # JniHelper
+  JniHelper/JniHelper.cpp
+
+  # zipper
+  zipper/unzipper.cpp
+
+  # minizip
+  minizip/aes/aescrypt.c
+  minizip/aes/aeskey.c
+  minizip/aes/aestab.c
+  minizip/aes/entropy.c
+  minizip/aes/fileenc.c
+  minizip/aes/hmac.c
+  minizip/aes/prng.c
+  minizip/aes/pwd2key.c
+  minizip/aes/sha1.c
+  minizip/ioapi.c
+  minizip/ioapi_buf.c
+  minizip/ioapi_mem.c
+  minizip/unzip.c
+  minizip/zip.c
+
+  # utf8
+  utf8/wstring/wstring.cpp
 )
 
-add_library( # Sets the name of the library.
+add_library(
         native-lib
-
-        # Sets the library as a shared library.
         SHARED
-
-        # Provides a relative path to your source file(s).
         ${source})
 
 target_include_directories(
@@ -273,6 +293,7 @@ target_include_directories(
     ./dlg_touch
     ./complib
     ./reslib
+    ../../../../fileaccessor/src/main/cpp
   )
 
 add_definitions(
@@ -298,26 +319,16 @@ target_compile_options(
   -w
 )
 
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
+find_package(ZLIB)
 
-find_library( # Sets the name of the path variable.
+find_library(
         log-lib
-
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
         log)
 
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries( # Specifies the target library.
+target_link_libraries(
         native-lib
+        ${log-lib}
+        ${ZLIB_LIBRARIES}
 
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
+      )

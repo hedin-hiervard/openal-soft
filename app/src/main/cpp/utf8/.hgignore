@@ -1,0 +1,38 @@
+syntax: glob
+
+# binary files
+*.sdf
+*.suo
+*.opensdf
+*.pdb
+*.class
+*.obj
+gen/*
+java.d
+bin/*
+Thumbs.db
+
+# build files
+build/*
+
+# backups
+*~
+*.bak
+
+# often changed project files (user-dependent)
+UserInterfaceState.xcuserstate
+xcuserdata/*
+*.filters
+project.xcworkspace/*
+*.user
+
+# eclipse generated files
+local.properties
+
+
+# various files
+.DS_Store
+*.lnk
+*.log
+*.tlog
+*.orig

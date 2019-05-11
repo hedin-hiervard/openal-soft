@@ -1,0 +1,100 @@
+syntax: glob
+# build products
+bld/*
+obj/*
+mapeditor/obj/*
+mapeditor/bld/*
+iolib/objs/*
+iolib/libs/*.lib
+prj/ios/build
+
+# win32 NuGet packages (are downloaded automagically)
+prj/win32/packages/
+
+
+# actual script configs (system-dependent)
+scripts/config_*.sh
+scripts/config_*.bat
+
+# steam output
+steam/content_win
+steam/content_mac
+steam/output
+
+# binary files
+*.a
+*.sdf
+*.suo
+*.opensdf
+*.pdb
+*.class
+*.obj
+gen/*
+java.d
+bin/*
+Thumbs.db
+
+# backups
+*~
+*.bak
+
+# often changed project files (user-dependent)
+UserInterfaceState.xcuserstate
+xcuserdata/*
+*.filters
+
+# cmake files
+CMakeFiles/
+*.cmake
+Makefile
+CMakeCache.txt
+
+# android resoures
+prj/proj.android/assets
+prj/proj.android/res
+
+# android build files
+prj/proj.android/obj/*
+prj/proj.android/libs/*
+prj/proj.android/lib/*
+prj/proj.android/bin/*
+prj/proj.android/gen/*
+src/libs/cocos2dx/platform/android/java/gen/*
+src/libs/cocos2dx/platform/android/java/bin/*
+
+src/libs/hss/make_android/obj/*
+src/libs/hss/external/oafile/Build/Android/obj/*
+src/libs/hss/external/libzip/Build/Android/obj/*
+src/libs/hss/lib_static/android/*
+src/libs/hss/lib_static/windows/*
+src/libs/hss/obj/*
+bld_android
+
+
+# android system dependent files
+prj/proj.android/config.sh
+
+# eclipse generated files
+ant.properties
+local.properties
+
+
+# eclipse configs
+org.eclipse.cdt.codan.core.prefs
+org.eclipse.jdt.core.prefs
+
+# various files
+.DS_Store
+*.lnk
+pheroes/prj/*
+*.log
+*.tlog
+
+# fastlane specific
+fastlane/report.xml
+
+# deliver temporary files
+fastlane/Preview.html
+
+# scan temporary files
+fastlane/test_output
