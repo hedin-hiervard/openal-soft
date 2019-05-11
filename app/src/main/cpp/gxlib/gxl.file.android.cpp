@@ -31,7 +31,6 @@ public:
 
 	bool Open(const iStringT& fname)
 	{
-
 	  m_hFile = fopen(CvtT2A<>(fname.CStr()), "r");
 	  return (m_hFile != INVALID_HANDLE_VALUE);
 	}

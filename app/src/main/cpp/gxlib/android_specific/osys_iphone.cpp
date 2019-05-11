@@ -64,7 +64,7 @@ int OSystem_IPHONE::timerHandler(int t) {
 
 void OSystem_IPHONE::initBackend() {
 #ifdef IPHONE_OFFICIAL
-	_savefile = new DefaultSaveFileManager(iPhone_getDocumentsDir());	
+	_savefile = new DefaultSaveFileManager(iPhone_getDocumentsDir());
 #else
 	_savefile = new DefaultSaveFileManager(SCUMMVM_SAVE_PATH);
 #endif
@@ -135,7 +135,7 @@ void OSystem_IPHONE::initSize(uint width, uint height) {
 	bzero(_fullscreen, fullSize);
 
 	iPhone_initSurface(width, height);
-	
+
 	_fullScreenIsDirty = false;
 	dirtyFullScreen();
 	_mouseVisible = false;
@@ -276,9 +276,9 @@ void OSystem_IPHONE::internUpdateScreen() {
 		Common::Rect dirtyRect = _dirtyRects.remove_at(_dirtyRects.size() - 1);
 
 		//printf("Drawing: (%i, %i) -> (%i, %i)\n", dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
-		
+
 		drawDirtyRect(dirtyRect);
-		
+
 		if (_overlayVisible)
 			drawDirtyOverlayRect(dirtyRect);
 
@@ -291,7 +291,7 @@ void OSystem_IPHONE::internUpdateScreen() {
 			Common::Rect dirtyRect = _dirtyOverlayRects.remove_at(_dirtyOverlayRects.size() - 1);
 
 			//printf("Drawing: (%i, %i) -> (%i, %i)\n", dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
-			
+
 			drawDirtyOverlayRect(dirtyRect);
 			drawMouseCursorOnRectUpdate(dirtyRect, mouseRect);
 			updateHardwareSurfaceForRect(dirtyRect);
@@ -308,7 +308,7 @@ void OSystem_IPHONE::drawDirtyRect(const Common::Rect& dirtyRect) {
 	for (int y = h; y > 0; y--) {
 		for (int x = w; x > 0; x--)
 			*dst++ = _palette[*src++];
-		
+
 		dst += _screenWidth - w;
 		src += _screenWidth - w;
 	}
@@ -369,7 +369,7 @@ void OSystem_IPHONE::drawMouseCursorOnRectUpdate(const Common::Rect& updatedRect
 }
 
 void OSystem_IPHONE::updateHardwareSurfaceForRect(const Common::Rect& updatedRect) {
-	iPhone_updateScreenRect(_fullscreen, updatedRect.left, updatedRect.top, updatedRect.right, updatedRect.bottom );		
+	iPhone_updateScreenRect(_fullscreen, updatedRect.left, updatedRect.top, updatedRect.right, updatedRect.bottom );
 }
 
 Graphics::Surface *OSystem_IPHONE::lockScreen() {
@@ -587,7 +587,7 @@ bool OSystem_IPHONE::pollEvent(Common::Event &event) {
 			case kInputMouseDragged:
 				if (!handleEvent_mouseDragged(event, x, y))
 					return false;
-				break;				
+				break;
 			case kInputMouseSecondDragged:
 				if (!handleEvent_mouseSecondDragged(event, x, y))
 					return false;
@@ -595,13 +595,13 @@ bool OSystem_IPHONE::pollEvent(Common::Event &event) {
 			case kInputMouseSecondDown:
 				_secondaryTapped = true;
 				if (!handleEvent_secondMouseDown(event, x, y))
-					return false;				
+					return false;
 				break;
 			case kInputMouseSecondUp:
 				_secondaryTapped = false;
 				if (!handleEvent_secondMouseUp(event, x, y))
-					return false;				
-				break;				
+					return false;
+				break;
 			case kInputOrientationChanged:
 				handleEvent_orientationChanged((int)xUnit);
 				return false;
@@ -758,30 +758,30 @@ bool OSystem_IPHONE::handleEvent_mouseDragged(Common::Event &event, int x, int y
 		int deltaY = _lastPadY - y;
 		_lastPadX = x;
 		_lastPadY = y;
-		
+
 		mouseNewPosX = (int)(_mouseX - deltaX / 0.5f);
 		mouseNewPosY = (int)(_mouseY - deltaY / 0.5f);
-		
+
 		if (mouseNewPosX < 0)
 			mouseNewPosX = 0;
 		else if (mouseNewPosX > _screenWidth)
 			mouseNewPosX = _screenWidth;
-		
+
 		if (mouseNewPosY < 0)
 			mouseNewPosY = 0;
 		else if (mouseNewPosY > _screenHeight)
 			mouseNewPosY = _screenHeight;
-		
+
 	} else {
 		mouseNewPosX = x;
 		mouseNewPosY = y;
 	}
-	
+
 	event.type = Common::EVENT_MOUSEMOVE;
 	event.mouse.x = mouseNewPosX;
 	event.mouse.y = mouseNewPosY;
 	warpMouse(mouseNewPosX, mouseNewPosY);
-	
+
 	return true;
 }
 
@@ -789,27 +789,27 @@ bool OSystem_IPHONE::handleEvent_mouseSecondDragged(Common::Event &event, int x,
 	if (_gestureStartX == -1 || _gestureStartY == -1) {
 		return false;
 	}
-	
+
 	int vecX = (x - _gestureStartX);
 	int vecY = (y - _gestureStartY);
 	int lengthSq =  vecX * vecX + vecY * vecY;
 	//printf("Lengthsq: %u\n", lengthSq);
-	
+
 	if (lengthSq > 15000) { // Long enough gesture to react upon.
 		_gestureStartX = -1;
 		_gestureStartY = -1;
-		
+
 		float vecLength = sqrt(lengthSq);
 		float vecXNorm = vecX / vecLength;
 		float vecYNorm = vecY / vecLength;
-		
+
 		//printf("Swipe vector: (%.2f, %.2f)\n", vecXNorm, vecYNorm);
-		
+
 		if (vecXNorm > -0.50 && vecXNorm < 0.50 && vecYNorm > 0.75) {
 			// Swipe down
 			event.type = Common::EVENT_KEYDOWN;
 			_queuedInputEvent.type = Common::EVENT_KEYUP;
-			
+
 			event.kbd.flags = _queuedInputEvent.kbd.flags = 0;
 			event.kbd.keycode = _queuedInputEvent.kbd.keycode = Common::KEYCODE_F5;
 			event.kbd.ascii = _queuedInputEvent.kbd.ascii = Common::ASCII_F5;
@@ -826,7 +826,7 @@ bool OSystem_IPHONE::handleEvent_mouseSecondDragged(Common::Event &event, int x,
 			GUI::TimedMessageDialog dialog(dialogMsg, 1500);
 			dialog.runModal();
 			return false;
-			
+
 		} else if (vecXNorm > 0.75 && vecYNorm >  -0.5 && vecYNorm < 0.5) {
 			// Swipe right
 			_touchpadModeEnabled = !_touchpadModeEnabled;
@@ -838,7 +838,7 @@ bool OSystem_IPHONE::handleEvent_mouseSecondDragged(Common::Event &event, int x,
 			GUI::TimedMessageDialog dialog(dialogMsg, 1500);
 			dialog.runModal();
 			return false;
-			
+
 		} else if (vecXNorm < -0.75 && vecYNorm >  -0.5 && vecYNorm < 0.5) {
 			// Swipe left
 			return false;
@@ -846,7 +846,7 @@ bool OSystem_IPHONE::handleEvent_mouseSecondDragged(Common::Event &event, int x,
 			return false;
 	} else
 		return false;
-	
+
 }
 
 void  OSystem_IPHONE::handleEvent_orientationChanged(int orientation) {
@@ -871,7 +871,7 @@ void  OSystem_IPHONE::handleEvent_orientationChanged(int orientation) {
 	if (_screenOrientation != newOrientation) {
 		_screenOrientation = newOrientation;
 		iPhone_initSurface(_screenWidth, _screenHeight);
-		
+
 		dirtyFullScreen();
 		if (_overlayVisible)
 			dirtyFullOverlayScreen();
@@ -1209,7 +1209,7 @@ Common::SeekableReadStream *OSystem_IPHONE::createConfigReadStream() {
 	strncat(buf, "/Preferences", 256 - strlen(buf) );
 	Common::FSNode file(buf);
 #else
-	Common::FSNode file(SCUMMVM_PREFS_PATH);	
+	Common::FSNode file(SCUMMVM_PREFS_PATH);
 #endif
 	return file.createReadStream();
 }
@@ -1219,10 +1219,10 @@ Common::WriteStream *OSystem_IPHONE::createConfigWriteStream() {
 	char buf[256];
 	strncpy(buf, iPhone_getDocumentsDir(), 256);
 	strncat(buf, "/Preferences", 256 - strlen(buf) );
-	Common::FSNode file(buf);	
+	Common::FSNode file(buf);
 #else
-	Common::FSNode file(SCUMMVM_PREFS_PATH);	
-#endif	
+	Common::FSNode file(SCUMMVM_PREFS_PATH);
+#endif
 	return file.createWriteStream();
 }
 
@@ -1266,7 +1266,7 @@ void iphone_main(int argc, char *argv[]) {
 
 	chdir("/var/mobile/");
 #endif
-	
+
 	g_system = OSystem_IPHONE_create();
 	assert(g_system);
 

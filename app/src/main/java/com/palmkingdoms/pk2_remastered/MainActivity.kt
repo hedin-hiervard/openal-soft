@@ -85,11 +85,16 @@ class MainActivity : Activity() {
     private fun updateSurface(data: ByteArray) {
         textureBuffer.position(0)
         textureBuffer.put(data)
+        mGLView.mRenderer.updateTexture()
     }
 
     private fun log(text: String) {
         Log.i("PK2", text)
     }
+
+//    private fun getFileContent(relPath: String): ByteArray {
+//
+//    }
 
     external fun native_onMouseDown(x: Int, y: Int, mID: Int, mbID: Int)
     external fun native_onMouseUp(x: Int, y: Int, mID: Int, mbID: Int)

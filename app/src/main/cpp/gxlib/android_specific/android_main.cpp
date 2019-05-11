@@ -2,10 +2,12 @@
 #include <string>
 
 #include "stdafx.h"
+#include <pthread.h>
 
 #define VOID_METHOD(name) JNIEXPORT void JNICALL Java_com_palmkingdoms_pk2_1remastered_MainActivity_native_1##name
 
 uint getSizeNextPOT(uint size);
+void pheroes_main();
 
 JavaVM* vm = NULL;
 jobject obj = NULL;
@@ -30,8 +32,8 @@ void Android_initSurface() {
 
 void log(const std::string& msg) {
     void *p;
-    vm->GetEnv(&p, JNI_VERSION_1_6);
     JNIEnv *env = (JNIEnv*)p;
+    vm->AttachCurrentThread(&env, NULL);
     jstring jmsg = env->NewStringUTF(msg.c_str());
     env->CallVoidMethod(obj, log_mid, jmsg);
     env->DeleteLocalRef(jmsg);
@@ -110,6 +112,12 @@ VOID_METHOD(onMouseMoved)(
 
 }
 
+void* main_thread(void* param) {
+    pheroes_main();
+    log("main exited");
+    return NULL;
+}
+
 VOID_METHOD(onStart)(
         JNIEnv *env,
         jobject t
@@ -120,8 +128,9 @@ VOID_METHOD(onStart)(
     jclass cls = env->GetObjectClass(t);
     log_mid = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
     update_surface_mid = env->GetMethodID(cls, "updateSurface", "([B)V");
-
-    log("started");
+    log("started, running main loop");
+    pthread_t thread;
+    pthread_create(&thread, NULL, &main_thread, NULL);
 }
 
 VOID_METHOD(onQuit)(

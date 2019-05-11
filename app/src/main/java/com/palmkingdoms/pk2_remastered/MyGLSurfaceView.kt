@@ -31,7 +31,7 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         mRenderer.activity = value
     }
 
-    private val mRenderer: MyGLRenderer
+    val mRenderer: MyGLRenderer
 
     private val TOUCH_SCALE_FACTOR = 180.0f / 320
     private var mPreviousX: Float = 0.toFloat()

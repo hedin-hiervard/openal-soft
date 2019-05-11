@@ -4,6 +4,7 @@
 #include "gxl.power.h"
 #include "Dlg_Register.h"
 #include "Dlg_GameLanguage.h"
+#include <string>
 
 //#include "xxc/xxc.dllfn.h"
 //#include "xxl.guard.h"
@@ -1126,10 +1127,11 @@ int preload_resources()
         //////////////////////
 }
 
+void log(const std::string& str);
 
 int pheroes_main()
     {
-
+        log("main started");
         LPCWSTR lpstrCmdLine = L"";
 
 
