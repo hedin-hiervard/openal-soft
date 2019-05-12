@@ -7,14 +7,18 @@
 #define VOID_METHOD(name) JNIEXPORT void JNICALL Java_com_palmkingdoms_pk2_1remastered_MainActivity_native_1##name
 
 uint getSizeNextPOT(uint size);
+int preload_resources();
 void pheroes_main();
 
 JavaVM* JVM = NULL;
 jobject activity_obj = NULL;
 u_int32_t surface_width;
 u_int32_t surface_height;
+pthread_mutex_t buffer_mutex;
 
 jmethodID log_java_method_id;
+jmethodID update_surface_java_method_id;
+jmethodID get_surface_java_method_id;
 jmethodID get_apk_path_method_id;
 jmethodID get_cache_dir_method_id;
 jmethodID get_library_dir_method_id;
@@ -25,7 +29,22 @@ jclass class_fa;
 char* _textureBuffer = NULL;
 int _textureWidth;
 int _textureHeight;
+bool launched = false;
 
+
+int Android_textureWidth() { return _textureWidth; }
+int Android_textureHeight() { return _textureHeight; }
+void Android_surfaceUnlock();
+void Android_surfaceLock();
+void log(const std::string& msg);
+
+
+void* main_thread(void* param) {
+    preload_resources();
+    pheroes_main();
+    log("main exited");
+    return NULL;
+}
 
 JNIEnv* getJNIEnv() {
     JNIEnv *env;
@@ -50,12 +69,16 @@ std::string jstring2string(jstring jstr)
 }
 
 void Android_initSurface() {
+    pthread_mutex_lock(&buffer_mutex);
+
     _textureWidth = getSizeNextPOT(surface_width);
     _textureHeight = getSizeNextPOT(surface_height);
 
     int textureSize = _textureWidth * _textureHeight * 2;
     _textureBuffer = (char*)malloc(textureSize);
     memset(_textureBuffer, 1424, textureSize);
+
+    pthread_mutex_unlock(&buffer_mutex);
 }
 
 void log(const std::string& msg) {
@@ -65,16 +88,40 @@ void log(const std::string& msg) {
     env->DeleteLocalRef(jmsg);
 }
 
-void updateSurface() {
-    // void *p;
-    // vm->GetEnv(&p, JNI_VERSION_1_6);
-    // JNIEnv *env = (JNIEnv*)p;
-    // int size = _textureWidth * _textureHeight * 2;
-    // jbyteArray jdata = env->NewByteArray(size);
-    // env->SetByteArrayRegion(jdata, 0, size, (jbyte*)_textureBuffer);
-    // env->CallVoidMethod(obj, update_surface_mid, jdata);
-    // env->DeleteLocalRef(jdata);
+void Android_surfaceLock() {
+    pthread_mutex_lock(&buffer_mutex);
 }
+
+void Android_surfaceUnlock() {
+    pthread_mutex_unlock(&buffer_mutex);
+}
+
+void Android_updateSurface() {
+
+    JNIEnv* env = getJNIEnv();
+    jobject buf =  env->CallObjectMethod(activity_obj, get_surface_java_method_id);
+    char* ptr = (char*)env->GetDirectBufferAddress(buf);
+    int textureSize = _textureWidth * _textureHeight * 2;
+
+    memcpy(ptr, _textureBuffer, textureSize);
+    env->DeleteLocalRef(buf);
+
+
+    env->CallVoidMethod(activity_obj, update_surface_java_method_id);
+}
+
+char* Android_getSurface() {
+  return _textureBuffer;
+}
+
+// void Android_updateScreenRect(unsigned short* screen, int x1, int y1, int x2, int y2) {
+//   int y;
+//   for (y = y1; y < y2; ++y) {
+//     memcpy(&_textureBuffer[(y * _textureWidth + x1 )* 2], &screen[y * _width + x1], (x2 - x1) * 2);
+//   }
+//   updateSurface();
+// }
+
 
 u_int32_t GetWindowWidth() {
   return surface_width;
@@ -82,10 +129,6 @@ u_int32_t GetWindowWidth() {
 
 u_int32_t GetWindowHeight(){
   return surface_height;
-}
-
-void * Android_getSurface() {
-    return _textureBuffer;
 }
 
 extern "C" {
@@ -102,7 +145,12 @@ VOID_METHOD(onSurfaceCreated)(
 
     log("surface created: " + std::to_string(width) + "x" + std::to_string(height));
     Android_initSurface();
-   // updateSurface();
+
+    if(!launched) {
+        pthread_t thread;
+        pthread_create(&thread, NULL, &main_thread, NULL);
+        launched = true;
+    }
 }
 
 VOID_METHOD(onMouseDown)(
@@ -138,16 +186,11 @@ VOID_METHOD(onMouseMoved)(
 
 }
 
-void* main_thread(void* param) {
-    pheroes_main();
-    log("main exited");
-    return NULL;
-}
-
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JVM = vm;
     JNIEnv *env;
     vm->AttachCurrentThread(&env, NULL);
+    pthread_mutex_init(&buffer_mutex, NULL);
 
     return JNI_VERSION_1_6;
 }
@@ -159,6 +202,8 @@ VOID_METHOD(onStart)(
     activity_obj = env->NewGlobalRef(t);
     jclass cls = env->GetObjectClass(t);
     log_java_method_id = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
+    update_surface_java_method_id = env->GetMethodID(cls, "updateSurface", "()V");
+    get_surface_java_method_id = env->GetMethodID(cls, "getSurface", "()Ljava/nio/ByteBuffer;");
 
     class_fa = env->FindClass("com/palmkingdoms/pk2_remastered/FileAccessor");
     class_fa = (jclass)env->NewGlobalRef(class_fa);
@@ -169,10 +214,6 @@ VOID_METHOD(onStart)(
     get_documents_dir_method_id = env->GetStaticMethodID(class_fa, "getDocumentsDirectory", "()Ljava/lang/String;");
     get_log_dir_method_id = env->GetStaticMethodID(class_fa, "getLogDirectory", "()Ljava/lang/String;");
 
-    log("started, running main loop");
-
-    pthread_t thread;
-    pthread_create(&thread, NULL, &main_thread, NULL);
 }
 
 VOID_METHOD(onQuit)(

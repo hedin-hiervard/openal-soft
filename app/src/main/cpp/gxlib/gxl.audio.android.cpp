@@ -161,7 +161,7 @@ bool iSoundPlayer::Init()
 	// 	alcMakeContextCurrent(mContext);
 	// 	return true;
 	// }
-	return false;
+	return true;
 }
 
 void iSoundPlayer::Close()

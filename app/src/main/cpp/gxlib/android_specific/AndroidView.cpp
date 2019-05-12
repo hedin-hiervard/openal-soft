@@ -2,11 +2,6 @@
 #include "android_common.h"
 
 // AndroidView *sharedInstance = NULL;
-static int _width = 0;
-static int _height = 0;
-static char* _textureBuffer = 0;
-static int _textureWidth = 0;
-static int _textureHeight = 0;
 
 // NSLock* _lock = nil;
 // static CGRect _screenRect;
@@ -21,24 +16,6 @@ void onMouseUp(int x, int y, MouseId mID, MouseButtonId mbID);
 void onMouseMove(int x, int y, MouseId mID, MouseButtonId mbID);
 void onQuit();
 
-void Android_updateScreenRect(unsigned short* screen, int x1, int y1, int x2, int y2) {
-	// [_lock lock];
-
-	int y;
-	for (y = y1; y < y2; ++y) {
-		memcpy(&_textureBuffer[(y * _textureWidth + x1 )* 2], &screen[y * _width + x1], (x2 - x1) * 2);
-	}
-
-	// [_lock unlock];
-}
-
-
-void Android_initSurface(int width, int height) {
-	_width = width;
-	_height = height;
-//    [sharedInstance initSurface];
-	// [sharedInstance performSelectorOnMainThread:@selector(initSurface) withObject:nil waitUntilDone: YES];
-}
 
 bool Android_fetchEvent(int *outEvent, float *outX, float *outY) {
 	// id event = [sharedInstance getEvent];
@@ -59,9 +36,9 @@ bool Android_fetchEvent(int *outEvent, float *outX, float *outY) {
 	return true;
 }
 
-const char* Android_getDocumentsDir() {
-  return "";
-}
+// const char* Android_getDocumentsDir() {
+//   return "";
+// }
 
 // bool getLocalMouseCoords(CGPoint *point) {
 // 	if (point->x < _screenRect.origin.x || point->x >= _screenRect.origin.x + _screenRect.size.width ||

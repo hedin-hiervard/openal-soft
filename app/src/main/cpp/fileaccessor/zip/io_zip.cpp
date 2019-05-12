@@ -25,8 +25,10 @@ namespace fileaccessor {
     shared_ptr<FileBuffer> FileReaderZip::getFileBuffer(const RelativeFilePath& path, const FileMode& mode)
     {
         auto data = make_shared<FileBuffer>();
-        m_unzipper->extractEntryToMemory("assets/" + path.plain_string(), *data);
-        return data;
+        if(m_unzipper->extractEntryToMemory("assets/" + path.plain_string(), *data)) {
+            return data;
+        }
+        return nullptr;
     }
 
 

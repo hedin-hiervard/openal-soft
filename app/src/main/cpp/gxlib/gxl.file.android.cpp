@@ -2,6 +2,7 @@
 #include "gxl.memory.h"
 #include "gxl.file.h"
 
+#include "FileAccessor/FileAccessor.h"
 #include <sys/stat.h>
 
 #ifndef INVALID_FILE_ATTRIBUTES
@@ -13,14 +14,16 @@
 
 #define INVALID_HANDLE_VALUE NULL
 
+using namespace fileaccessor;
+
 class iFileWin32 : public ref_countable_impl<iFileI>
 {
 public:
 
-	FILE* m_hFile;
+	std::shared_ptr<std::vector<char>> m_buffer = nullptr;
+  sint32 m_buffer_pos = 0;
 
 	iFileWin32()
-	: m_hFile(INVALID_HANDLE_VALUE)
 	{
 	}
 
@@ -31,176 +34,79 @@ public:
 
 	bool Open(const iStringT& fname)
 	{
-	  m_hFile = fopen(CvtT2A<>(fname.CStr()), "r");
-	  return (m_hFile != INVALID_HANDLE_VALUE);
+    m_buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(RelativeFilePath(fname.CStr()), "r");
+    m_buffer_pos = 0;
+	  return (m_buffer != nullptr);
 	}
 
 	bool Create(const iStringT& fname)
 	{
-	  m_hFile = fopen(CvtT2A<>(fname.CStr()), "w");
-	  return (m_hFile != INVALID_HANDLE_VALUE);
+	  // m_hFile = fopen(CvtT2A<>(fname.CStr()), "w");
+	  // return (m_hFile != INVALID_HANDLE_VALUE);
+    return false;
 	}
 
 	void Close()
 	{
-	  if (m_hFile != INVALID_HANDLE_VALUE) {
-	    fclose(m_hFile);
-	    m_hFile = INVALID_HANDLE_VALUE;
-	  }
+	   m_buffer = nullptr;
 	}
 
 	// iFileI interface implementation
 	uint32 Seek(sint32 pos, SeekMode smode = FSEEK_SET)
 	{
-		switch(smode) {
-			case FSEEK_SET:
-				return fseek(m_hFile, pos, SEEK_SET);
-			case FSEEK_CUR:
-				return fseek(m_hFile, pos, SEEK_CUR);
-			case FSEEK_END:
-				return fseek(m_hFile, pos, SEEK_CUR);
-		}
-
-	   //PORTTODO (not used?)
-	  /*check(IsOpen());
-	  uint32 win32SeekMode;
-	  LARGE_INTEGER offset;
-	  offset.QuadPart = pos;
-
-	  switch (smode) {
-	  case FSEEK_SET:		win32SeekMode = _BEGIN; break;
-	  case FSEEK_CUR:		win32SeekMode = FILE_CURRENT; break;
-	  case FSEEK_END:		win32SeekMode = FILE_END; break;
-	  default:			win32SeekMode = FILE_BEGIN; break;
-	  }
-
-	  offset.LowPart = ::SetFilePointer(m_hFile, offset.LowPart, &offset.HighPart, win32SeekMode);
-	  return offset.LowPart;
-	  */
+	    switch(smode) {
+	        case FSEEK_CUR:
+	            m_buffer_pos += pos;
+	            break;
+	        case FSEEK_SET:
+	            m_buffer_pos = pos;
+	            break;
+	        case FSEEK_END:
+	            m_buffer_pos = m_buffer->size() + pos;
+	            break;
+	    }
+        return pos;
 	}
 
 	uint32 GetPosition() const
 	{
-		check(IsOpen());
-		return ftell(m_hFile);
+		return m_buffer_pos;
 	}
 
 	uint32 Read(void *buff, uint32 buffsize)
 	{
-	  check(IsOpen());
-	  DWORD readed = fread(buff, 1, buffsize, m_hFile);
-	  return readed;
+    memcpy(buff, &((*m_buffer)[m_buffer_pos]), buffsize);
+    m_buffer_pos += buffsize;
+	  return buffsize;
 	}
 
 	uint32 Write(const void *buff, uint32 buffsize)
 	{
-	  check(IsOpen());
-	  DWORD writen = fwrite(buff, 1, buffsize, m_hFile);
-	  return writen;
+    return 0;
+	  // check(IsOpen());
+	  // DWORD writen = fwrite(buff, 1, buffsize, m_hFile);
+	  // return writen;
 	}
 
 	bool IsOpen() const
 	{
-	  return (m_hFile != INVALID_HANDLE_VALUE);
+	  return m_buffer != nullptr;
 	}
 
 	uint32 GetSize() const
 	{
-	  uint32 pos = ftell(m_hFile);
-	  fseek (m_hFile, 0, SEEK_END);
-	  uint32 lSize = ftell(m_hFile);
-	  fseek(m_hFile, pos, SEEK_SET);
-	  return lSize;
+	   return m_buffer->size();
 	}
 
 	void Flush()
 	{
-	  check(IsOpen());
-	  fflush(m_hFile);
+
 	}
 };
 
 //
 //
 //
-#if !defined( UNDER_CE) && !defined (OS_APPLE) && !defined(OS_ANDROID)
-class iFileWinStg : public ref_countable_impl<iFileI>
-{
-public:
-
-	IStream* m_pStream;
-
-	iFileWinStg(IStream *pstream)
-	: m_pStream(pstream)
-	{
-	}
-
-	~iFileWinStg()
-	{
-		m_pStream->Release();
-		m_pStream = NULL;
-	}
-
-	// iFileI interface implementation
-	uint32 Seek(sint32 pos, SeekMode smode = FSEEK_SET)
-	{
-		check(IsOpen());
-		LARGE_INTEGER lgint;
-		ULARGE_INTEGER newPos;
-		lgint.QuadPart = pos;
-		HRESULT hr = m_pStream->Seek(lgint,smode,&newPos);
-		check(hr == S_OK);
-		if ( hr == S_OK ) return newPos.LowPart;
-		else return ~0UL;
-	}
-
-	uint32 GetPosition() const
-	{
-		check(IsOpen());
-		ULARGE_INTEGER ulgint;
-		LARGE_INTEGER lgint;
-		lgint.QuadPart = 0;
-		HRESULT hr = m_pStream->Seek(lgint,STREAM_SEEK_CUR,&ulgint);
-		check(hr == S_OK);
-		return (uint32)ulgint.QuadPart;
-	}
-
-	uint32 Read(void *buff, uint32 buffsize)
-	{
-		check(IsOpen());
-		DWORD readed;
-		HRESULT hr = m_pStream->Read(buff,buffsize,&readed);
-		check(hr == S_OK);
-		return readed;
-	}
-
-	uint32 Write(const void *buff, uint32 buffsize)
-	{
-		check(IsOpen());
-		DWORD writen;
-		HRESULT hr = m_pStream->Write(buff,buffsize,&writen);
-		check(hr == S_OK);
-		return writen;
-	}
-
-	bool IsOpen() const
-	{
-		return (m_pStream != NULL);
-	}
-
-	uint32 GetSize() const
-	{
-		STATSTG pst;
-		HRESULT hr = m_pStream->Stat(&pst,STATFLAG_NONAME);
-		check(hr == S_OK && &pst != NULL);
-		return (uint32)pst.cbSize.QuadPart;
-	}
-
-	void Flush()
-	{
-	}
-};
-#endif
 
 //
 iFileI* CreateWin32File(const iStringT& fname)
@@ -223,21 +129,6 @@ iFileI* OpenWin32File(const iStringT& fname)
 	return result;
 }
 
-#if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_ANDROID)
-iFileI* CreateWinStgFile(IStream *stream)
-{
-	if (!stream) return NULL;
-	return new iFileWinStg(stream);
-}
-
-
-iFileI* OpenWinStgFile(IStream *stream)
-{
-	if (!stream) return NULL;
-	return new iFileWinStg(stream);
-}
-#endif
-
 
 /*
  *	iFile static functions
@@ -246,36 +137,25 @@ namespace iFile {
 
 bool Exists(const iStringT& fname)
 {
-	FILE* f = fopen(CvtT2A<>(fname.CStr()), "r");
-	if(f) {
-		fclose(f);
-		return true;
-	} else
-		return false;
+  return FileAccessor::sharedFileAccessor()->fileExists(RelativeFilePath(fname.CStr()));
 }
 
 bool Delete(const iStringT& fname)
 {
-  if ( !Exists(fname) ) return true;
-  return !remove(CvtT2A<>(fname.CStr()));
+  FileAccessor::sharedFileAccessor()->deleteFile(RelativeFilePath(fname.CStr()));
+  return true;
 }
 
 
 
 bool Rename(const iStringT& fname, const iStringT& to_fname)
 {
-  if (rename(CvtT2A<>(fname.CStr()), CvtT2A<>(to_fname.CStr()))) {
-  	return false;
-  }
-  return true;
+  return false;
 }
 
 bool Copy(const iStringT& fname, const iStringT& to_fname)
 {
-  //if (!Exists(fname) || !::CopyFileW(fname.CStr(), to_fname.CStr(), FALSE)) {
-  //	return false;
-  //}
-  return true;
+  return false;
 }
 
 bool Move(const iStringT& fname, const iStringT& to_fname)
@@ -285,38 +165,32 @@ bool Move(const iStringT& fname, const iStringT& to_fname)
 
 bool DirExists(const iStringT& dname)
 {
-
-  //DWORD res = ::GetFileAttributesW(dname.CStr());
-  //if ( res == INVALID_FILE_ATTRIBUTES ) return false;
-  //else return (res & FILE_ATTRIBUTE_DIRECTORY) != 0;
+  return FileAccessor::sharedFileAccessor()->fileExists(RelativeFilePath(dname.CStr()));
 }
 
 bool DirDelete(const iStringT& dname)
 {
-  ///if ( !DirExists( dname ) ) return true;
-  //return ::RemoveDirectoryW(dname.CStr()) ? true : false;
+  auto absPath = FileAccessor::sharedFileAccessor()->resolve(RelativeFilePath(dname.CStr()));
+  FileAccessor::sharedFileAccessor()->deleteDirectory(absPath);
+  return true;
 }
 
 void DirRename(const iStringT& dname, const iStringT& to_dname)
 {
-  //if (!DirExists(dname)){
-  //	return;
-  //}
-  //Rename(dname,to_dname);
+
 }
 
 bool DirCreate(const iStringT& dname)
 {
-	return mkdir(CvtT2A<>(dname.CStr()), 0777) == 0;
+  auto absPath = FileAccessor::sharedFileAccessor()->resolve(RelativeFilePath(dname.CStr()));
+  FileAccessor::sharedFileAccessor()->createDirectory(absPath);
+  return true;
 }
 
 uint32 GetSize(const iStringT& fname)
 {
-  //HANDLE hFile = ::CreateFileW(fname.CStr(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  //if (hFile == INVALID_HANDLE_VALUE) return 0;
-  //uint32 size = ::GetFileSize(hFile,NULL);
-  //if (size == 0xFFFFFFFF) return 0;
-  //return size;
+  auto buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(RelativeFilePath(fname.CStr()), "r");
+  return buffer->size();
 }
 
 } // namespace iFile
@@ -343,38 +217,19 @@ void GetAppName(iStringT& str)
   //}
 }
 
-
-
 void GetAppPath(iStringT& str)
 {
-  // str = iStringT(CvtA2T<>(GetBundlePath()));
-//#if defined(OS_IPHONE)
-
-//#endif
-//  iStringT fname;
-//  GetAppFullName(fname);
-/*#if defined(OS_MACOS)
-  sint32 pos = str.ReverseFind('/');
-  if (pos != -1){
-  	str = str.Left(pos+1);
-  }
-#endif
- */
-
-#ifdef OS_MACOS
-	str += _T("/Contents/Resources");
-#endif
-	str += _T("/");
+    //str = _T("assets/");
 }
 
 void GetAppDocPath(iStringT& str)
 {
-	// str = iStringT(CvtA2T<>(GetDocumentsPath())) + _T("/");
+  // str = "";
 }
 
 void GetAppLibPath(iStringT& str)
 {
-    // str = iStringT(CvtA2T<>(GetLibraryPath())) + _T("/");
+    // str = "";
 }
 
 

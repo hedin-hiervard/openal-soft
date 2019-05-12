@@ -77,12 +77,13 @@ namespace zipper {
                 return false;
             
             err = extractStrategy(entryinfo);
-            if (UNZ_OK == err)
+            bool success = err > 0;
+            if (success)
             {
-                err = unzCloseCurrentFile(m_zf);
+                unzCloseCurrentFile(m_zf);
             }
             
-            return UNZ_OK == err;
+            return success;
         }
         
         int extractToFile(const std::string& filename, ZipEntry& info)

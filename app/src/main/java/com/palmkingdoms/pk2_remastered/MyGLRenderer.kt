@@ -58,9 +58,9 @@ class MyGLRenderer : GLSurfaceView.Renderer {
      */
     var angle: Float = 0.toFloat()
 
-    fun createTexture() {
-        textureWidth = 128
-        textureHeight = 128
+    fun createTexture(surfaceWidth: Int, surfaceHeight: Int) {
+        textureWidth = Math.max(1, Integer.highestOneBit(surfaceWidth - 1) shl 1)
+        textureHeight = Math.max(1, Integer.highestOneBit(surfaceHeight - 1) shl 1)
 
         Log.i("PK2", "texture size: %d x %d".format(textureWidth, textureHeight))
 
@@ -78,14 +78,15 @@ class MyGLRenderer : GLSurfaceView.Renderer {
 
         GLES20.glEnable(GLES20.GL_TEXTURE_2D)
         activity?.textureBuffer = ByteBuffer.allocateDirect(textureHeight * textureWidth * 2)
-    }
-
-    fun updateTexture() {
 
         activity?.textureBuffer?.position(0)
         for(i in 0 .. textureHeight * textureWidth * 2 - 1) {
             activity?.textureBuffer?.put(120.toByte())
         }
+    }
+
+    fun updateTexture() {
+
 
         activity?.textureBuffer?.position(0)
 
@@ -135,8 +136,8 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
-        createTexture()
-        updateTexture()
+        createTexture(width, height);
+        activity?.native_onSurfaceCreated(width, height);
     }
 
     companion object {

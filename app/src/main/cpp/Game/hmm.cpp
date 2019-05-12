@@ -38,6 +38,7 @@
 #include "FileAccessor/FileAccessor.h"
 
 using namespace iosdk;
+void log(const std::string& str);
 
 class iDlg_Message;
 
@@ -896,6 +897,7 @@ bool IsIpad();
 int preload_resources()
 {
     // Adomatic::sharedInstance()->init("PK2", "4d01d62fb6a74af872ccd9d577ce56403386785a553d1a5ca8b9ce0eaa68c089");
+        fileaccessor::FileAccessor::sharedFileAccessor()->init("Palm Kingdoms 2 Remastered", "iosoftware");
 
 #ifdef OS_WINCE
         // check second instance of app
@@ -1104,8 +1106,8 @@ int preload_resources()
 
         gMusicMgr.SetVolume(gSettings.GetEntryValue(CET_MSCVOLUME));
 
-        SetGameLanguage(gSettings.GetLanguage());
         gSettings.Save();
+        SetGameLanguage(gSettings.GetLanguage());
 
         //////////////////////
         // debug: output creatures info into text file
@@ -1126,16 +1128,15 @@ int preload_resources()
          fclose(f);
          */
         //////////////////////
+        log("preloading finished");
+        return 0;
 }
-
-void log(const std::string& str);
 
 int pheroes_main()
     {
         log("main started");
         LPCWSTR lpstrCmdLine = L"";
 
-        fileaccessor::FileAccessor::sharedFileAccessor()->init("Palm Kingdoms 2 Remastered", "iosoftware");
         bool bFirstLaunch = false;
 
         //determine first launch
@@ -1170,7 +1171,7 @@ int pheroes_main()
 
 
 
-
+    log("starting main loop");
 
 	// Core loop
 	/*sint32 retCode =  */gApp.Run();
@@ -1179,6 +1180,7 @@ int pheroes_main()
 	// Cleanup
 	gApp.Destroy();
 
+	log("main loop finished");
 	return 0;//retCode;
 }
 

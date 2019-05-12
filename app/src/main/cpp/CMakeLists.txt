@@ -247,9 +247,6 @@ set(source
   fileaccessor/posix/io_posix.cpp
   fileaccessor/paths.cpp
 
-  # JniHelper
-  JniHelper/JniHelper.cpp
-
   # zipper
   zipper/unzipper.cpp
 

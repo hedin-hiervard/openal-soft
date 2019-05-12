@@ -82,10 +82,14 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun updateSurface(data: ByteArray) {
-        textureBuffer.position(0)
-        textureBuffer.put(data)
-        mGLView.mRenderer.updateTexture()
+    private fun updateSurface() {
+        mGLView.queueEvent(Runnable {
+             mGLView.mRenderer.updateTexture()
+        })
+    }
+
+    private fun getSurface(): ByteBuffer {
+        return textureBuffer;
     }
 
     private fun log(text: String) {

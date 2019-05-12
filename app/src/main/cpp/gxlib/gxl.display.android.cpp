@@ -19,7 +19,13 @@ iDisplay::~iDisplay()
         check(!m_bInited);
 }
 
-void * Android_getSurface();
+char * Android_getSurface();
+void Android_updateScreenRect(unsigned short* screen, int x1, int y1, int x2, int y2);
+void Android_updateSurface();
+int Android_textureWidth();
+int Android_textureHeight();
+void Android_surfaceUnlock();
+void Android_surfaceLock();
 
 bool iDisplay::Init(HWND hwnd, const iSize& siz, uint32 flags)
 {
@@ -88,28 +94,15 @@ void iDisplay::DoPaint(const iRect& rc)
 {
 //    return;
 	const iDib::pixel* pSrc = m_BackBuff.GetPtr();
+	Android_surfaceLock();
 	void *buf = Android_getSurface();
 
 	if(!buf) {
-		iSize sz = m_Siz;
-		if(m_Flags & GXLF_DOUBLESIZE)
-		{
-			sz.w *= 2;
-			sz.h *= 2;
-		}
-		Android_initSurface(sz.w, sz.h);
-		textW = getSizeNextPOT(sz.w);
-		textH = getSizeNextPOT(sz.h);
-#ifdef OS_MACOS
-		pthread_mutex_lock(&surfaceMutex);
-#endif
-		buf = Android_getSurface();
-//		textW = getSizeNextPOT(m_Siz.w);
-//		textH = getSizeNextPOT(m_Siz.h);
-	} else {
-		//pthread_mutex_lock(&surfaceMutex);
-	}
-	//Android_updateScreenRect(pSrc, 0, 0, 320, 480);
+		Android_surfaceUnlock();
+	   return;
+   }
+  int textW = Android_textureWidth();
+  int textH = Android_textureHeight();
 
 	uint16 *line;
 
@@ -173,4 +166,6 @@ void iDisplay::DoPaint(const iRect& rc)
 			}
 		}
 	}
+    Android_updateSurface();
+	Android_surfaceUnlock();
 }
