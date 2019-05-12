@@ -206,7 +206,7 @@ void RenderFPS(DWORD count) {
 //	gTextComposer.TextOut(gApp.Surface(), iPoint(0, 10), iFormat(_T("FPS: %d"), count));
 }
 
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 void SetRotated(bool bRotated)
 {
 	gApp.SetOrientation(true, !bRotated);

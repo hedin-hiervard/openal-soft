@@ -84,7 +84,8 @@ class MainActivity : Activity() {
 
     private fun updateSurface() {
         mGLView.queueEvent(Runnable {
-             mGLView.mRenderer.updateTexture()
+            //mGLView.mRenderer.updateTexture()
+            mGLView.requestRender()
         })
     }
 

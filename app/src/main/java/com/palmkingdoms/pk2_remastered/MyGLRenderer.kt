@@ -86,8 +86,6 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     }
 
     fun updateTexture() {
-
-
         activity?.textureBuffer?.position(0)
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTexture)
@@ -110,13 +108,13 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(unused: GL10) {
-        val scratch = FloatArray(16)
+        updateTexture()
 
         // Draw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
         // Set the camera position (View matrix)
-//        Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+      //  Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 1.0f, 0f, 0f, 0f, 0f, 0.0f, 1.0f)
         Matrix.setIdentityM(mViewMatrix, 0)
 
         // Calculate the projection and view transformation
@@ -135,7 +133,6 @@ class MyGLRenderer : GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-//        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
         Matrix.orthoM(
             mProjectionMatrix,
             0,

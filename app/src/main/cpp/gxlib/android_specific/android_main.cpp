@@ -37,7 +37,9 @@ int Android_textureHeight() { return _textureHeight; }
 void Android_surfaceUnlock();
 void Android_surfaceLock();
 void log(const std::string& msg);
-
+void onMouseDown(int x, int y, MouseId mID, MouseButtonId mbID);
+void onMouseMove(int x, int y, MouseId mID, MouseButtonId mbID);
+void onMouseUp(int x, int y, MouseId mID, MouseButtonId mbID);
 
 void* main_thread(void* param) {
     preload_resources();
@@ -76,7 +78,7 @@ void Android_initSurface() {
 
     int textureSize = _textureWidth * _textureHeight * 2;
     _textureBuffer = (char*)malloc(textureSize);
-    memset(_textureBuffer, 1424, textureSize);
+    memset(_textureBuffer, 5600, textureSize);
 
     pthread_mutex_unlock(&buffer_mutex);
 }
@@ -161,7 +163,7 @@ VOID_METHOD(onMouseDown)(
         jint mID,
         jint mbID)
 {
-
+  onMouseDown(x, y, mID, mbID);
 }
 
 VOID_METHOD(onMouseUp)(
@@ -172,10 +174,10 @@ VOID_METHOD(onMouseUp)(
         jint mID,
         jint mbID)
 {
-
+  onMouseUp(x, y, mID, mbID);
 }
 
-VOID_METHOD(onMouseMoved)(
+VOID_METHOD(onMouseMove)(
         JNIEnv *env,
         jobject, /* this */
         jint x,
@@ -183,7 +185,7 @@ VOID_METHOD(onMouseMoved)(
         jint mID,
         jint mbID)
 {
-
+  onMouseMove(x, y, mID, mbID);
 }
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {

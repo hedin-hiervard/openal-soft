@@ -56,32 +56,22 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
 
-        val x = e.x
-        val y = e.y
+        val x: Int = e.x.toInt()
+        val y: Int = e.y.toInt()
+        val touchId = e.actionButton
 
         when (e.action) {
+            MotionEvent.ACTION_DOWN -> {
+                activity?.native_onMouseDown(x, y, touchId, 0)
+            }
+            MotionEvent.ACTION_UP -> {
+                activity?.native_onMouseUp(x, y, touchId, 0)
+            }
             MotionEvent.ACTION_MOVE -> {
-
-                var dx = x - mPreviousX
-                var dy = y - mPreviousY
-
-                // reverse direction of rotation above the mid-line
-                if (y > height / 2) {
-                    dx = dx * -1
-                }
-
-                // reverse direction of rotation to left of the mid-line
-                if (x < width / 2) {
-                    dy = dy * -1
-                }
-
-                mRenderer.angle = mRenderer.angle + (dx + dy) * TOUCH_SCALE_FACTOR  // = 180.0f / 320
-                requestRender()
+                activity?.native_onMouseMove(x, y, touchId, 0)
             }
         }
 
-        mPreviousX = x
-        mPreviousY = y
         return true
     }
 
