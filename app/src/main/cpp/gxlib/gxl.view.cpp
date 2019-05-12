@@ -16,7 +16,7 @@
 
 iView::iView(iViewMgr* pViewMgr, const iRect& rect, uint32 clsId, uint32 uid, uint32 state)
 : m_bNeedRedraw(true),  m_pParent(NULL)
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 , m_lastClick(-1), m_bIsDoubleClicking(false)
 #endif
 {

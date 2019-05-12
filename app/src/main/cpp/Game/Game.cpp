@@ -70,6 +70,7 @@ extern uint8* pBloomBits;
 #include "iosdk/analytics/analytics.h"
 
 using namespace iosdk;
+using namespace fileaccessor;
 
 /*
 *  BlackBack
@@ -223,16 +224,17 @@ bool iGame::Init(const iStringT& fname)
             iFile::Move(gSavePath + _T("lastses.phsd"), gSavePath + _T("lastses.use"));
 
 
+    auto lastSesPath = RelativeFilePath((gSavePath + _T("lastses.use")).CStr(), FileLocationType::FLT_DOCUMENT);
 #ifdef HMM_COMPOVERSION
             iFilePtr pSaveFile = xxc::OpenXFile(gSavePath + _T("lastses.use"),HMM_COMPOCODE);
 #else
-            iFilePtr pSaveFile = OpenWin32File(gSavePath + _T("lastses.use"));
+            iFilePtr pSaveFile = OpenWin32File(lastSesPath);
 #endif
             check(pSaveFile);
             if (pSaveFile) {
                 uint32 fourcc; pSaveFile->Read(&fourcc,sizeof(fourcc));
                 iMapInfo mapInfo;
-                mapInfo.m_FileName = gSavePath + _T("lastses.use");
+                mapInfo.m_FileName = lastSesPath;
                 mapInfo.m_bNewGame = false;
                 if(mapInfo.ReadMapInfo(pSaveFile.get())) {
                     mapInfo.ReorderPlayers();
@@ -380,14 +382,16 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
 bool iGame::StartTutorialMap()
 {
 	iStringT filename;
-	filename = _T("break.phmd");
+  filename = _T("break.phmd");
 
-    iFilePtr pMapFile = OpenWin32File(gBundledMapsPath + filename);
+  auto tutorialPath = RelativeFilePath((gBundledMapsPath + filename).CStr());
+
+    iFilePtr pMapFile = OpenWin32File(tutorialPath);
 	check(pMapFile);
 	if (pMapFile) {
 		uint32 fourcc; pMapFile->Read(&fourcc,sizeof(fourcc));
 		iMapInfo mapInfo;
-		mapInfo.m_FileName = gBundledMapsPath + filename;
+		mapInfo.m_FileName = tutorialPath;
 		mapInfo.m_bNewGame = true;
 		if(mapInfo.ReadMapInfo(pMapFile.get())) {
 			mapInfo.m_Difficulty = DFC_NORMAL;
@@ -402,24 +406,24 @@ bool iGame::StartTutorialMap()
 
 bool iGame::StartSingleMap()
 {
-	iStringT filename;
-#ifdef ROYAL_BOUNTY
-	filename = _T("RoyalBounty.phmd");
-#endif
-	iFilePtr pMapFile = OpenWin32File(gBundledMapsPath + filename);
-	check(pMapFile);
-	if (pMapFile) {
-		uint32 fourcc; pMapFile->Read(&fourcc,sizeof(fourcc));
-		iMapInfo mapInfo;
-		mapInfo.m_FileName = gBundledMapsPath + filename;
-		mapInfo.m_bNewGame = true;
-		if(mapInfo.ReadMapInfo(pMapFile.get())) {
-			mapInfo.m_Difficulty = DFC_NORMAL;
-			mapInfo.ReorderPlayers();
-			return StartNewGame(mapInfo, true, true);
-		} else
-			return false;
-	} else
+// 	iStringT filename;
+// #ifdef ROYAL_BOUNTY
+// 	filename = _T("RoyalBounty.phmd");
+// #endif
+// 	iFilePtr pMapFile = OpenWin32File(gBundledMapsPath + filename);
+// 	check(pMapFile);
+// 	if (pMapFile) {
+// 		uint32 fourcc; pMapFile->Read(&fourcc,sizeof(fourcc));
+// 		iMapInfo mapInfo;
+// 		mapInfo.m_FileName = gBundledMapsPath + filename;
+// 		mapInfo.m_bNewGame = true;
+// 		if(mapInfo.ReadMapInfo(pMapFile.get())) {
+// 			mapInfo.m_Difficulty = DFC_NORMAL;
+// 			mapInfo.ReorderPlayers();
+// 			return StartNewGame(mapInfo, true, true);
+// 		} else
+// 			return false;
+// 	} else
 		return false;
 }
 
@@ -1582,7 +1586,7 @@ void iGame::Quickload()
 	iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 1);
 	iMapInfo mapInfo;
 	mapInfo.m_bNewGame = false;
-	mapInfo.m_FileName = fname;
+	mapInfo.m_FileName = RelativeFilePath(fname.CStr(), FileLocationType::FLT_DOCUMENT);
 
 	iFilePtr pFile(OpenWin32File(fname));
 

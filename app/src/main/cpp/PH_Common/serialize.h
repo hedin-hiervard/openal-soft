@@ -98,7 +98,7 @@ inline void Unserialize(iFileI* pFile, iStringT& text)
 	pFile->Read(&len, sizeof(len));
 	if ( len ) {
 		iCharT* buff = new iCharT[len];
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 		sint16* tbuff = new sint16[len];
 		sint32 bcnt = len*sizeof(sint16);
 		pFile->Read(tbuff,bcnt);
@@ -111,7 +111,7 @@ inline void Unserialize(iFileI* pFile, iStringT& text)
 		text.Set(buff,len);
 #endif
 		delete[] buff;
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 		delete [] tbuff;
 #endif
 	

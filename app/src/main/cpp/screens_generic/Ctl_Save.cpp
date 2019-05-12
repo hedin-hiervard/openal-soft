@@ -1,13 +1,15 @@
 //
 // Ctl_Save.cpp
-// 
+//
 
 #include "stdafx.h"
 #include "Dlg_Save.h"
 #include "helpers.h"
 //#include "xxc/xxc.file.h"
 #include "Ctl_Save.h"
+#include "FileAccessor/FileAccessor.h"
 
+using namespace fileaccessor;
 
 // CotullaTODO: copy of button code, from ScenList, move it somewhere else later
 class iSortBtn2 : public iButton
@@ -40,7 +42,7 @@ public:
                 if(GetScrRect() == iIphoneBtn::sm_defSize)
                     gGfxMgr.Blit(PDGG(BTN_FRAME), gApp.Surface(), dst);
             }
-        }		
+        }
         iTextComposer::FontConfig fc(newmenufc_med_text);
         fc.cmpProps.faceColor = RGB16(0, 0, 0);
         gTextComposer.TextOut(fc,gApp.Surface(),rect,gTextMgr[m_tid],rect,AlignCenter, iPoint());
@@ -56,26 +58,26 @@ private:
 };
 
 /*
-*	
+*
 */
 static void EnumSaveGames(bool bSave, iSaveSlots& saveSlots)
 {
 	// skip the autosave & quicksave if saving
-    for (uint32 xx = bSave ? 1 : 0; xx < SAVE_GAME_SLOTS - (bSave ? 1 : 0); ++xx) 
+    for (uint32 xx = bSave ? 1 : 0; xx < SAVE_GAME_SLOTS - (bSave ? 1 : 0); ++xx)
     {
-        iStringT fname = gSavePath + iFormat(_T("save%02d.phsd"),xx);
+        auto fpath = RelativeFilePath((gSavePath + iFormat(_T("save%02d.phsd"),xx)).CStr(), FileLocationType::FLT_DOCUMENT);
 #ifdef HMM_COMPOVERSION
         iFilePtr pFile(xxc::OpenXFile(fname.CStr(),HMM_COMPOCODE));
 #else
-        iFilePtr pFile(OpenWin32File(fname.CStr()));
-#endif 
-        if (pFile) 
+        iFilePtr pFile(OpenWin32File(fpath));
+#endif
+        if (pFile)
         {
             iMapInfo* pMapInfo = new iMapInfo;
             pMapInfo->m_bNewGame = false;
-            pMapInfo->m_FileName = fname;
+            pMapInfo->m_FileName = fpath;
             uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));
-            if (fourcc == GMAP_FILE_HDR_KEY && pMapInfo->ReadMapInfo(pFile.get())) 
+            if (fourcc == GMAP_FILE_HDR_KEY && pMapInfo->ReadMapInfo(pFile.get()))
             {
 				iSaveSlot slot;
 				slot.mapInfo = pMapInfo;
@@ -90,17 +92,17 @@ static void EnumSaveGames(bool bSave, iSaveSlots& saveSlots)
             // file is missing, end of saves
 			// disabled, Hedin, 15.05.2011
             // break;
-        }        
+        }
     }
-	
+
 	if (bSave) {
 		iSaveSlot sl;
 		sl.mapInfo = NULL;
 		sl.idx = 0;
-		
+
 		if(saveSlots.GetSize() > 0)
 			saveSlots.InsertBefore(0, sl);
-		else 
+		else
 			saveSlots.Add(sl);
 	}
 }
@@ -109,7 +111,7 @@ static bool GetNextFileName(iStringT& fname)
 {
     fname = _T("");
 	// do not select quicksave & autosave
-    for (uint32 xx = 1; xx < SAVE_GAME_SLOTS - 1; ++xx) 
+    for (uint32 xx = 1; xx < SAVE_GAME_SLOTS - 1; ++xx)
     {
         iStringT fn = gSavePath + iFormat(_T("save%02d.phsd"),xx);
         if (!iFile::Exists(fn))
@@ -143,7 +145,7 @@ public:
         for (uint32 i = 0; i < m_saveSlots.GetSize(); i++)
         {
             m_clrdata.Add((i % 2) ? 1 : 0);
-        }        
+        }
     }
 private:
     void ComposeLBBackground(const iRect& rect)
@@ -151,9 +153,9 @@ private:
         iRect rc = rect;
         //gApp.Surface().Darken25Rect(rc);
     }
-    
+
     //void ComposeLBItem(uint32 iIdx, bool bSel, const iRect& irc)
-    void ExComposeLBItem(iDib &dib, sint32 iIdx, bool bSel, const iRect& irc)    
+    void ExComposeLBItem(iDib &dib, sint32 iIdx, bool bSel, const iRect& irc)
     {
         iRect rc=irc;
 
@@ -171,7 +173,7 @@ private:
 		if (!bSel)
 		{
 			if (bClr)
-				dib.FillRect(rc, 
+				dib.FillRect(rc,
 #ifdef PC_VERSION
                              RGB16(196, 184, 163)
 #else
@@ -179,30 +181,30 @@ private:
 #endif
                              ); //RGB16(160, 152, 136));
 			else
-				dib.FillRect(rc, 
+				dib.FillRect(rc,
 #ifdef PC_VERSION
                              RGB16(165, 155, 133)
 #else
                              RGB16(165, 155, 133)
 #endif
-                             ); //RGB16(176, 168, 152));        
+                             ); //RGB16(176, 168, 152));
 		}
 		else
 		{
 			fc_b.cmpProps.faceColor = RGB16(0, 0, 0);
-			dib.FillRect(rc, RGB16(242, 230, 198));            
+			dib.FillRect(rc, RGB16(242, 230, 198));
 		}
-		
+
        /* if (!bSel)
         {
             if (m_clrdata[iIdx])
                 dib.FillRect(rc, RGB16(160, 152, 136));
             else
-                dib.FillRect(rc, RGB16(176, 168, 152));        
+                dib.FillRect(rc, RGB16(176, 168, 152));
         }
         else
         {
-            dib.FillRect(rc, RGB16(242, 230, 198));            
+            dib.FillRect(rc, RGB16(242, 230, 198));
             fc_b.cmpProps.faceColor = RGB16(0, 0, 0);
         }*/
 
@@ -231,30 +233,30 @@ private:
 				name = iFormat(_T("[Q] %s"), m_saveSlots[iIdx].mapInfo->MapName().CStr());
 			else
 				name = iFormat(_T("[%d] %s"), m_saveSlots[iIdx].idx, m_saveSlots[iIdx].mapInfo->MapName().CStr());
-			
+
             gTextComposer.TextOut(fc_b, dib,rc, name, iRect(rc.x,rc.y,300,rc.h),AlignLeft);
 #ifdef PC_VERSION
             rc.DeflateRect(300,0,0,0);
 #else
             rc = AlignRect(iSize(140, rc.h), rc, AlignRight);
 #endif
-            // 4. Date 
+            // 4. Date
             uint16 ch = gTextComposer.GetCharHeight(fc_m.fontSize);
             iRect rt(rc.x, rc.y + (rc.h - 2 * ch - 8) / 2, 70, 2 * ch + 8);
 
-            gTextComposer.TextOut(fc_m, dib, rt, FormatDateDM(m_saveSlots[iIdx].mapInfo->m_saveTime, false), 
+            gTextComposer.TextOut(fc_m, dib, rt, FormatDateDM(m_saveSlots[iIdx].mapInfo->m_saveTime, false),
                 rt, AlignTop);
-            gTextComposer.TextOut(fc_m, dib, rt, FormatTime(m_saveSlots[iIdx].mapInfo->m_saveTime), 
+            gTextComposer.TextOut(fc_m, dib, rt, FormatTime(m_saveSlots[iIdx].mapInfo->m_saveTime),
                 rt, AlignBottom);
             rc.DeflateRect(70,0,0,0);
-            
-            // 5. GameDate 
+
+            // 5. GameDate
             sint32 days = m_saveSlots[iIdx].mapInfo->m_curDay - 1;
-            gTextComposer.TextOut(fc_m, dib, rc, iFormat(_T("%s%d%s%d%s%d"), gTextMgr[TRID_MONTH_S], 
-                    days / 28 + 1, gTextMgr[TRID_WEEK_S], (days % 28) / 7 + 1,gTextMgr[TRID_DAY_S],days % 7 + 1), 
+            gTextComposer.TextOut(fc_m, dib, rc, iFormat(_T("%s%d%s%d%s%d"), gTextMgr[TRID_MONTH_S],
+                    days / 28 + 1, gTextMgr[TRID_WEEK_S], (days % 28) / 7 + 1,gTextMgr[TRID_DAY_S],days % 7 + 1),
                     iRect(rc.x,rc.y,80,rc.h), AlignLeft);
-        } 
-        else 
+        }
+        else
         {
             iTextComposer::FontConfig fc_m(newmenufc_med_text);
             fc_m.cmpProps.faceColor = RGB16(0, 0, 0);
@@ -270,24 +272,24 @@ private:
 /*
 *	Save dialog
 */
-iSaveGameView::iSaveGameView(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, bool bSave) 
+iSaveGameView::iSaveGameView(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, bool bSave)
 : iView(pViewMgr, rect, GENERIC_VIEWPORT, uid, Visible|Enabled), m_bSave(bSave), m_selSlot(-1),  m_sort(RevDate), m_pCmdHandler(pCmdHandler)
-{       
+{
     iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-       
+
 
     // Listbox header
-    AddChild(new iSortBtn2(m_pMgr, this, iRect(0, 0, 129, 47), 500, 
-        PDGG(NMENU_SORT_NL), PDGG(NMENU_SORT_PL), TRID_MENU_SAVELOAD1, Visible | Enabled));    
+    AddChild(new iSortBtn2(m_pMgr, this, iRect(0, 0, 129, 47), 500,
+        PDGG(NMENU_SORT_NL), PDGG(NMENU_SORT_PL), TRID_MENU_SAVELOAD1, Visible | Enabled));
     if(!gUseIpadUI)
     {
         AddChild(new iSortBtn2(m_pMgr, this, iRect(128, 0, 128, 47), 501,
                                PDGG(NMENU_SORT_NM), PDGG(NMENU_SORT_PM), TRID_MENU_SAVELOAD2,Visible | Enabled));
     }
-    AddChild(new iSortBtn2(m_pMgr, this, iRect(clRect.w - 129 - 128 + 1, 0, 128, 47), 502, 
+    AddChild(new iSortBtn2(m_pMgr, this, iRect(clRect.w - 129 - 128 + 1, 0, 128, 47), 502,
         PDGG(NMENU_SORT_NM), PDGG(NMENU_SORT_PM), TRID_MENU_SAVELOAD3,Visible | Enabled));
 
-    AddChild(new iSortBtn2(m_pMgr, this, iRect(clRect.w - 129, 0, 129, 47), 503, 
+    AddChild(new iSortBtn2(m_pMgr, this, iRect(clRect.w - 129, 0, 129, 47), 503,
         PDGG(NMENU_SORT_NR), PDGG(NMENU_SORT_PR), TRID_MENU_SAVELOAD4,Visible | Enabled));
     AddChild(m_pLB = new iSaveListBox(m_pMgr, this, iRect(3, 47, clRect.w - 3 * 2, clRect.h - 47), 100, m_saveSlots));
 
@@ -324,7 +326,7 @@ bool iSaveGameView::SelFile(iStringT& fname) const
 	}
     else if (m_selSlot == 0)
         return GetNextFileName(fname);
-    else 
+    else
         return false;
 }
 
@@ -352,38 +354,38 @@ bool iSaveGameView::IsGoodSelection() const
 }
 
 void iSaveGameView::SortSaves(SortBy sort_by)
-{    
+{
     iSortArray<iSaveSlot> sort;
     sint32 idx;
     uint32 uid = 0;
 
-    for (uint32 xx = 0; xx < m_saveSlots.GetSize(); ++xx) 
+    for (uint32 xx = 0; xx < m_saveSlots.GetSize(); ++xx)
     {
-        if (!m_saveSlots[xx].mapInfo || m_saveSlots[xx].idx == 0) 
+        if (!m_saveSlots[xx].mapInfo || m_saveSlots[xx].idx == 0)
         {
             idx = 0x0000000;
         }
-        else 
+        else
         {
             idx = 0x10000000;
             if (sort_by == Size) idx = 0x10000000 + m_saveSlots[xx].mapInfo->m_Size;
             else if (sort_by == RevSize) idx = 0x10000000 - m_saveSlots[xx].mapInfo->m_Size;
-            else if (sort_by == Name) idx = 0x10000000 + (m_saveSlots[xx].mapInfo->MapName()[0] << 16) | m_saveSlots[xx].mapInfo->MapName()[1];			
-            else if (sort_by == RevName) idx = 0x10000000 - (m_saveSlots[xx].mapInfo->MapName()[0] << 16) | m_saveSlots[xx].mapInfo->MapName()[1];			
+            else if (sort_by == Name) idx = 0x10000000 + (m_saveSlots[xx].mapInfo->MapName()[0] << 16) | m_saveSlots[xx].mapInfo->MapName()[1];
+            else if (sort_by == RevName) idx = 0x10000000 - (m_saveSlots[xx].mapInfo->MapName()[0] << 16) | m_saveSlots[xx].mapInfo->MapName()[1];
             else if (sort_by == Progress) idx = 0x10000000 + m_saveSlots[xx].mapInfo->m_curDay;
             else if (sort_by == RevProgress) idx = 0x10000000 - m_saveSlots[xx].mapInfo->m_curDay;
             else if (sort_by == Date) idx = 0x10000000 + m_saveSlots[xx].mapInfo->m_saveTime / 8;
             else if (sort_by == RevDate) idx = 0x10000000 - m_saveSlots[xx].mapInfo->m_saveTime / 8;
 
             if (!m_saveSlots[xx].mapInfo->Supported()) idx += 0x10000000;
-			
-        }		
+
+        }
         sort.Insert(m_saveSlots[xx], idx);
     }
 
     for (uint32 xx = 0; xx < m_saveSlots.GetSize(); ++xx) m_saveSlots[xx] = sort.Value(xx);
 
-    if (m_pLB) m_pLB->RefillColors();    
+    if (m_pLB) m_pLB->RefillColors();
     m_sort = sort_by;
 
     if (sort_by == Name || sort_by == RevName) uid = 500;
@@ -396,14 +398,14 @@ void iSaveGameView::SortSaves(SortBy sort_by)
 }
 
 
-void iSaveGameView::OnCompose() 
+void iSaveGameView::OnCompose()
 {
 }
 
 
 void iSaveGameView::SendResult(uint32 res)
 {
-    if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);    
+    if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, (uint32)res);
 }
 
 void iSaveGameView::CheckHeaderButton(uint32 id)
@@ -421,29 +423,29 @@ void iSaveGameView::CheckHeaderButton(uint32 id)
     p4->SetHighlighted(id == 503);
 }
 
-void iSaveGameView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param) 
-{ 
+void iSaveGameView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
+{
     uint32 uid = pView->GetUID();
-    if (uid == 100) 
+    if (uid == 100)
     {
         if (cmd == CCI_LBSELCHANGED)
-        {                    
+        {
             m_selSlot = param;
             if (CanSelect())
             {
-                if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_EDITCHANGED, (uint32)0);    
+                if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this, CCI_EDITCHANGED, (uint32)0);
             }
-        } 
-        else if (cmd == CCI_LBSELECTED) 
+        }
+        else if (cmd == CCI_LBSELECTED)
         {
-            if (CanSelect() && Confirmed()) 
+            if (CanSelect() && Confirmed())
             {
-                SendResult(DRC_OK); 
+                SendResult(DRC_OK);
             }
-        } 
+        }
     }
     else if (uid == 500)
-    {           
+    {
         SortSaves(m_sort == Name ? RevName : Name);
     }
     else if (uid == 501)
@@ -464,7 +466,7 @@ void iSaveGameView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 p
 bool iSaveGameView::Confirmed() const
 {
     check(m_selSlot != -1);
-    if (m_bSave && m_saveSlots[m_selSlot].mapInfo != NULL) 
+    if (m_bSave && m_saveSlots[m_selSlot].mapInfo != NULL)
     {
         iQuestDlg qdlg(m_pMgr, _T(""), gTextMgr[TRID_CONFIRM_OVERWRITE], PID_NEUTRAL);
         if (qdlg.DoModal() == DRC_NO) return false;
@@ -473,7 +475,7 @@ bool iSaveGameView::Confirmed() const
 }
 
 void iSaveGameView::LoadData()
-{       
+{
     // called for list refresh (on activate of menu panel)
 	for(uint32 xx=0; xx<m_saveSlots.GetSize(); xx++)
 		if(m_saveSlots[xx].mapInfo) delete m_saveSlots[xx].mapInfo;

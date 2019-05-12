@@ -15,8 +15,10 @@
 #include "gxl.inc.h"
 #include <vector>
 #include <string>
+#include "FileAccessor/FileAccessor.h"
 // #include "NewMapShop/NewMapShop.h"
 
+using namespace fileaccessor;
 
 // Cotulla: ask Hedin if we need this
 /*
@@ -56,30 +58,30 @@ iMapEnum::~iMapEnum()
 
 void iMapEnum::Serialize(iFileI* to)
 {
-    iDynamicBuffer dbuff;
-    dbuff.Write((uint16)m_scList.GetSize());
-    for (uint32 ssid = 0; ssid < m_scList.GetSize(); ++ssid)
-    {
-        m_scList[ssid]->Serialize(dbuff);
-        ::Serialize(dbuff, m_scList[ssid]->m_FileName);
-    }
-    to->Write(dbuff.GetData(), dbuff.GetSize());
+    // iDynamicBuffer dbuff;
+    // dbuff.Write((uint16)m_scList.GetSize());
+    // for (uint32 ssid = 0; ssid < m_scList.GetSize(); ++ssid)
+    // {
+    //     m_scList[ssid]->Serialize(dbuff);
+    //     ::Serialize(dbuff, m_scList[ssid]->m_FileName);
+    // }
+    // to->Write(dbuff.GetData(), dbuff.GetSize());
 }
 
 void iMapEnum::Unserialize(iDynamicBuffer& dbuff)
 {
-    uint16 sscnt;
-    dbuff.Read(sscnt);
-    if (!sscnt) return;
-    m_scList.RemoveAll();
-    for (uint16 ssid=0; ssid<sscnt; ++ssid)
-    {
-        ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
-        mapInfo->Unserialize(dbuff);
-        mapInfo->m_bNewGame = true;
-        ::Unserialize(dbuff, mapInfo->m_FileName);
-        m_scList.Add(mapInfo.Giveup());
-    }
+    // uint16 sscnt;
+    // dbuff.Read(sscnt);
+    // if (!sscnt) return;
+    // m_scList.RemoveAll();
+    // for (uint16 ssid=0; ssid<sscnt; ++ssid)
+    // {
+    //     ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
+    //     mapInfo->Unserialize(dbuff);
+    //     mapInfo->m_bNewGame = true;
+    //     ::Unserialize(dbuff, mapInfo->m_FileName);
+    //     m_scList.Add(mapInfo.Giveup());
+    // }
 }
 
 const std::vector<std::wstring> free_map_names =
@@ -131,46 +133,33 @@ void iMapEnum::EnumScenarios()
         FindClose(hFind);
     }
 #else
-    // glob_t g;
-    // iStringT strText = gDownloadedMapsPath + _T("*.phmd");
-    // glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE, NULL, &g);
+    for(auto file : FileAccessor::sharedFileAccessor()->getFiles(RelativeFilePath("Maps"), "*.phmd")) {
+        ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
+        mapInfo->m_bNewGame = true;
+        mapInfo->m_FileName = file;
+        iFilePtr pFile(OpenWin32File(file));
 
-    // strText = gBundledMapsPath + _T("*.phmd");
-    // glob(CvtT2A<>(strText.CStr()), GLOB_NOSORT|GLOB_NOESCAPE|GLOB_APPEND, NULL, &g);
+        //if ( !pFile ) continue;
+        check(pFile);
+        uint32 fourcc;
+        pFile->Read(&fourcc,sizeof(fourcc));
+        if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false))
+        {
+            iStringT str = iStringT(mapInfo->m_Id);
+            bool flag = false;
 
-    // for(sint32 x=0; x<g.gl_pathc; x++) {
-    //     ScopedPtr<iMapInfo> mapInfo( new iMapInfo() );
-    //     mapInfo->m_bNewGame = true;
-    //     mapInfo->m_FileName = CvtA2T<>(g.gl_pathv[x]);
-    //     std::wstring basename = base_name(mapInfo->m_FileName.CStr());
-    //     basename = basename.substr(0, basename.length() - 5);
-    //     // if(!gMapShop.IsMapPackPurchased() &&
-    //     //    std::find(free_map_names.begin(), free_map_names.end(), basename) == free_map_names.end())
-    //     //     continue;
+            for( sint32 y=0; y<m_scList.GetSize(); y++ )
+                if( m_scList.At(y)->m_Id == mapInfo->m_Id ){
 
-    //     iFilePtr pFile(OpenWin32File(mapInfo->m_FileName));
+                    flag = true;
+                    break;
+                }
 
+            if( !flag )
+                m_scList.Add(mapInfo.Giveup());
+        }
+    }
 
-    //     //if ( !pFile ) continue;
-    //     check(pFile);
-    //     uint32 fourcc; pFile->Read(&fourcc,sizeof(fourcc));
-    //     if (fourcc == GMAP_FILE_HDR_KEY && mapInfo->ReadMapInfo(pFile.get(), false))
-    //     {
-    //         iStringT str = iStringT(mapInfo->m_Id);
-    //         bool flag = false;
-
-    //         for( sint32 y=0; y<m_scList.GetSize(); y++ )
-    //             if( m_scList.At(y)->m_Id == mapInfo->m_Id ){
-
-    //                 flag = true;
-    //                 break;
-    //             }
-
-    //         if( !flag )
-    //             m_scList.Add(mapInfo.Giveup());
-    //     }
-    // }
-    // globfree(&g);
 
 #endif
 

@@ -3,6 +3,7 @@
 
 #include "xxl.ref.countable.h"
 #include "xxl.ref.ptr.h"
+#include "FileAccessor/FileAccessor.h"
 
 /*
  *	iFileI interface
@@ -96,6 +97,7 @@ public:
  */
 iFileI* CreateWin32File(const iStringT& fname);
 iFileI* OpenWin32File(const iStringT& fname);
+iFileI* OpenWin32File(const fileaccessor::RelativeFilePath& path);
 
 #if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_LINUX) && !defined(OS_ANDROID)
 iFileI* CreateWinStgFile(IStream *stream);

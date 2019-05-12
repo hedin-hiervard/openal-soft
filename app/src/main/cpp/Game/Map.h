@@ -50,7 +50,7 @@ struct iMapInfo {
     bool                        m_bNewGame;
     uint32                      m_saveTime;
     GameMode                    m_gameMode;
-    iStringT                    m_FileName;
+    fileaccessor::RelativeFilePath                    m_FileName;
     DIFFICULTY_LEVEL            m_Difficulty;
     iSimpleArray<iPlayerInfo>   m_Players;
     MAP_SIZE                    m_Size;

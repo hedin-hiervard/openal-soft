@@ -33,7 +33,7 @@ private:
 	void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param);
 
 private:
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 	uint			m_startTime;
 
 #endif

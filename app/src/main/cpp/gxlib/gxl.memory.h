@@ -430,7 +430,7 @@ public:
 		uint32 len;
 		if ( !Read( len ) || len > m_Capacity - m_Pos) return false;
 		if ( len ) {
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 			iCharW *tmpbuf = new iCharW[len + 1];
 			sint16 *start = (sint16*)IncPtr( m_Data, m_Pos );
 			iCharW *pnt = tmpbuf;
@@ -441,7 +441,7 @@ public:
 			iCharW *pnt = (iCharW*)IncPtr( m_Data, m_Pos );
 #endif
 			s = iStringW( pnt, len );
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 			delete [] tmpbuf;
 			m_Pos += len*sizeof(sint16);
 #else

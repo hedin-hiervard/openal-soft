@@ -34,10 +34,15 @@ public:
 
 	bool Open(const iStringT& fname)
 	{
-    m_buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(RelativeFilePath(fname.CStr()), "r");
-    m_buffer_pos = 0;
-	  return (m_buffer != nullptr);
+        return Open(RelativeFilePath(fname.CStr()));
 	}
+
+    bool Open(const RelativeFilePath& path)
+    {
+        m_buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(path, "r");
+        m_buffer_pos = 0;
+        return (m_buffer != nullptr);
+    }
 
 	bool Create(const iStringT& fname)
 	{
@@ -75,9 +80,10 @@ public:
 
 	uint32 Read(void *buff, uint32 buffsize)
 	{
-    memcpy(buff, &((*m_buffer)[m_buffer_pos]), buffsize);
-    m_buffer_pos += buffsize;
-	  return buffsize;
+		auto to_read = iMIN(buffsize, m_buffer->size() - m_buffer_pos);
+      memcpy(buff, &((*m_buffer)[m_buffer_pos]), to_read);
+      m_buffer_pos += to_read;
+	  return to_read;
 	}
 
 	uint32 Write(const void *buff, uint32 buffsize)
@@ -129,6 +135,16 @@ iFileI* OpenWin32File(const iStringT& fname)
 	return result;
 }
 
+
+iFileI* OpenWin32File(const RelativeFilePath& path)
+{
+    iFileWin32* result = new iFileWin32();
+    if (!result->Open(path)) {
+        delete result;
+        return NULL;
+    }
+    return result;
+}
 
 /*
  *	iFile static functions

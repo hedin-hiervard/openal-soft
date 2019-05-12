@@ -420,7 +420,7 @@ void iCreditsComposer::Compose(iDib& surface, const iPoint& pos)
 			else  if (spos > 160) fc.cmpProps.alpha = (210 - spos) * 255 / 50;
 			else fc.cmpProps.alpha = 255;
 			if (cline >= 0 && cline < (sint32)crtext.GetSize() ) {
-#ifdef OS_APPLE
+#if defined(OS_APPLE) || defined(OS_ANDROID)
 				gTextComposer.TextOut(fc, gApp.Surface(), iPoint(), crtext[cline], iRect(75,spos + 10,320,14), AlignTop);
 #else
 				gTextComposer.TextOut(fc, gApp.Surface(), iPoint(), crtext[cline], iRect(0,spos,gApp.Surface().GetWidth(),14), AlignTop);				

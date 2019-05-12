@@ -10,7 +10,7 @@
  */
 bool iMapInfo::Supported() const
 {
-#if defined (PC_VERSION) || defined (OS_IPHONE)//OS_APPLE 
+#if defined (PC_VERSION) || defined (OS_IPHONE) || defined(OS_ANDROID)//OS_APPLE
 	return true;
 #else
 #if defined (OS_WINCE) || (defined (OS_WIN32) && defined (DEV_VER))
