@@ -107,7 +107,6 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-        mSquare = Square()
     }
 
     override fun onDrawFrame(unused: GL10) {
@@ -117,7 +116,8 @@ class MyGLRenderer : GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+//        Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+        Matrix.setIdentityM(mViewMatrix, 0)
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0)
@@ -135,8 +135,25 @@ class MyGLRenderer : GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
-        createTexture(width, height);
+//        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+        Matrix.orthoM(
+            mProjectionMatrix,
+            0,
+            0.0f,
+            width.toFloat(),
+            height.toFloat(),
+            0.0f,
+            -1.0f,
+            1.0f
+        )
+
+        createTexture(width, height)
+        mSquare = Square(
+            width.toFloat(),
+            height.toFloat(),
+            width.toFloat() / textureWidth,
+            height.toFloat() / textureHeight
+        )
         activity?.native_onSurfaceCreated(width, height);
     }
 

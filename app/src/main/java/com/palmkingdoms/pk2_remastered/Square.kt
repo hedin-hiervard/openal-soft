@@ -67,17 +67,61 @@ class Square {
     private var mTextureHandle: Int = 0
     private var mMVPMatrixHandle: Int = 0
 
+    private var mSurfaceWidth: Float = 0.0f
+    private var mSurfaceHeight: Float = 0.0f
+    private var mTextureRelWidth: Float = 0.0f
+    private var mTextureRelHeight: Float = 0.0f
+    internal val COORDS_PER_VERTEX = 3
+
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3) // order to draw vertices
 
     private val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
     internal var color = floatArrayOf(0.2f, 0.709803922f, 0.898039216f, 1.0f)
 
-    /**
-     * Sets up the drawing object data for use in an OpenGL ES context.
-     */
-    init {
-        // initialize vertex byte buffer for shape coordinates
+    lateinit private var squareCoords: FloatArray
+    lateinit private var texCoords: FloatArray
+
+    constructor(surfaceWidth: Float, surfaceHeight: Float, textureRelWidth: Float, textureRelHeight: Float) {
+        mSurfaceWidth = surfaceWidth
+        mSurfaceHeight = surfaceHeight
+        mTextureRelWidth = textureRelWidth
+        mTextureRelHeight = textureRelHeight
+
+        // number of coordinates per vertex in this array
+        // PROPER
+        squareCoords = floatArrayOf(
+            0f, 0f, 0.0f, // top left
+            0f, mSurfaceHeight, 0.0f, // bottom left
+            mSurfaceWidth, mSurfaceHeight, 0.0f, // bottom right
+            mSurfaceWidth, 0.0f, 0.0f // // top right
+        )
+
+        texCoords = floatArrayOf(
+            0.0f, 0.0f, 0.0f, // top left
+            0.0f, mTextureRelHeight, 0.0f, // bottom left
+            mTextureRelWidth, mTextureRelHeight, 0.0f, // bottom right
+            mTextureRelWidth, 0.0f, 0.0f
+        ) // top right
+
+
+        // OLD
+    // number of coordinates per vertex in this array
+//        squareCoords = floatArrayOf(
+//            -0.5f, 0.5f, 0.0f, // top left
+//            -0.5f, -0.5f, 0.0f, // bottom left
+//            0.5f, -0.5f, 0.0f, // bottom right
+//            0.5f, 0.5f, 0.0f
+//        ) // top right
+//
+//        texCoords = floatArrayOf(
+//            0.0f, 0.0f, 0.0f, // top left
+//            0.0f, 1.0f, 0.0f, // bottom left
+//            1.0f, 1.0f, 0.0f, // bottom right
+//            1.0f, 0.0f, 0.0f
+//        ) // top right
+
+
         val bb = ByteBuffer.allocateDirect(
             // (# of coordinate values * 4 bytes per float)
             squareCoords.size * 4
@@ -122,6 +166,7 @@ class Square {
         GLES20.glAttachShader(mProgram, fragmentShader) // add the fragment shader to program
         GLES20.glLinkProgram(mProgram)                  // create OpenGL program executables
     }
+
 
     /**
      * Encapsulates the OpenGL ES instructions for drawing this shape.
@@ -176,25 +221,6 @@ class Square {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle)
-    }
-
-    companion object {
-
-        // number of coordinates per vertex in this array
-        internal val COORDS_PER_VERTEX = 3
-        internal var squareCoords = floatArrayOf(
-            -0.5f, 0.5f, 0.0f, // top left
-            -0.5f, -0.5f, 0.0f, // bottom left
-            0.5f, -0.5f, 0.0f, // bottom right
-            0.5f, 0.5f, 0.0f
-        ) // top right
-
-        internal var texCoords = floatArrayOf(
-            0.0f, 0.0f, 0.0f, // top left
-            0.0f, 1.0f, 0.0f, // bottom left
-            1.0f, 1.0f, 0.0f, // bottom right
-            1.0f, 0.0f, 0.0f
-        ) // top right
     }
 
 }
