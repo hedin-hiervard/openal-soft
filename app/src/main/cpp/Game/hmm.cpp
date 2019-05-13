@@ -1016,7 +1016,6 @@ int preload_resources()
         if (gSettings.GetEntryValue(CET_LHANDMAODE)) flags |= GXLF_LHANDER;
 #ifdef OS_WIN32
 
-        //flags |= GXLF_DOUBLESIZE;
         // only for Win32 build
         // GXLF_FULLSCREEN - start application in fullscreen mode
         // no GXLF_FULLSCREEN - start application in windowed mode
@@ -1026,6 +1025,7 @@ int preload_resources()
             //    flags |= GXLF_FULLSCREEN;
         }
 #endif
+//    flags |= GXLF_DOUBLESIZE;
 
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
 

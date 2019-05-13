@@ -45,7 +45,7 @@ class Square {
 
     private val fragmentShaderCode =
         """
-            precision mediump float;
+            precision highp float;
 
             uniform vec4 uColor;
             uniform sampler2D uTexture;
@@ -67,10 +67,8 @@ class Square {
     private var mTextureHandle: Int = 0
     private var mMVPMatrixHandle: Int = 0
 
-    private var mSurfaceWidth: Float = 0.0f
-    private var mSurfaceHeight: Float = 0.0f
-    private var mTextureRelWidth: Float = 0.0f
-    private var mTextureRelHeight: Float = 0.0f
+    private var mTextureWidth: Float = 0f
+    private var mTextureHeight: Float = 0f
     internal val COORDS_PER_VERTEX = 3
 
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3) // order to draw vertices
@@ -82,26 +80,27 @@ class Square {
     lateinit private var squareCoords: FloatArray
     lateinit private var texCoords: FloatArray
 
-    constructor(surfaceWidth: Float, surfaceHeight: Float, textureRelWidth: Float, textureRelHeight: Float) {
-        mSurfaceWidth = surfaceWidth
-        mSurfaceHeight = surfaceHeight
-        mTextureRelWidth = textureRelWidth
-        mTextureRelHeight = textureRelHeight
+    constructor(
+            textureWidth: Float,
+            textureHeight: Float
+    ) {
+        mTextureWidth = textureWidth
+        mTextureHeight = textureHeight
 
         // number of coordinates per vertex in this array
         // PROPER
         squareCoords = floatArrayOf(
             0f, 0f, 0.0f, // top left
-            0f, mSurfaceHeight, 0.0f, // bottom left
-            mSurfaceWidth, mSurfaceHeight, 0.0f, // bottom right
-            mSurfaceWidth, 0.0f, 0.0f // // top right
+            0f, mTextureHeight, 0.0f, // bottom left
+            mTextureWidth, mTextureHeight, 0.0f, // bottom right
+            mTextureWidth, 0.0f, 0.0f // // top right
         )
 
         texCoords = floatArrayOf(
             0.0f, 0.0f, 0.0f, // top left
-            0.0f, mTextureRelHeight, 0.0f, // bottom left
-            mTextureRelWidth, mTextureRelHeight, 0.0f, // bottom right
-            mTextureRelWidth, 0.0f, 0.0f
+            0.0f, 1f, 0.0f, // bottom left
+            1f, 1f, 0.0f, // bottom right
+            1f, 0.0f, 0.0f
         ) // top right
 
 

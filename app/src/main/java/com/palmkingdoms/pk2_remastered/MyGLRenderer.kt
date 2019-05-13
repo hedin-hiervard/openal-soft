@@ -15,6 +15,7 @@
  */
 package com.palmkingdoms.pk2_remastered
 
+import android.graphics.Point
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -22,6 +23,7 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.util.Log
+import android.view.Display
 import com.palmkingdoms.pk2_remastered.Square
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
@@ -127,12 +129,14 @@ class MyGLRenderer : GLSurfaceView.Renderer {
     override fun onSurfaceChanged(unused: GL10, width: Int, height: Int) {
         // Adjust the viewport based on geometry changes,
         // such as screen rotation
+        val display = activity?.windowManager?.defaultDisplay
+        var p = Point()
+        display?.getRealSize(p)
+        var width = p.x
+        val height = p.y
+
         GLES20.glViewport(0, 0, width, height)
 
-        val ratio = width.toFloat() / height
-
-        // this projection matrix is applied to object coordinates
-        // in the onDrawFrame() method
         Matrix.orthoM(
             mProjectionMatrix,
             0,
@@ -140,16 +144,14 @@ class MyGLRenderer : GLSurfaceView.Renderer {
             width.toFloat(),
             height.toFloat(),
             0.0f,
-            -1.0f,
-            1.0f
+            -5.0f,
+            5.0f
         )
 
         createTexture(width, height)
         mSquare = Square(
-            width.toFloat(),
-            height.toFloat(),
-            width.toFloat() / textureWidth,
-            height.toFloat() / textureHeight
+            textureWidth.toFloat(),
+            textureHeight.toFloat()
         )
         activity?.native_onSurfaceCreated(width, height);
     }
