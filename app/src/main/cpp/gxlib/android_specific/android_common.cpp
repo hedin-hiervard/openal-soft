@@ -62,11 +62,6 @@ void DebugOutput(const char * str) {
 // #endif
 // }
 
-bool IsIpad()
-{
-    return false;
-    // return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-}
 
 // bool IsRetina()
 // {

@@ -102,6 +102,12 @@ void Android_surfaceUnlock() {
     pthread_mutex_unlock(&buffer_mutex);
 }
 
+bool IsIpad()
+{
+    return true;
+    // return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+}
+
 void Android_updateSurface() {
 
     JNIEnv* env = getJNIEnv();

@@ -1530,7 +1530,6 @@ namespace UI_IPAD
 
     static uint32 s_buttons_trid_main[] =
     {
-        TRID_MENU_DOWNLOADMAPS,
         TRID_MENU_SINGLEPLAYER,
         TRID_MENU_HOTSEAT,
         TRID_MENU_TUTORIAL,
@@ -1694,11 +1693,11 @@ namespace UI_IPAD
 
         if (m_type == TypeMain)
         {
-            //DEF_TAB_ENTRY(302, iMenuTab_DownloadMaps);
             DEF_RES_ENTRY(ResSingle);
             DEF_TAB_ENTRY_PARAM(301, iMenuTab_SingleNew, 1); // iMenuTab_SingleNew
             DEF_RES_ENTRY(ResTutorial); // iMenuTab_SingleTutorial
             DEF_TAB_ENTRY(303, iMenuTab_Credits); // iMenuTab_Credits
+            DEF_RES_ENTRY(ResExit); // iMenuTab_Credits
 #if defined(PC_VERSION)
             DEF_RES_ENTRY(ResExitGame);
 #endif
