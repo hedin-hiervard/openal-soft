@@ -1025,9 +1025,10 @@ int preload_resources()
             //    flags |= GXLF_FULLSCREEN;
         }
 #endif
-//    flags |= GXLF_DOUBLESIZE;
-
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
+    if(sz.w >= 960 && sz.h >= 480) {
+      flags |= GXLF_DOUBLESIZE;
+    }
 
 #if defined(OS_IPHONE) || defined(OS_ANDROID) // iOS
     if (!gApp.Init(&gGame, 60, flags, sz))

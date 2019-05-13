@@ -2,7 +2,7 @@
 #ifdef OS_WINCE
 //#include <gx.h>
 #include "gxl.window.h"
-#include "gxl.display.h" 
+#include "gxl.display.h"
 #include "gapi_help.h"
 #endif //OS_WINCE
 #include "gxl.window.h"
@@ -22,20 +22,20 @@ extern iGAPILoader gapi;
 // from winuserm.h
 #define VK_TSOFT1   VK_F1               // Softkey 1
 #define VK_TSOFT2   VK_F2               // Softkey 2
-#define VK_TTALK    VK_F3               // Talk           
-#define VK_TEND     VK_F4               // End           
-#define VK_THOME    VK_LWIN             // Home         
-#define VK_TBACK    VK_ESCAPE           // Back       
+#define VK_TTALK    VK_F3               // Talk
+#define VK_TEND     VK_F4               // End
+#define VK_THOME    VK_LWIN             // Home
+#define VK_TBACK    VK_ESCAPE           // Back
 
-#define VK_TACTION      VK_RETURN       // Action       
+#define VK_TACTION      VK_RETURN       // Action
 #define VK_TRECORD      VK_F10          // Record
 #define VK_TFLIP        VK_F17          // Flip
 #define VK_TPOWER       VK_F18          // Power
-#define VK_TVOLUMEUP    VK_F6           // Volume Up       
-#define VK_TVOLUMEDOWN  VK_F7           // Volume Down       
+#define VK_TVOLUMEUP    VK_F6           // Volume Up
+#define VK_TVOLUMEDOWN  VK_F7           // Volume Down
 
-#define VK_TUP      VK_UP               // Up 
-#define VK_TDOWN    VK_DOWN             // Down             
+#define VK_TUP      VK_UP               // Up
+#define VK_TDOWN    VK_DOWN             // Down
 #define VK_TLEFT    VK_LEFT             // Left
 #define VK_TRIGHT   VK_RIGHT            // Right
 
@@ -49,8 +49,8 @@ extern iGAPILoader gapi;
 #define VK_T7       L'7'
 #define VK_T8       L'8'
 #define VK_T9       L'9'
-#define VK_TSTAR    VK_F8               // *           
-#define VK_TPOUND   VK_F9               // #   
+#define VK_TSTAR    VK_F8               // *
+#define VK_TPOUND   VK_F9               // #
 
 #define VK_SYMBOL   VK_F11              // Symbol (SYM) key
 
@@ -60,17 +60,17 @@ extern iGAPILoader gapi;
 #define VK_ACTION   VK_F23              // Sent with VK_RETURN when doing Action on PPC rockers
 
 
-// Chorded keys.  DONE is VK_RWIN + VK_F6 and MOJI is VK_RWIN + VK_F7 
+// Chorded keys.  DONE is VK_RWIN + VK_F6 and MOJI is VK_RWIN + VK_F7
 #define VK_DONE     VK_F6                 // <OK/Close> hotkey code
 #define MOD_DONE    (MOD_WIN | MOD_KEYUP) // <OK/Close> hotkey modifiers
 
 #define VK_MOJI     VK_F7                  // Key used to switch between FE language layouts
 #define MOD_MOJI    (MOD_WIN | MOD_KEYUP)  //Modifiers so MOJI goes to the shell
 
-    
+
 // App keys
-#define VK_APP1     0xC1 
-#define VK_APP2     0xC2 
+#define VK_APP1     0xC1
+#define VK_APP2     0xC2
 #define VK_APP3     0xC3
 #define VK_APP4     0xC4
 #define VK_APP5     0xC5
@@ -79,7 +79,7 @@ extern iGAPILoader gapi;
 
 //////////////////////////////////////////////////////////////////////////
 iInput::iInput() : m_bInited(false)
-{ 
+{
 	ClearKeyState();
 }
 
@@ -90,7 +90,7 @@ iInput::~iInput()
 
 void iInput::ClearKeyState()
 {
-	memset(m_KeysState,0,sizeof(m_KeysState)); 
+	memset(m_KeysState,0,sizeof(m_KeysState));
 }
 
 bool iInput::Init(const iSize& scr_siz, uint32 flags)
@@ -122,7 +122,7 @@ void iInput::Destroy()
 }
 
 void iInput::SetOrientation(bool bLandscape, bool bLeftHander)
-{ 
+{
 	if (bLandscape && (m_Flags & GXLF_LANDSCAPE) == 0) m_Flags |= GXLF_LANDSCAPE;
 	else if (!bLandscape && (m_Flags & GXLF_LANDSCAPE) != 0) m_Flags ^= GXLF_LANDSCAPE;
 
@@ -189,7 +189,7 @@ void iInput::SetOrientation(bool bLandscape, bool bLeftHander)
 	for( size_t nk = 0; nk !=4; nk++ ) {
 		if ( fourKeys[nk] != 0 ) {
 			foundKey4=fourKeys[nk];
-			break;	
+			break;
 		}
 	}
 	m_Translate[ 9 ].vk = foundKey4; //FindFourthHWKey();
@@ -216,7 +216,7 @@ void iInput::SetOrientation(bool bLandscape, bool bLeftHander)
 	// keybd_event(VK_LWIN, 0, KEYEVENTF_SILENT, 0);
 	// GenKeyEvent(VK_APP1);
 	// keybd_event(VK_LWIN, 0, KEYEVENTF_SILENT | KEYEVENTF_KEYUP, 0);
-	m_Translate[16 ].vk = 0x99ff; //VK_THOME; 
+	m_Translate[16 ].vk = 0x99ff; //VK_THOME;
 	m_Translate[16 ].kc = KEY_HOME;
 	m_Translate[17 ].vk = VK_TSOFT1;
 	m_Translate[17 ].kc = KEY_SOFT1;
@@ -256,12 +256,12 @@ iKbdKey iInput::KeyCode2Key(sint16 key_code)
 //	else if (key_code == (unsigned char)'Q') return KEY_VKA;
 //	else if (key_code == (unsigned char)'W') return KEY_VKB;
 //	else if (key_code == (unsigned char)'E') return KEY_VKC;
-	else if (key_code == VK_F8) return KEY_F8; 
+	else if (key_code == VK_F8) return KEY_F8;
 	return KEY_INVALID;
 #endif // OS_WIN32
-	
+
 #ifdef OS_MACOS
-	
+
 #endif
 }
 
@@ -297,8 +297,6 @@ extern iDisplay* main_display;
 
 void iInput::CvtScrCoor(sint16& px, sint16& py)
 {
-    return;
-    
     // HACK... all data stored in iDisplay class, so the best variant to call it.
 #ifdef OS_WINCE
 	if (main_display)
@@ -307,26 +305,32 @@ void iInput::CvtScrCoor(sint16& px, sint16& py)
     }
 #elif defined(OS_WIN32)
 	if (m_Flags & GXLF_DOUBLESIZE) { px /= 2; py /= 2; }
-#elif defined(OS_IPHONE)
-	sint16 npx;
-	sint16 npy;
-	iSize sz = m_dimScreen;
-	if(m_Flags & GXLF_DOUBLESIZE) {
-		sz.w /= 2;
-		sz.h /= 2;
-	//	px /= 2;
-	//	py /= 2;
+#elif defined(OS_IPHONE) || defined(OS_ANDROID)
+    if(m_Flags & GXLF_DOUBLESIZE) {
+//		sz.w /= 2;
+//		sz.h /= 2;
+		 px /= 2;
+		 py /= 2;
 	}
-	if(!(m_Flags & GXLF_LHANDER)) {
-		npx = sz.w - py;
-		npy = px;
-	}
-	else {
-		npx = py;
-		npy = sz.h - px;
-	}
-	px = npx;
-	py = npy;
+//	sint16 npx;
+//	sint16 npy;
+//	iSize sz = m_dimScreen;
+//	if(m_Flags & GXLF_DOUBLESIZE) {
+//		sz.w /= 2;
+//		sz.h /= 2;
+//		// px /= 2;
+//		// py /= 2;
+//	}
+//	if(!(m_Flags & GXLF_LHANDER)) {
+//		npx = sz.w - py;
+//		npy = px;
+//	}
+//	else {
+//		npx = py;
+//		npy = sz.h - px;
+//	}
+//	px = npx;
+//	py = npy;
 #endif
 
 }
@@ -363,19 +367,19 @@ void iInput::msg_OnMouseEntered(sint16 px, sint16 py, MouseId mID){
 }
 
 void iInput::msg_OnMouseLeave(sint16 px, sint16 py, MouseId mID){
-	
+
 	CvtScrCoor(px,py);
 
 	m_Entries.Put(iEntry(iEntry::MouseLeave,px,py, mID, 0));
 }
 
 void iInput::msg_OnMouseWheelDown(sint16 line, MouseId mID){
-	
+
 	m_Entries.Put(iEntry(iEntry::MouseWheelDown,line,0, mID, 0));
 }
 
 void iInput::msg_OnMouseWheelUp(sint16 line, MouseId mID){
-	
+
 	m_Entries.Put(iEntry(iEntry::MouseWheelUp,line,0, mID, 0));
 }
 
