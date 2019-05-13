@@ -17,6 +17,7 @@ u_int32_t surface_height;
 pthread_mutex_t buffer_mutex;
 
 jmethodID log_java_method_id;
+jmethodID quit_java_method_id;
 jmethodID update_surface_java_method_id;
 jmethodID get_surface_java_method_id;
 jmethodID get_apk_path_method_id;
@@ -41,18 +42,21 @@ void onMouseDown(int x, int y, MouseId mID, MouseButtonId mbID);
 void onMouseMove(int x, int y, MouseId mID, MouseButtonId mbID);
 void onMouseUp(int x, int y, MouseId mID, MouseButtonId mbID);
 
-void* main_thread(void* param) {
-    preload_resources();
-    pheroes_main();
-    log("main exited");
-    return NULL;
-}
-
 JNIEnv* getJNIEnv() {
     JNIEnv *env;
     JVM->AttachCurrentThread(&env, NULL);
     return env;
 }
+
+void* main_thread(void* param) {
+    preload_resources();
+    pheroes_main();
+    log("main exited");
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(activity_obj, quit_java_method_id);
+    return NULL;
+}
+
 
 std::string jstring2string(jstring jstr)
 {
@@ -204,6 +208,7 @@ VOID_METHOD(onStart)(
     activity_obj = env->NewGlobalRef(t);
     jclass cls = env->GetObjectClass(t);
     log_java_method_id = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
+    quit_java_method_id = env->GetMethodID(cls, "quit", "()V");
     update_surface_java_method_id = env->GetMethodID(cls, "updateSurface", "()V");
     get_surface_java_method_id = env->GetMethodID(cls, "getSurface", "()Ljava/nio/ByteBuffer;");
 

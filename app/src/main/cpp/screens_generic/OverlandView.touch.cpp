@@ -169,7 +169,7 @@ iMainView_touch::iMainView_touch()
                                                Visible | Enabled, AlignTopLeft));
     }
     SwitchInterface(IT_BARLESS);
-    
+
     UpdateMetrics();
 }
 

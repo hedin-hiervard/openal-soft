@@ -1765,11 +1765,11 @@ private:
 
 static uint32 s_buttons_trid_main[5] =
 {
-    TRID_MENU_DOWNLOADMAPS,
     TRID_MENU_SINGLEPLAYER,
     TRID_MENU_MULTIPLAYER,
     TRID_MENU_TUTORIAL,
-    TRID_MENU_CREDITS
+    TRID_MENU_CREDITS,
+    TRID_MENU_EXITGAME,
 };
 
 
@@ -1912,6 +1912,7 @@ void iMainMenuView::FillControlsForType()
         DEF_TAB_ENTRY_PARAM(301, iMenuTab_SingleNew, 1); // iMenuTab_SingleNew
         DEF_RES_ENTRY(ResTutorial); // iMenuTab_SingleTutorial
         DEF_TAB_ENTRY(303, iMenuTab_Credits); // iMenuTab_Credits
+        DEF_RES_ENTRY(ResExit); // iMenuTab_Credits
     }
     else if (m_type == TypeSingle)
     {

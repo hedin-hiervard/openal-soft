@@ -92,6 +92,10 @@ class MainActivity : Activity() {
         return textureBuffer;
     }
 
+    private fun quit() {
+        finish()
+    }
+
     private fun log(text: String) {
         Log.i("PK2", text)
     }
