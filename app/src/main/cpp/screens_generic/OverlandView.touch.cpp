@@ -168,21 +168,8 @@ iMainView_touch::iMainView_touch()
 #endif
                                                Visible | Enabled, AlignTopLeft));
     }
+    SwitchInterface(IT_BARLESS);
     
-    if(m_Rect.w < 1024) {
-        SwitchInterface(IT_BARLESS);
-    } else {
-        
-#ifdef ROYAL_BOUNTY
-        SwitchInterface(IT_TOOLBAR);
-#else
-#ifdef FULL_VERSION
-        SwitchInterface(IT_TOOLBAR);
-#else
-        SwitchInterface(IT_BARLESS);
-#endif
-#endif
-    }
     UpdateMetrics();
 }
 
