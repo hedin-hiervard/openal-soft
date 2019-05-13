@@ -975,10 +975,11 @@ int preload_resources()
         }
 #endif
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
-    if(sz.w >= 1920 && sz.h >= 960) {
-        flags |= GXLF_QUADSIZE;
-    }
-    else if(sz.w >= 960 && sz.h >= 480) {
+//    if(sz.w >= 1920 && sz.h >= 960) {
+//        flags |= GXLF_QUADSIZE;
+//    }
+//    else
+        if(sz.w >= 960 && sz.h >= 480) {
       flags |= GXLF_DOUBLESIZE;
     }
 

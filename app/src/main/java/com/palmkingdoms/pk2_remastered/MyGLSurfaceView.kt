@@ -46,6 +46,7 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // Set the Renderer for drawing on the GLSurfaceView
         mRenderer = MyGLRenderer()
         setRenderer(mRenderer)
+        preserveEGLContextOnPause = true
 
         // Render the view only when there is a change in the drawing data
         renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
@@ -58,7 +59,7 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
 
         val x: Int = e.x.toInt()
         val y: Int = e.y.toInt()
-        val touchId = e.actionButton
+        val touchId = e.actionIndex
 
         when (e.action) {
             MotionEvent.ACTION_DOWN -> {
