@@ -105,8 +105,45 @@ void iDisplay::DoPaint(const iRect& rc)
   int textH = Android_textureHeight();
 
 	uint16 *line;
+	if(m_Flags & GXLF_QUADSIZE) { // 4x mode
+		if(!(m_Flags & GXLF_LHANDER)) {
+			for (uint32 yy=0; yy< m_Siz.h; ++yy)
+				{
+					line = (uint16*)buf + yy * 4 * textW;
 
-	if(m_Flags & GXLF_DOUBLESIZE) { // 2x mode
+					for (uint32 xx=0; xx<m_Siz.w; ++xx)
+						{
+							*(line) = *pSrc;
+							*(line + 1) = *pSrc;
+							*(line + 2) = *pSrc;
+							*(line + 3) = *pSrc;
+							memcpy(line + textW, line, 8);
+							memcpy(line + textW * 2, line, 8);
+                            memcpy(line + textW * 3, line, 8);
+                            memcpy(line + textW * 4, line, 8);
+							pSrc++;
+							line += 4;
+						}
+				}
+		} else {
+			for (uint32 yy=0; yy< m_Siz.h; ++yy)
+				{
+					line = (uint16*)buf + (m_Siz.h - yy - 1) * 2 * textW + (m_Siz.w - 1) * 2;
+
+					for (uint32 xx=0; xx<m_Siz.w; ++xx)
+						{
+							*(line) = *pSrc;
+							*(line + 1) = *pSrc;
+							memcpy(line + textW, line, 4);
+
+							line -= 2;
+							pSrc++;
+						}
+				}
+		}
+
+	}
+	else if(m_Flags & GXLF_DOUBLESIZE) { // 2x mode
 
 		if(!(m_Flags & GXLF_LHANDER)) {
 			for (uint32 yy=0; yy< m_Siz.h; ++yy)
@@ -123,20 +160,20 @@ void iDisplay::DoPaint(const iRect& rc)
 				}
 			}
 		} else {
-			for (uint32 yy=0; yy< m_Siz.h; ++yy)
-			{
-				line = (uint16*)buf + (m_Siz.h - yy - 1) * 2 * textW + (m_Siz.w - 1) * 2;
-
-				for (uint32 xx=0; xx<m_Siz.w; ++xx)
-				{
-					*(line) = *pSrc;
-					*(line + 1) = *pSrc;
-					memcpy(line + textW, line, 4);
-
-					line -= 2;
-			                pSrc++;
-				}
-			}
+//			for (uint32 yy=0; yy< m_Siz.h; ++yy)
+//			{
+//				line = (uint16*)buf + (m_Siz.h - yy - 1) * 2 * textW + (m_Siz.w - 1) * 2;
+//
+//				for (uint32 xx=0; xx<m_Siz.w; ++xx)
+//				{
+//					*(line) = *pSrc;
+//					*(line + 1) = *pSrc;
+//					memcpy(line + textW, line, 4);
+//
+//					line -= 2;
+//			                pSrc++;
+//				}
+//			}
 		}
 
 	} else { // non-2x mode

@@ -87,6 +87,6 @@ const uint32 GXLF_LHANDER		= 0x10;
 const uint32 GXLF_ENABLESOUND	= 0x20;
 const uint32 GXLF_REALVGA		= 0x40;
 const uint32 GXLF_FULLSCREEN	= 0x80;
-
+const uint32 GXLF_QUADSIZE	    = 0x100;
 
 #endif //GXLIB_GXL_INC_H_

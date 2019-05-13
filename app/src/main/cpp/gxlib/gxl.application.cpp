@@ -126,6 +126,10 @@ bool iGXApp::Init(HINSTANCE hInst, LPCWSTR appName, IGame* pGame, uint32 cdelay,
 	{
 		scrsiz.w /= 2;
 		scrsiz.h /= 2;
+	} else if (flags & GXLF_QUADSIZE)
+	{
+		scrsiz.w /= 4;
+		scrsiz.h /= 4;
 	}
 
 	//The game must default run in fullscreen.

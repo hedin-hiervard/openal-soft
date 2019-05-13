@@ -307,10 +307,11 @@ void iInput::CvtScrCoor(sint16& px, sint16& py)
 	if (m_Flags & GXLF_DOUBLESIZE) { px /= 2; py /= 2; }
 #elif defined(OS_IPHONE) || defined(OS_ANDROID)
     if(m_Flags & GXLF_DOUBLESIZE) {
-//		sz.w /= 2;
-//		sz.h /= 2;
 		 px /= 2;
 		 py /= 2;
+	} else  if(m_Flags & GXLF_QUADSIZE) {
+		px /= 4;
+		py /= 4;
 	}
 //	sint16 npx;
 //	sint16 npy;

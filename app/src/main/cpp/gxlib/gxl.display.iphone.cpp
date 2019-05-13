@@ -95,6 +95,10 @@ void iDisplay::DoPaint(const iRect& rc)
 		{
 			sz.w *= 2;
 			sz.h *= 2;
+		} else if(m_Flags & GXLF_QUADSIZE)
+		{
+			sz.w *= 4;
+			sz.h *= 4;
 		}
 		iPhone_initSurface(sz.w, sz.h);
 		textW = getSizeNextPOT(sz.w);
