@@ -702,9 +702,9 @@ private:
 
 const iStringT CREDITS[] =
 {
-    _T("^PK2: Remastered"),
+    _T("*PK2: Remastered"),
     _T(""),
-    _T("^Programmers:"),
+    _T("*Programmers:"),
     _T(""),
     _T("Hedin"),
     _T("Cotulla"),
@@ -712,7 +712,7 @@ const iStringT CREDITS[] =
     _T("Alexander Nazarov (Nazavrik)"),
     _T("Sergei Chistov (Polovinel)"),
     _T(""),
-    _T("^Artists:"),
+    _T("*Artists:"),
     _T(""),
     _T("Eugene Ivanov (Jim)"),
     _T("Danny Flexner"),
@@ -725,12 +725,12 @@ const iStringT CREDITS[] =
     _T("Mihail Chilikin"),
     _T("Oleg Kirshev"),
     _T(""),
-    _T("^Castle Graphics:"),
+    _T("*Castle Graphics:"),
     _T("Anton Baecker (improvisator)"),
     _T("Vladimir Gulevskiy (GRAFuS)"),
     _T(""),
     _T(""),
-    _T("^Guest artists:"),
+    _T("*Guest artists:"),
     _T(""),
     _T("Simon Butler"),
     _T("Ian Schlaepfer"),
@@ -738,12 +738,12 @@ const iStringT CREDITS[] =
     _T("Michael Elwin Setiadi"),
     _T("Ivan Ivanov"),
     _T(""),
-    _T("^Music:"),
+    _T("*Music:"),
     _T(""),
     _T("Kevin MacLeod"),
     _T("www.incompetech.com"),
     _T(""),
-    _T("^Testing"),
+    _T("*Testing"),
     _T(""),
     _T("Daniil Levashov (dizabled)"),
     _T("Victor Chirea (Victorash)"),
@@ -758,15 +758,15 @@ const iStringT CREDITS[] =
     _T(""),
     _T(""),
     _T(""),
-    _T("^Palm Kingdoms 1"),
+    _T("*Palm Kingdoms 1"),
     _T(""),
-    _T("^Programmers:"),
+    _T("*Programmers:"),
     _T(""),
     _T("Hedin"),
     _T("Anton Stuk (SiGMan)"),
     _T("Cotulla"),
     _T(""),
-    _T("^Artists:"),
+    _T("*Artists:"),
     _T(""),
     _T("Eugene Ivanov (Jim)"),
     _T("Danny Flexner"),
@@ -778,7 +778,7 @@ const iStringT CREDITS[] =
     _T("Vladimir Gulevskiy (GRAFuS)"),
     _T("Kevin Brock (tekpir8)"),
     _T(""),
-    _T("^Guest artists:"),
+    _T("*Guest artists:"),
     _T(""),
     _T("Simon Butler"),
     _T("Ian Schlaepfer"),
@@ -786,11 +786,11 @@ const iStringT CREDITS[] =
     _T("Michael Elwin Setiadi"),
     _T("Ivan Ivanov"),
     _T(""),
-    _T("^Lead Tester:"),
+    _T("*Lead Tester:"),
     _T(""),
     _T("Victor Chirea (Victorash)"),
     _T(""),
-    _T("^Testers:"),
+    _T("*Testers:"),
     _T(""),
     _T("Victor Chirea (victorash)"),
     _T("Yaroslaw Artemiev (Yaros)"),
@@ -810,7 +810,7 @@ const iStringT CREDITS[] =
     _T("Lain"),
     _T("leshekb"),
     _T(""),
-    _T("^Localizations:"),
+    _T("*Localizations:"),
     _T(""),
     _T("Slovak: feriancr"),
     _T("French: Fhal"),
@@ -820,7 +820,7 @@ const iStringT CREDITS[] =
     _T("Simon Hackfort (Spawn)"),
     _T("Wuff"),
     _T(""),
-    _T("^Map designers:"),
+    _T("*Map designers:"),
     _T(""),
     _T("Roman Tersky (Mongol)"),
     _T("Ruslan Pantyushin (Lain)"),
@@ -835,18 +835,18 @@ const iStringT CREDITS[] =
     _T("Yaroslaw Artemiev (Yaros)"),
     _T("Dmitry Koshelev (variag)"),
     _T(""),
-    _T("^WEB-design & mastering:"),
+    _T("*WEB-design & mastering:"),
     _T(""),
     _T("Hedin"),
     _T("Eugene Ivanov (Jim)"),
     _T(""),
-    _T("^Manual and Help file:"),
+    _T("*Manual and Help file:"),
     _T(""),
     _T("Victor Chirea (victorash)"),
     _T("Andy Young (67L48)"),
     _T("Sergey Indiukov"),
     _T(""),
-    _T("^Alpha version supporters:"),
+    _T("*Alpha version supporters:"),
     _T(""),
     _T("Andrey Glinsky"),
     _T("Fjodor Dzjuba"),
@@ -886,7 +886,7 @@ const iStringT CREDITS[] =
     _T("Lain "),
     _T("Dead mummy"),
     _T(""),
-    _T("^Special thanx to:"),
+    _T("*Special thanx to:"),
     _T(""),
     _T("Robert Tarasov"),
     _T("Jon Van Caneghem"),
@@ -988,18 +988,18 @@ protected:
             m_curline = 0;
 
 		iStringT curline = crtext[m_curline];
-        if (curline.Find(iStringT(_T("^"))) != iStringT::NOT_FOUND)
+        if (curline.Find(iStringT(_T("*"))) != iStringT::NOT_FOUND)
         {
             // save title string
 			iStringT str = crtext[m_curline];
-			str.Replace(_T("^"), _T(""));
+			//str.Replace(_T("*"), _T(""));
             m_title = str;
         }
 
         // calc number of lines to show (start of group detected by # in string)
         for (i = m_curline + 1; i < m_totallines; i++)
         {
-            if (crtext[i].Find(iStringT(_T("^"))) != iStringT::NOT_FOUND)
+            if (crtext[i].Find(iStringT(_T("*"))) != iStringT::NOT_FOUND)
             {
                 break;
             }
