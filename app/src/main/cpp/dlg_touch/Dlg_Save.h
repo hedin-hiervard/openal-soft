@@ -1,6 +1,7 @@
 #ifndef PHEROES_GAME_DLG_SAVE_H_
 #define PHEROES_GAME_DLG_SAVE_H_
 
+#include "FileAccessor/FileAccessor.h"
 
 #include "Ctl_Save.h"
 
@@ -10,9 +11,9 @@ class iSaveDlg : public iBaseGameDlg
 public:
 	iSaveDlg(iViewMgr* pViewMgr, bool bSave);
 	~iSaveDlg();
-    static void GetSaveFileName(iStringT& fname, uint32 slot);
-    bool SelFile(iStringT& fname) const;
-    const iMapInfo& SelScenario() const;    
+    static void GetSaveFileName(fileaccessor::RelativeFilePath& path, uint32 slot);
+    bool SelFile(fileaccessor::RelativeFilePath& path) const;
+    const iMapInfo& SelScenario() const;
 	iSaveGameView* SaveGameView() { return( m_ctrl ); }
 private:
 	void OnCreateDlg();

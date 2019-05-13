@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+using namespace fileaccessor;
 //#include "xxc/xxc.file.h"
 
 sint32 GetRectsHeight(sint32 w, iSimpleArray<iSize>& szs)
@@ -215,11 +217,10 @@ iStringT FormatTime(uint32 timestamp)
 
 //////////////////////////////////////////////////////////////////////////
 
-bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
+bool SaveGameFile( const RelativeFilePath& path, iGameWorld& gmap, bool MP )
 {
 #ifdef OS_WIN32
 	// Check and create save directory (if not exists)
-	iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
 	bool dirIsOk = iFile::DirExists(saveDir);
 	if ( !dirIsOk ) {
 		dirIsOk = iFile::DirCreate(saveDir);
@@ -233,7 +234,7 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 #endif
 
 	// normally we should create it in the save directory
-	iStringT tempSaveName( gSavePath + _T("tempsave.tmp") );
+	auto tempSaveName = RelativeFilePath("tempsave.tmp", FileLocationType::FLT_DOCUMENT);
 #ifdef HMM_COMPOVERSION
 	iFilePtr pFile( xxc::CreateXFile( tempSaveName, HMM_COMPOCODE ) );
 #else
@@ -267,8 +268,8 @@ bool SaveGameFile( const iStringT& fname, iGameWorld& gmap, bool MP )
 	// close file
 	pFile.reset();
 	// rename file to the destination
-	iFile::Delete( fname );
-	iFile::Rename( tempSaveName, fname );
+	iFile::Delete( path );
+	iFile::Rename( tempSaveName, path );
 	iFile::Delete( tempSaveName );
 
 	gGame.AddMsg(iStringT(_T("#F6B6")) + gTextMgr[TRID_MSG_GAME_SAVED]);

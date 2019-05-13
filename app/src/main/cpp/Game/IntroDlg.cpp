@@ -2,13 +2,17 @@
 #include "IntroDlg.h"
 #include "lzo/lzo.h"
 
+#include "FileAccessor/FileAccessor.h"
+
+using namespace fileaccessor;
+
 iIntroDlg::iIntroDlg(iViewMgr* pViewMgr)
 : iDialog(pViewMgr), m_dibLogo(iSize(320,240), iDib::RGB), m_aniStep(0)
 {
-	iFilePtr sdataFile = OpenWin32File(gDataPath + L"game.pix");
+	iFilePtr sdataFile = OpenWin32File(RelativeFilePath("game.pix"));
 	if (!sdataFile) return;
 	// disabled for now
-	check(0); 
+	check(0);
 	uint32 tmpBuffLen;
 	sdataFile->Read(&tmpBuffLen, sizeof(tmpBuffLen));
 	unsigned char* pTmpBuff = (unsigned char*)malloc(tmpBuffLen);

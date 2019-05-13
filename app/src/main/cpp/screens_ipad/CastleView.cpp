@@ -5,6 +5,9 @@
 #include "TransitionView.h"
 #include "Dlg_CreatInfo.h"
 // #include "NewMapShop/NewMapShop.h"
+#include "FileAccessor/FileAccessor.h"
+
+using namespace fileaccessor;
 
 namespace UI_IPAD
 {
@@ -1014,14 +1017,14 @@ namespace UI_IPAD
 
     }
 
-    iStringT castleThemes[CTLT_COUNT] = {
-        _T("Achaidh_Cheide"),   // citadel
-        _T("Thunderhead"),      // stronghold
-        _T("Ibn Al-Noor"),	    // tower
-        _T("Eastern_Thought"),  // dungeon
-        _T("Finding_Movement"), // fortress
-        _T("Frost_Waltz"),       // necropolis
-        _T("Pale_Rider")       // variags
+    std::string castleThemes[CTLT_COUNT] = {
+        ("Achaidh_Cheide"),   // citadel
+        ("Thunderhead"),      // stronghold
+        ("Ibn Al-Noor"),	    // tower
+        ("Eastern_Thought"),  // dungeon
+        ("Finding_Movement"), // fortress
+        ("Frost_Waltz"),       // necropolis
+        ("Pale_Rider")       // variags
     };
 
 
@@ -1037,8 +1040,8 @@ namespace UI_IPAD
         m_pArmyExchange->SetTopOwner(m_pCastle, true);
         UpdateSize();
         Update();
-        iStringT str = castleThemes[m_pCastle->Proto()->Type()] + _T(".mp3");
-        iStringT tmp = gMusicPath + castleThemes[m_pCastle->Proto()->Type()] + _T(".mp3");
+        // iStringT str = castleThemes[m_pCastle->Proto()->Type()] + _T(".mp3");
+        auto tmp = RelativeFilePath("Music/" + castleThemes[m_pCastle->Proto()->Type()] + (".mp3"));
         gMusicMgr.Play(tmp, true);
     }
 

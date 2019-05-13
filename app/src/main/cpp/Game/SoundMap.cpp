@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "SoundMap.h"
 
+#include "FileAccessor/FileAccessor.h"
+
+using namespace fileaccessor;
+
 //////////////////////////////////////////////////////////////////////////
-iSoundMap::iSoundMap() 
+iSoundMap::iSoundMap()
 : m_pMap(NULL)
 {
 
@@ -126,38 +130,38 @@ const sint32 VOL_PRESETS[5] = {
 	3,
 };
 
-iStringT SURF_MUSIC[STYPE_COUNT] = {
-	_T(""),	// water
-	_T("Expeditionary"),	// sand (beach)
-	_T("Colossus"),	// dirt
-	_T("Arid Foothills"),	// grass
-	_T("Opium"),	// swamp
-	_T("Supernatural"),	// lava
-	_T("Willow and the Light"),	// wasteland
-	_T("Desert City"),	// desert
-	_T("Temple of the Manes"),	// snow
-	_T("Cambodian Odyssey"),	// new desert
-	_T("Celtic Impulse"),	// pavement
-	_T("Phantasm"),	// new wasteland
-};	
+std::string SURF_MUSIC[STYPE_COUNT] = {
+	(""),	// water
+	("Expeditionary"),	// sand (beach)
+	("Colossus"),	// dirt
+	("Arid Foothills"),	// grass
+	("Opium"),	// swamp
+	("Supernatural"),	// lava
+	("Willow and the Light"),	// wasteland
+	("Desert City"),	// desert
+	("Temple of the Manes"),	// snow
+	("Cambodian Odyssey"),	// new desert
+	("Celtic Impulse"),	// pavement
+	("Phantasm"),	// new wasteland
+};
 
-iStringT nowPlaying = _T("");
+std::string nowPlaying = ("");
 
 void iSoundMap::SetupEnvSounds(const iPoint& pos)
 {
 	// background music
-	iCell c = gGame.Map().GetAt(pos.x,pos.y);	
+	iCell c = gGame.Map().GetAt(pos.x,pos.y);
 	SURF_TYPE upSurf = (SURF_TYPE)c.SurfNode(0);
 	if(nowPlaying != SURF_MUSIC[upSurf])
 	{
-        if(  SURF_MUSIC[upSurf] == _T("") )
+        if(  SURF_MUSIC[upSurf] == ("") )
             return;
-        
+
 		nowPlaying = SURF_MUSIC[upSurf];
-		iStringT path = gMusicPath + SURF_MUSIC[upSurf] + _T(".mp3"); 
+		auto path = RelativeFilePath(std::string("Music/") + SURF_MUSIC[upSurf] + (".mp3"));
 		gMusicMgr.Play(path, true);
 	}
-	
+
 	if (!gApp.SndPlayer().Inited()) return;
 	iItemList newEnvItems;
 	check(m_pMap->IsValidPos(pos.x, pos.y));
@@ -213,7 +217,7 @@ void iSoundMap::SetupEnvSounds(const iPoint& pos)
 
 void iSoundMap::ResetEnvSounds()
 {
-	nowPlaying = _T("");
+	nowPlaying = ("");
 	if (!gApp.SndPlayer().Inited()) return;
 	for (uint32 xx=0; xx<m_items.GetSize(); ++xx) {
 		check(m_items[xx].channel != -1);

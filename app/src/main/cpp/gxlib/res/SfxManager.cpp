@@ -31,10 +31,10 @@ iSfxManager::~iSfxManager()
 	Cleanup();
 }
 
-bool iSfxManager::Init(const iStringT& fname)
+bool iSfxManager::Init(const fileaccessor::RelativeFilePath& path)
 {
 	Cleanup();
-	m_pDataFile = OpenWin32File(fname);
+	m_pDataFile = OpenWin32File(path);
 	if (!m_pDataFile) return false;
 	uint32 cnt;
 	m_pDataFile->Read(&cnt, sizeof(uint32));
@@ -48,11 +48,11 @@ bool iSfxManager::Init(const iStringT& fname)
 			m_xauBuffLen = xauLen;
 		}
 		m_pDataFile->Read(m_pXauBuff, xauLen);
-				
-		m_pPcmBuff = (sint8*)malloc(pcmLen);		
+
+		m_pPcmBuff = (sint8*)malloc(pcmLen);
 		m_pcmBuffLen = pcmLen;
 
-		xau_pcm8m_decode( m_pXauBuff, xauLen, m_pPcmBuff, pcmLen );		
+		xau_pcm8m_decode( m_pXauBuff, xauLen, m_pPcmBuff, pcmLen );
 		m_entries.Add(iGXApp::Instance().SndPlayer().LoadSample(m_pPcmBuff, pcmLen, 0));
 		// !! do not free m_pPcmBuff right now, it is used internally by SndPlayer and will be released by it when needed
 		// it doesn't free...

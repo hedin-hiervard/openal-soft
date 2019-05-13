@@ -25,7 +25,7 @@ bool iTextComposer::ProcessChar(const iCharW* &text, SpriteId &sid, iTextCompose
 		++text;
 		uint16 r,g,b,a;
 		switch (*text){
-			case 'I': 
+			case 'I':
 				++text;
 				r = HexChar2Int(*text++);
 				g = HexChar2Int(*text++);
@@ -45,14 +45,14 @@ bool iTextComposer::ProcessChar(const iCharW* &text, SpriteId &sid, iTextCompose
 				check(r < m_fntCount);
 				cfg.fontSize = m_relSizes[r];
 				break;
-			case 'F': 
+			case 'F':
 				++text;
 				r = HexChar2Int(*text++);
 				g = HexChar2Int(*text++);
 				b = HexChar2Int(*text++);
 				cfg.cmpProps.faceColor = r<<12|g<<7|b<<1;
 				break;
-			case 'B': 
+			case 'B':
 				++text;
 				r = HexChar2Int(*text++);
 				g = HexChar2Int(*text++);
@@ -76,9 +76,9 @@ iTextComposer::iTextComposer()
 		m_relSizes[xx] = (FontSize)xx;
 }
 
-bool iTextComposer::Init(const iStringT& path, uint8 fntCount, uint32 commonKey, uint32 fileKey, uint32 fileHdrKey, uint16 fileVersion)
+bool iTextComposer::Init(const fileaccessor::RelativeFilePath& path, uint8 fntCount, uint32 commonKey, uint32 fileKey, uint32 fileHdrKey, uint16 fileVersion)
 {
-    
+
 
 	m_fntCount = fntCount;
 
@@ -96,7 +96,7 @@ bool iTextComposer::Init(const iStringT& path, uint8 fntCount, uint32 commonKey,
 	for (uint32 nn=0; nn<m_fntCount; ++nn) {
 		if (!m_Fonts[nn].Init(fileBuff, (nn==2)?2:0)) return false;
 	}
-	
+
 	return true;
 }
 
@@ -125,7 +125,7 @@ iSize iTextComposer::GetTextSize(const iStringT& text, FontConfig cfg)
 {
 	iSize res(2,m_Fonts[cfg.fontSize].GetFontHeight());
 
-	
+
 	const iCharW* ptr = text.CStr();
 	const iCharW* lastChar = ptr+text.Length();
 
@@ -153,7 +153,7 @@ iSize iTextComposer::GetTextBoxSize(const iStringT& text, uint32 width, FontConf
 	const iCharT* pEnd = pTB + text.Length();
 	const iCharT* pLS = 0;
 	SpriteId sid;
-	FontConfig ffc = fc;	
+	FontConfig ffc = fc;
 	sint32 fheight = m_Fonts[fc.fontSize].GetFontHeight();
 
 	while (pEnd > pCur) {
@@ -203,7 +203,7 @@ void iTextComposer::TextOut(const FontConfig &fcc, iDib& dib, const iPoint& pos,
 
 	// move baseline
 	sint32 foy = op.y;
-	
+
 	const iCharW* ptr = text.CStr();
 	const iCharW* lastChar = ptr+text.Length();
 
@@ -234,27 +234,27 @@ void iTextComposer::TextOut(iDib& dib, const iPoint& pos, const iStringT& text, 
 }
 
 iSize iTextComposer::TextCut(iStringT& text, const uint32 limlen, const FontConfig &fc){
- 
-    iStringT limtxt = text;    
-    iSize sz = GetTextSize(text, fc);  
-    
+
+    iStringT limtxt = text;
+    iSize sz = GetTextSize(text, fc);
+
     if( sz.w>limlen ){
-        
+
         limtxt.SetLength(limtxt.Length()-2);
         limtxt += _T("..");
-        
+
         sz = GetTextSize(limtxt, fc);
-        
+
         while( sz.w>limlen ){
-        
+
             limtxt.SetLength(limtxt.Length()-3);
             limtxt += _T("..");
             sz = GetTextSize(limtxt, fc);
-        }        
+        }
     }
-    
+
     text = limtxt;
-    
+
     return sz;
 }
 
@@ -267,7 +267,7 @@ void iTextComposer::TextOutWithScroll(const FontConfig &fcc, iDib& dib, const iP
 	TextOut(fcc, tmp, iPoint(), text);
 	tmp.CopyRectToDibXY(dib, iRect(scrollPos, 0, rect.w, rect.h), iPoint(rect.x, rect.y + (rect.h - tmp.GetHeight()) / 2));
 	//tmp.CopyRectToDibXY(dib, iRect(0, 0, tmp.GetWidth(), tmp.GetHeight()), rect.point(), 255);
-	
+
 /*	sint32 sum = scrollPos - 5;
 	sint32 x = -1;
 	for(;; x++) {
@@ -279,13 +279,13 @@ void iTextComposer::TextOutWithScroll(const FontConfig &fcc, iDib& dib, const iP
 	uint32 y = 0, curwidth = 0;
 	for(;;)
 		if(y < toshow.Length() && curwidth + m_Fonts[fcc.fontSize].GetCharWidth(toshow[y]) < rect.w - 20) {
-			
+
 			curwidth += m_Fonts[fcc.fontSize].GetCharWidth(toshow[y]);
 			y++;
 		} else
 			break;
 	toshow = toshow.Left(y);
-	TextOut(fcc, dib, pos - iPoint(sum - 5, 0), toshow);	
+	TextOut(fcc, dib, pos - iPoint(sum - 5, 0), toshow);
  */
 }
 
@@ -345,7 +345,7 @@ sint32 iTextComposer::TextBoxOut(const FontConfig &fc, iDib& dib, const iStringT
 		height += fheight;
 	}
 
-	/* 
+	/*
 	sint32 lineBegin=0;
 	sint32 linePos = 0;
 	sint32 height = 0;
@@ -397,6 +397,6 @@ uint16 iTextComposer::GetCharHeight(FontSize fs)
     case 3: return 24;
     case 4: return 30;
     case 5: return 36;
-    }    
+    }
     return 0;
 }

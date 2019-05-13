@@ -5,6 +5,8 @@
 
 //#include "xxc/xxc.security.h"
 
+using namespace fileaccessor;
+
 //////////////////////////////////////////////////////////////////////////
 iFramePopupView::iFramePopupView(iViewMgr* pViewMgr, PLAYER_ID pid)
 : iPopupView(pViewMgr), m_pid(pid)
@@ -139,9 +141,9 @@ iCheckButton::iCheckButton(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, con
 : iImgBtn(pViewMgr, this, iRect(pt, sm_defSize), uid, sid, psid, iStringT(), state), m_pOwnCmdHandler(pCmdHandler), m_spriteId(sid), m_bChecked(bChecked)
 {}
 
-void iCheckButton::SetChecked(bool bChecked, bool bNotify) 
-{ 
-	m_bChecked = bChecked; 
+void iCheckButton::SetChecked(bool bChecked, bool bNotify)
+{
+	m_bChecked = bChecked;
 	SetHighlighted(bChecked);
 	if (bNotify) m_pOwnCmdHandler->iCMDH_ControlCommand(this, CCI_CHECKED, m_bChecked);
 }
@@ -184,9 +186,9 @@ iCheckBox::iCheckBox(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRe
 : iButton(pViewMgr, this, rect, uid, state), m_pOwnCmdHandler(pCmdHandler), m_text(text), m_bChecked(bChecked)
 {}
 
-void iCheckBox::SetChecked(bool bChecked, bool bNotify) 
-{ 
-	m_bChecked = bChecked; 
+void iCheckBox::SetChecked(bool bChecked, bool bNotify)
+{
+	m_bChecked = bChecked;
 	if (bNotify) m_pOwnCmdHandler->iCMDH_ControlCommand(this, CCI_CHECKED, m_bChecked);
 }
 
@@ -206,7 +208,7 @@ void iCheckBox::OnCompose()
 	icnRect.DeflateRect(1);
 	gApp.Surface().Darken50Rect(icnRect);
 	*/
-	
+
 	if (m_bChecked) BlitIcon(gApp.Surface(), PDGG(CHECKBOX), icnRect);
 	if (state & Pressed) gApp.Surface().Darken25Rect(icnRect);
 	iTextComposer::FontConfig fc(GetButtonFont(state));
@@ -238,9 +240,9 @@ iNMCheckBox::iNMCheckBox(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const
 : iButton(pViewMgr, this, rect, uid, state), m_pOwnCmdHandler(pCmdHandler), m_text(text), m_bChecked(bChecked)
 {}
 
-void iNMCheckBox::SetChecked(bool bChecked, bool bNotify) 
-{ 
-    m_bChecked = bChecked; 
+void iNMCheckBox::SetChecked(bool bChecked, bool bNotify)
+{
+    m_bChecked = bChecked;
     if (bNotify) m_pOwnCmdHandler->iCMDH_ControlCommand(this, CCI_CHECKED, m_bChecked);
 }
 
@@ -254,9 +256,9 @@ void iNMCheckBox::OnCompose()
 
     //iRect icnRect(rc.x, rc.y+1, 16, 16);
     iRect icnRect(rc.x + (rc.w - sz.w) / 2, rc.y + (rc.h - sz.h) / 2, sz.w, sz.h);
-    if (m_bChecked) 
+    if (m_bChecked)
         gGfxMgr.Blit(PDGG(NMENU_CBOX_P), gApp.Surface(), icnRect);
-    else 
+    else
         gGfxMgr.Blit(PDGG(NMENU_CBOX_N), gApp.Surface(), icnRect);
     iTextComposer::FontConfig fc(GetButtonFont(state));
     gTextComposer.TextOut(fc,gApp.Surface(),iPoint(rc.x+19, rc.y), m_text, iRect(rc.x+19, rc.y, rc.w-19, rc.h),AlignTopLeft);
@@ -273,7 +275,7 @@ iPHScrollBar::iPHScrollBar(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, con
 {}
 
 void iPHScrollBar::ComposeSBElement(Element el, const iRect& rc, uint32 flags)
-{ 
+{
 	if (el == EL_Bkgnd) {
 		gGfxMgr.BlitTile(PDGG(BKTILE), gApp.Surface(), rc);
 		gApp.Surface().Darken50Rect(rc);
@@ -310,7 +312,7 @@ iPHMiniSlider::iPHMiniSlider(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, c
 {}
 
 void iPHMiniSlider::ComposeSBElement(Element el, const iRect& rc, uint32 flags)
-{ 
+{
 	if (el == EL_Bkgnd) {
 		gGfxMgr.BlitTile(PDGG(BKTILE), gApp.Surface(), rc);
 		gApp.Surface().Darken50Rect(rc);
@@ -344,17 +346,17 @@ iSize iIphoneBtn::sm_defPerkSize = iSize(50, 55);
 void iIphoneBtn::OnCompose()
 {
 	//gApp.Surface().FrameRect(GetScrRect(), cColor_White);
-	iRect rc = AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), GetScrRect(), m_align);	
+	iRect rc = AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), GetScrRect(), m_align);
 	if(m_img == -1) return;
 	//iSize dim = gGfxMgr.Dimension(m_img);
 	//iRect dst = AlignRect(dim, rc, AlignCenter);
 
-	
+
 
 	if(m_bUnclickable || (!(m_state & Pressed) && !m_high))
 		gGfxMgr.Blit(PDGG(BTN_FRAME), gApp.Surface(), AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), rc, AlignCenter));
 
-	gGfxMgr.Blit(m_img, gApp.Surface(), AlignRect(gGfxMgr.Dimension(m_img), rc, AlignCenter));			
+	gGfxMgr.Blit(m_img, gApp.Surface(), AlignRect(gGfxMgr.Dimension(m_img), rc, AlignCenter));
 
 	if(!m_bUnclickable && ((m_state & Pressed) || m_high)) {
 		gGfxMgr.Blit(PDGG(BTN_FRAME_PRESSED), gApp.Surface(), AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME_PRESSED)), rc, AlignCenter));
@@ -368,19 +370,19 @@ void iImgBtn::OnCompose() {
 	//gApp.Surface().FrameRect(rect, cColor_White);
 	iSize dim = gGfxMgr.Dimension(m_sid);
 	iRect dst = AlignRect(dim, rect, m_align);
-	
+
 #if defined( PC_VERSION )
 	if( m_bHighBtn )
 		m_high = true;
 #endif
 
-    sint16 pressed_sid = 
+    sint16 pressed_sid =
 #ifdef FULL_VERSION
     PDGG(BTN_DELUXE_PRESSED);
 #else
     PDGG(BTN_FRAME_PRESSED);
 #endif
-    
+
 	if((!m_high && !(m_state & Pressed)) || m_bUnclickable) {
 		if(m_sid != -1) {
 			gGfxMgr.Blit(m_sid, gApp.Surface(), dst);
@@ -394,101 +396,101 @@ void iImgBtn::OnCompose() {
 				gGfxMgr.Blit(pressed_sid, gApp.Surface(), AlignRect(gGfxMgr.Dimension(pressed_sid), dst, AlignCenter));
             }
 		}
-	} 
+	}
 #if defined( PC_VERSION )
 	if( m_bEntered && text.Length() ){
-		
+
 			iSize sz = gTextComposer.GetTextSize(text, btnfc_normal);
 			iSize szcntx_l = gGfxMgr.Dimension(PDGG(CONTEXT_L));
 
 			iRect cntx = iRect();
 			iPoint txtpnt = iPoint();
 			iPoint pos = iPoint();
-			
+
 			if( m_align == AlignTopRight || m_align == AlignRight ){
-	
+
 				pos = iPoint( rect.x2(), rect.y1() + 2*rect.size().h/3 );
-			
+
 				cntx = iRect( pos.x - 2*szcntx_l.w - sz.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_L), gApp.Surface(), cntx);
-			
-				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );
 				gGfxMgr.BlitTile(PDGG(CONTEXT_M), gApp.Surface(), cntx);
-			
-				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_R), gApp.Surface(), cntx);
-			
+
 				txtpnt = iPoint(pos.x - szcntx_l.w - sz.w, pos.y+(szcntx_l.h - sz.h)/2);
 			}
 			else if( m_align == AlignTopLeft ){
-		
+
 				pos = iPoint( rect.x1(), rect.size().h/2);
-			
+
 				gGfxMgr.Blit(PDGG(CONTEXT_L), gApp.Surface(), pos);
-		
-				cntx = iRect( pos.x+szcntx_l.w, pos.y, sz.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x+szcntx_l.w, pos.y, sz.w, szcntx_l.h );
 				gGfxMgr.BlitTile(PDGG(CONTEXT_M), gApp.Surface(), cntx);
-		
+
 				gGfxMgr.Blit(PDGG(CONTEXT_R), gApp.Surface(), iPoint( pos.x+szcntx_l.w+sz.w, pos.y ) );
-		
+
 				txtpnt = iPoint(pos.x+szcntx_l.w, pos.y+(szcntx_l.h - sz.h)/2);
-			}		
+			}
 			else if(m_align == AlignBottomLeft || m_align == AlignBottomRight){
-							
+
 				iSize limsize = szcntx_l + iSize(5, 0);
                 iStringT limtext = text;
-/*                
+/*
                 if( sz.w > limsize.w ){
-        
+
                     iSize stext;
-                    
+
                     limtext.SetLength(text.Length()-2);
                     limtext += _T("..");
-                    
+
                     stext = gTextComposer.GetTextSize(limtext, btnfc_normal);
-                    
+
                     while( stext.w > limsize.w ){
-                    
+
                         limtext.SetLength(limtext.Length()-3);
                         limtext += _T("..");
                         stext = gTextComposer.GetTextSize(limtext, btnfc_normal);
                     }
                 }
-*/                
+*/
                 sz = gTextComposer.TextCut(limtext, limsize.w, btnfc_normal);//  gTextComposer.GetTextSize(limtext, btnfc_normal);
-                
+
                 pos = iPoint( rect.x2() + szcntx_l.w + sz.w/2 - rect.size().w/2, rect.y1() - 2*rect.size().h/3 );
-                
+
 				cntx = iRect( pos.x - 2*szcntx_l.w - sz.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_L), gApp.Surface(), cntx);
-                
-				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );
 				gGfxMgr.BlitTile(PDGG(CONTEXT_M), gApp.Surface(), cntx);
-                
-				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_R), gApp.Surface(), cntx);
-                
+
 				txtpnt = iPoint(pos.x - szcntx_l.w - sz.w, pos.y+(szcntx_l.h - sz.h)/2);
-                
+
                 gTextComposer.TextOut(btnfc_normal, gApp.Display().GetSurface(), txtpnt, limtext, cInvalidRect, AlignLeft);
                 return;
 			}
             else if(m_align == AlignBottom ){
-            
+
                 pos = iPoint( rect.x2() + szcntx_l.w + sz.w/2 - rect.size().w/2, rect.y1() - 2*rect.size().h/3 );
-                
+
 				cntx = iRect( pos.x - 2*szcntx_l.w - sz.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_L), gApp.Surface(), cntx);
-                
-				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w - sz.w, pos.y, sz.w, szcntx_l.h );
 				gGfxMgr.BlitTile(PDGG(CONTEXT_M), gApp.Surface(), cntx);
-                
-				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );		
+
+				cntx = iRect( pos.x - szcntx_l.w, pos.y, szcntx_l.w, szcntx_l.h );
 				gGfxMgr.Blit(PDGG(CONTEXT_R), gApp.Surface(), cntx);
-                
+
 				txtpnt = iPoint(pos.x - szcntx_l.w - sz.w, pos.y+(szcntx_l.h - sz.h)/2);
             }
-      
+
 			gTextComposer.TextOut(btnfc_normal, gApp.Display().GetSurface(), txtpnt, text, cInvalidRect, AlignLeft);
 	}
 #endif
@@ -507,7 +509,7 @@ void iAmountChooser::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButtonId 
 	if(!rc.PtInRect(pos.x, pos.y)) return;
 	m_pos = iCLAMP<sint32>(0, m_max, m_max * (rc.y + (rc.h) - pos.y) / (rc.h - 20));
 	Invalidate();
-	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);	
+	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
 }
 
 void iAmountChooser::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mbID)
@@ -518,7 +520,7 @@ void iAmountChooser::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId m
 void iAmountChooser::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
 {
 	m_pos = m_max;
-	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);	
+	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
 	Invalidate();
 }
 
@@ -549,17 +551,17 @@ const sint32 iAmountChooserGlow::sm_offset = 257;
 #endif
 
 iAmountChooserGlow::iAmountChooserGlow(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, bool bDeluxe):
-iBaseCtrl(pViewMgr, pCmdHandler, iRect(rect.x, rect.y, rect.w 
+iBaseCtrl(pViewMgr, pCmdHandler, iRect(rect.x, rect.y, rect.w
 #ifdef PC_VERSION
                                        + 25
-#endif                      
+#endif
                                        , rect.h), GENERIC_VIEWPORT, uid, Visible | Enabled), m_pos(0), m_max(0), m_bDeluxe(bDeluxe)
-{	
+{
     sint16 sid = bDeluxe ? PDGG(BTN_SWITCH_CASTLES_DELUXE): PDGG(BTN_SWITCH_CASTLES);
 
 	AddChild(m_pBtnLeft = new iImgBtn(&gApp.ViewMgr(), this, iRect(), 114, sid, sid + 2));
-	AddChild(m_pBtnRight = new iImgBtn(&gApp.ViewMgr(), this, iRect(), 115, sid + 1, sid + 3));		
-    
+	AddChild(m_pBtnRight = new iImgBtn(&gApp.ViewMgr(), this, iRect(), 115, sid + 1, sid + 3));
+
     UpdateSize();
 }
 
@@ -569,7 +571,7 @@ void iAmountChooserGlow::UpdateSize()
     if( !m_bDeluxe ){
 #ifdef PC_VERSION
         m_pBtnLeft->SetRect(AlignChild(iSize(50, 50), AlignLeft) + iPoint(10, 0));
-        m_pBtnRight->SetRect(AlignChild(iSize(50, 50), AlignRight));                    
+        m_pBtnRight->SetRect(AlignChild(iSize(50, 50), AlignRight));
 #endif
     }
     else{
@@ -584,7 +586,7 @@ void iAmountChooserGlow::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButto
 {
 	iRect rc = AlignRect(iSize(
 #ifdef PC_VERSION
-                               sm_defSize.w - 
+                               sm_defSize.w -
 #endif
                                sm_offset, sm_defSize.h), GetScrRect(), AlignCenter);
 
@@ -593,20 +595,20 @@ void iAmountChooserGlow::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButto
     uint32 lw_offset = 0, rw_offset = 0;
 
     if( m_bDeluxe ){
-    
+
         lw_offset = 15;
         rw_offset = 20;
-    }    
-    
+    }
+
 	sint32 lw = gGfxMgr.Dimension(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_L): PDGG(AMOUNT_CONTROL_GLOW_L)).w-lw_offset,
     rw = gGfxMgr.Dimension(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_R): PDGG(AMOUNT_CONTROL_GLOW_R)).w-rw_offset;
 #else
     sint32 lw = gGfxMgr.ObjRect(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_L) : PDGG(AMOUNT_CONTROL_GLOW_L)).w,
     rw = gGfxMgr.ObjRect(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_R) : PDGG(AMOUNT_CONTROL_GLOW_R)).w;
 #endif
-	if(pos.x <= rc.x + lw) 
+	if(pos.x <= rc.x + lw)
 		m_pos = 0;
-	else if(pos.x >= rc.x 
+	else if(pos.x >= rc.x
 #ifdef PC_VERSION
             + sm_defSize.w - sm_offset
 #else
@@ -615,15 +617,15 @@ void iAmountChooserGlow::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButto
             - rw)
 		m_pos = m_max;
 	else{
-#ifdef PC_VERSION        
+#ifdef PC_VERSION
 		m_pos = iCLAMP<sint32>(0, m_max, m_max * (pos.x - rc.x - lw) / (sm_defSize.w - sm_offset - rw - lw)+1);
 #else
         m_pos = iCLAMP<sint32>(0, m_max, m_max * (pos.x - rc.x) / (sm_offset));
-#endif        
+#endif
 //        posit = (double)(m_max * (pos.x - rc.x - lw)) / (double)(sm_defSize.w - sm_offset - rw - lw);
     }
 	Invalidate();
-	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);	
+	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
 }
 
 void iAmountChooserGlow::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mbID)
@@ -637,9 +639,9 @@ void iAmountChooserGlow::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sin
 	if(uid == 114) {
 		m_pos = iCLAMP<sint32>(0, m_max, m_pos - 1);
 	} else if(uid == 115) {
-		m_pos = iCLAMP<sint32>(0, m_max, m_pos + 1);		
+		m_pos = iCLAMP<sint32>(0, m_max, m_pos + 1);
 	}
-	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);	
+	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
 	Invalidate();
 }
 
@@ -648,7 +650,7 @@ void iAmountChooserGlow::OnCompose()
 {
 	iRect rc = AlignRect(iSize(
 #ifdef PC_VERSION
-                               sm_defSize.w - 
+                               sm_defSize.w -
 #endif
                                sm_offset, sm_defSize.h), GetScrRect(), AlignCenter);
 
@@ -656,63 +658,63 @@ void iAmountChooserGlow::OnCompose()
     if(m_bDeluxe)
 		rc -= iPoint(15, 0);
 #endif
-    
+
     uint32 lw_offset = 0, rw_offset = 0;
 #ifdef PC_VERSION
     if( m_bDeluxe ){
-        
+
         lw_offset = 15;
         rw_offset = 20;
-    }  
+    }
 #endif
 	sint32 lw = gGfxMgr.Dimension(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_L) : PDGG(AMOUNT_CONTROL_GLOW_L)).w-lw_offset,
 			rw = gGfxMgr.Dimension(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_R) : PDGG(AMOUNT_CONTROL_GLOW_R)).w-rw_offset;
-    
+
     iSize sz = gGfxMgr.Dimension(PDGG(AMOUNT_CONTROL_DELUXE));
-    
-	gGfxMgr.Blit(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE) : PDGG(AMOUNT_CONTROL_GLOW), gApp.Surface(), rc);	
+
+	gGfxMgr.Blit(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE) : PDGG(AMOUNT_CONTROL_GLOW), gApp.Surface(), rc);
 
 	iPoint offset;
 
 	if(!m_bDeluxe)
 		offset = iPoint(7, 8);
-	else 
+	else
 		offset = iPoint(-10, -11);
-    
+
     iPoint trc;
 	if(m_max > 0) {
 #ifdef PC_VERSION
 		sint32 barCnt = m_pos* (sm_defSize.w - sm_offset - lw - rw) / m_max;// - rw - lw;
         for(sint32 x=1; x<barCnt+1; x++){
-            
+
             trc = iPoint(rc.x + x + lw, rc.y) + offset;
 #else
         sint32 barCnt = m_pos * (sm_offset - lw - (m_bDeluxe ? 0 : rw)) / m_max;
         for(sint32 x=1; x<barCnt+1; x++){
-            
+
             trc = rc.point() + iPoint(x + lw - 1, 0) + offset;
 #endif
             gGfxMgr.Blit(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_M): PDGG(AMOUNT_CONTROL_GLOW_M), gApp.Surface(), trc);
         }
     }
 	if(m_pos > 0) {
-        
+
         trc = rc.point() + offset;
-        
+
 		gGfxMgr.Blit(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_L) : PDGG(AMOUNT_CONTROL_GLOW_L), gApp.Surface(), trc);
 		if(m_pos == m_max){
-            
+
 #ifdef PC_VERSION
             uint32 offs = 0;
             if(m_bDeluxe)
                 offs = 31;
             else
                 offs = rw+4;
-            
+
             trc = rc.point() + iPoint(sm_defSize.w - sm_offset - offs, 0) + offset;
 #else
             trc = rc.point() + iPoint(sm_offset - (m_bDeluxe ? 0 : (rw+1)), 0) + offset;
-#endif            
+#endif
 			gGfxMgr.Blit(m_bDeluxe ? PDGG(AMOUNT_CONTROL_DELUXE_R) : PDGG(AMOUNT_CONTROL_GLOW_R), gApp.Surface(), trc);
         }
 	}
@@ -725,7 +727,7 @@ const iSize iRater::sm_defSize = iSize(265, 73);
 
 iRater::iRater(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid):
 iBaseCtrl(pViewMgr, pCmdHandler, iRect(rect.x, rect.y, rect.w, rect.h), GENERIC_VIEWPORT, uid, Visible | Enabled), m_pos(0), m_alpha(255)
-{	
+{
 }
 
 void iRater::UpdateSize()
@@ -735,17 +737,17 @@ void iRater::UpdateSize()
 void iRater::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButtonId mbID)
 {
 	iRect rc = GetScrRect(); //AlignRect(iSize(sm_defSize.w, sm_defSize.h), GetScrRect(), AlignCenter);
-	
+
 	if(!rc.PtInRect(pos.x, pos.y)) return;
-	
-	if(pos.x <= rc.x ) 
+
+	if(pos.x <= rc.x )
 		m_pos = 0;
 	else if(pos.x >= rc.x + sm_defSize.w)
 		m_pos = 4;
 	else
 		m_pos = iCLAMP<sint32>(0, 4, (pos.x - rc.x) / (sm_defSize.w / 5));
 	Invalidate();
-//	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);	
+//	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
 }
 
 void iRater::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mbID)
@@ -755,7 +757,7 @@ void iRater::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mbID)
 
 void iRater::OnMouseUp(const iPoint &pos, MouseId mID, MouseButtonId mbID)
 {
-	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK, m_pos);		
+	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK, m_pos);
 }
 
 void iRater::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
@@ -786,14 +788,14 @@ void iRater::OnCompose()
 
 //
 // Twitter pane
-// 
+//
 
 const iSize iTwitterPane::sm_defSize = iSize(360, 220);
 
 iTwitterPane::iTwitterPane(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid):
 iBaseCtrl(pViewMgr, pCmdHandler, iRect(rect.x, rect.y, rect.w, rect.h), GENERIC_VIEWPORT, uid, Visible | Enabled),
 m_pHandler(pCmdHandler)
-{	
+{
 	AddChild(m_pRater = new iRater(pViewMgr, this, iRect(), 100));
 	AddChild(m_pBtn = new iImgBtn(pViewMgr, this, iRect(), 101, PDGG(TWEET), PDGG(TWEET_PRESSED)));
 	m_pRater->SetVisible(false);
@@ -810,7 +812,7 @@ void iTwitterPane::UpdateSize()
 
 void iTwitterPane::OnMouseTrack(const iPoint &pos, MouseId mID, MouseButtonId mbID)
 {
-	
+
 }
 
 void iTwitterPane::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mbID)
@@ -829,7 +831,7 @@ void iTwitterPane::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
 		m_pHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, 0);
 		//m_pRater->SetVisible(!m_pRater->IsVisible());
 	} else if(uid == 100) {
-		m_pHandler->iCMDH_ControlCommand(this, CCI_LBSELECTED, m_pRater->CurPos());		
+		m_pHandler->iCMDH_ControlCommand(this, CCI_LBSELECTED, m_pRater->CurPos());
 		m_pHandler->iCMDH_ControlCommand(this, CCI_BTNCLICK, 0);
 	}
 }
@@ -863,7 +865,7 @@ sint32 iTwitterPane::SelectedRating() const
 iPHVolumeBar::iPHVolumeBar(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid):
 iBaseCtrl(pViewMgr, pCmdHandler, rect, GENERIC_VIEWPORT, uid, Visible | Enabled), m_pos(0)
 {
-	
+
 }
 
 void iPHVolumeBar::OnCompose()
@@ -892,7 +894,7 @@ void iPHVolumeBar::OnMouseTrack(const iPoint& pos, MouseId mID, MouseButtonId mb
 	iRect rc = GetScrRect();
 	m_pos = iCLAMP<sint32>(0, 4, (pos.x - rc.x) / 30);
 	if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
-	Invalidate();	
+	Invalidate();
 }
 
 
@@ -936,7 +938,7 @@ void iNMVolumeBar::OnMouseTrack(const iPoint& pos, MouseId mID, MouseButtonId mb
     iRect rc = GetScrRect();
     m_pos = iCLAMP<sint32>(0, /*4*/5, (pos.x - rc.x) / 30);
     if (m_pCmdHandler) m_pCmdHandler->iCMDH_ControlCommand(this,CCI_BTNCLICK,m_pos);
-    Invalidate();	
+    Invalidate();
 }
 
 void iNMVolumeBar::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
@@ -951,7 +953,7 @@ void iNMVolumeBar::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
 
 // Tool bar tabbed switch
 iBarTabSwitch::iBarTabSwitch(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 tabcnt, uint32 uid)
-: iTabbedSwitch(pViewMgr, pCmdHandler, rect, tabcnt, uid) 
+: iTabbedSwitch(pViewMgr, pCmdHandler, rect, tabcnt, uid)
 {}
 
 void iBarTabSwitch::SetTabIcon(SpriteId sid)
@@ -971,7 +973,7 @@ iHeroPortBtn::iHeroPortBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, con
                            , bool bGUI
 #endif
                            )
-: iIphoneBtn(pViewMgr, pCmdHandler, rect, uid, Visible, PDGG(UNK_HERO), false, align), m_pHero(NULL), m_bUnclickable(bUnclickable), m_bShowMoves(bShowMoves) 
+: iIphoneBtn(pViewMgr, pCmdHandler, rect, uid, Visible, PDGG(UNK_HERO), false, align), m_pHero(NULL), m_bUnclickable(bUnclickable), m_bShowMoves(bShowMoves)
 #ifndef PC_VERSION
 , m_bGUI(bGUI)
 #endif
@@ -980,29 +982,29 @@ iHeroPortBtn::iHeroPortBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, con
 void iHeroPortBtn::OnCompose()
 {
 	if(m_pHero){
-#ifndef PC_VERSION	
+#ifndef PC_VERSION
         if(m_bGUI)
 #endif
-			iIphoneBtn::OnCompose();	
+			iIphoneBtn::OnCompose();
 #ifndef PC_VERSION
 		else {
-			iRect rc = AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), GetScrRect(), m_align);	
-			
-			gGfxMgr.Blit(m_img, gApp.Surface(), AlignRect(gGfxMgr.Dimension(m_img), rc, AlignCenter));			
+			iRect rc = AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), GetScrRect(), m_align);
+
+			gGfxMgr.Blit(m_img, gApp.Surface(), AlignRect(gGfxMgr.Dimension(m_img), rc, AlignCenter));
 		}
 #endif
     }
-	if(m_bShowMoves && m_pHero) {	
+	if(m_bShowMoves && m_pHero) {
 		iRect rect = AlignRect(gGfxMgr.Dimension(PDGG(BTN_FRAME)), GetScrRect(), m_align);
 		iSize dim = gGfxMgr.Dimension(m_img);
-		iRect rc  = AlignRect(dim, rect, AlignCenter);		
+		iRect rc  = AlignRect(dim, rect, AlignCenter);
 
 #ifndef ROYAL_BOUNTY
 		iRect movebar = AlignRect(iSize(46, 3), rc, AlignBottom);// + iPoint(1, -1);
 		iRect tofill = AlignRect(iSize(iCLAMP<sint32>(0, movebar.w, m_pHero->Moves() * movebar.w / m_pHero->TotalMoves()), movebar.h), movebar, AlignLeft);
 		gApp.Surface().FillRect(tofill, cColor_Green);
 		if(m_pHero->Exhausted())
-			gApp.Surface().DarkenBWRect(rc);		
+			gApp.Surface().DarkenBWRect(rc);
 #else
         if(m_pHero->MaxManaPts() > 0) {
 			iRect manabar = AlignRect(iSize(46, 3), rc, AlignBottom);// + iPoint(1, -1);
@@ -1018,7 +1020,7 @@ void iHeroPortBtn::SetHero(iHero* pHero)
 	m_pHero = pHero;
 	SetEnabled(m_pHero != NULL && !m_bUnclickable);
 	SetVisible(m_pHero != NULL);
-	if(m_pHero) 
+	if(m_pHero)
 		SetSprite(m_pHero->Proto()->m_icn46);
 	Invalidate();
 }
@@ -1033,21 +1035,21 @@ void iBigHeroPortBtn::OnCompose()
 	iRect avrc = AlignRect(iSize(50, 50), rc, AlignTop);
 	ComposeHeroAvatar(gApp.Surface(), avrc, m_pHero, (m_state & Pressed) || m_bHighlighted, true);
 	if(m_pHero->Exhausted())
-		gApp.Surface().DarkenBWRect(avrc);	
-	
-	// print name		
+		gApp.Surface().DarkenBWRect(avrc);
+
+	// print name
 	rc.y += 55;
-	rc.InflateRect(50, 0);		
+	rc.InflateRect(50, 0);
 	rc.h = gTextComposer.GetFontHeight(castleheronamefc.fontSize);
 	gTextComposer.TextBoxOut(castleheronamefc, gApp.Surface(), m_pHero->Name(), rc);
 
-	
+
 }
 
 void iBigHeroPortBtn::SetHero(iHero* pHero)
 {
-	m_pHero = pHero;	
-	SetVisible(m_pHero != NULL);			
+	m_pHero = pHero;
+	SetVisible(m_pHero != NULL);
 	Invalidate();
 }
 
@@ -1057,7 +1059,7 @@ iCastleGlyphBtn::iCastleGlyphBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandle
                                  , bool bGUI
 #endif
                                  )
-: iImgBtn(pViewMgr, pCmdHandler, rect, uid, -1, 0-1, iStringT(), Visible|Enabled, AlignCenter, bUnclick) 
+: iImgBtn(pViewMgr, pCmdHandler, rect, uid, -1, 0-1, iStringT(), Visible|Enabled, AlignCenter, bUnclick)
 #ifndef PC_VERSION
 , m_bGUI(bGUI)
 #endif
@@ -1067,13 +1069,13 @@ iCastleGlyphBtn::iCastleGlyphBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandle
 void iCastleGlyphBtn::SetCastle(iCastle* pCastle)
 {
 	m_pCastle = pCastle;
-	
-    sint16 sid = 
+
+    sint16 sid =
 #ifndef PC_VERSION
-    !m_bGUI ? PDGG(BTN_CASTLES_DELUXE): 
+    !m_bGUI ? PDGG(BTN_CASTLES_DELUXE):
 #endif
     PDGG(BTN_CASTLES);
-    
+
 	if(m_pCastle) {
 		SetSprite(sid + m_pCastle->Proto()->Type(), -1);
 	} else {
@@ -1091,7 +1093,7 @@ iBigCastleGlyphBtn::iBigCastleGlyphBtn(iViewMgr* pViewMgr, IViewCmdHandler* pCmd
 
 void iBigCastleGlyphBtn::SetCastle(iCastle* pCastle)
 {
-	m_pCastle = pCastle;	
+	m_pCastle = pCastle;
 	SetVisible(m_pCastle != NULL);
 	Invalidate();
 }
@@ -1099,7 +1101,7 @@ void iBigCastleGlyphBtn::SetCastle(iCastle* pCastle)
 void iBigCastleGlyphBtn::OnCompose()
 {
 	iRect rc = GetScrRect();
-	
+
 	if(m_pCastle) {
 		sint16 sid = PDGG(BTN_CASTLES_BIG) + m_pCastle->Proto()->Type();
 		iRect trc = AlignRect(gGfxMgr.Dimension(sid), rc, AlignTop);
@@ -1110,15 +1112,15 @@ void iBigCastleGlyphBtn::OnCompose()
 		if(!m_pCastle->CanBuild())
 			gApp.Surface().DarkenBWRect(trc);
 
-		// print name		
+		// print name
 		rc.y += 55;
-		rc.InflateRect(50, 0);		
+		rc.InflateRect(50, 0);
 		rc.h = gTextComposer.GetFontHeight(castleheronamefc.fontSize);
-        
-        iStringT cstlName = m_pCastle->Name(); 
-        
+
+        iStringT cstlName = m_pCastle->Name();
+
         gTextComposer.TextCut(cstlName, 100, castleheronamefc);
-        
+
 		gTextComposer.TextBoxOut(castleheronamefc, gApp.Surface(), cstlName, rc);
 	}
 }
@@ -1170,7 +1172,7 @@ void iPopupList::OnHidePopup()
 {
 }
 
-void iPopupList::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId mbID) 
+void iPopupList::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId mbID)
 {
 	sint32 nidx = m_scrPos + (pos.y - m_Rect.y - 3) / (sint32)m_itemMetrics.h;
 	if (nidx >= 0 && nidx < m_itemsCount) m_sidx = nidx;
@@ -1352,7 +1354,7 @@ static void GameMenuHandler(sint32 itemId)
 			// Save game
 			iSaveDlg sdlg(&gApp.ViewMgr(), true);
 			if (sdlg.DoModal() == DRC_OK) {
-				iStringT fname;
+				RelativeFilePath fname;
 				if(sdlg.SelFile(fname)) {
 					SaveGameFile(fname, gGame.Map());
 				} else {
@@ -1374,7 +1376,7 @@ static void GameMenuHandler(sint32 itemId)
 						gGame.ExitGame(false);
 						gGame.StartNewGame(scenProps, false, false);
 					//}
-				} 
+				}
 			}
 		} else if (res == GMRC_RESTART) {
 			iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_RESTART], PID_NEUTRAL);
@@ -1387,20 +1389,23 @@ static void GameMenuHandler(sint32 itemId)
 		} else if (res == GMRC_QUIT) {
 			// Quit to OS
 			iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_QUIT], PID_NEUTRAL);
-			if (qdlg.DoModal() == DRC_YES) {				
+			if (qdlg.DoModal() == DRC_YES) {
 				if(
 #ifdef MULTIPLAYER
 				!gMPMgr.IsMultiplayer() &&
 #endif
 					gGame.Map().CurPlayer()->PlayerType() == PT_HUMAN) {
-						iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
+						auto saveDir = RelativeFilePath("", FileLocationType::FLT_DOCUMENT);
 						bool bOk = false;
+            auto lastsesTmp = RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT);
+            auto lastses = RelativeFilePath("lastses.phsd", FileLocationType::FLT_DOCUMENT);
+
 						if (iFile::DirExists(saveDir) || iFile::DirCreate(saveDir)) {
-							iFilePtr pFile(CreateWin32File(gSavePath + _T("lastses.tmp")));
+              iFilePtr pFile(CreateWin32File(lastsesTmp));
 							check(pFile);
 							bOk = (pFile && gGame.Map().SaveToFile(pFile.operator->()));
 						}
-						if (bOk) iFile::Move(gSavePath + _T("lastses.tmp"), gSavePath + _T("lastses.phsd"));					
+						if (bOk) iFile::Move(lastsesTmp, lastses);
 				}
 				gGame.Quit();
 			}
@@ -1409,7 +1414,7 @@ static void GameMenuHandler(sint32 itemId)
 		} else {
 			check(0 == "Unknown menu item?");
 		}
-	} 
+	}
 }
 
 iGamePopupMenu::iGamePopupMenu(iViewMgr* pViewMgr)

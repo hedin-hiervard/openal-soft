@@ -1,6 +1,8 @@
 #ifndef GXLIB_RES_GFXMANAGER_H_
 #define GXLIB_RES_GFXMANAGER_H_
 
+#include "FileAccessor/FileAccessor.h"
+
 //////////////////////////////////////////////////////////////////////////
 typedef uint32 SpriteId;
 //////////////////////////////////////////////////////////////////////////
@@ -48,7 +50,7 @@ public:
     void inline SetGamma( uint32 glevel )
     { gammaLevel = glevel; }
 
-    bool Load( BankId cat, const TCHAR* fileName, LoadMode lmode );
+    bool Load( BankId cat, const fileaccessor::RelativeFilePath& path, LoadMode lmode );
 	void Unload( BankId cat );
 	void Reload();
 
@@ -120,9 +122,9 @@ public:
 #endif
 		void*			pMap;
 		LoadMode		loadMode;
-		iStringT		fileName;
+		fileaccessor::RelativeFilePath		fileName;
 
-		bool Load( const TCHAR* file, LoadMode lmode, uint32 gammaLevel );
+		bool Load( const fileaccessor::RelativeFilePath& path, LoadMode lmode, uint32 gammaLevel );
 		void Unload();
 		bool Reload( uint32 gammaLevel );
 	};

@@ -1,13 +1,13 @@
 //
 // Dlg_Save.cpp
-// 
+//
 
 #include "stdafx.h"
 #include "Dlg_Save.h"
 #include "helpers.h"
 #include "Ctl_Save.h"
 
-
+#include "FileAccessor/FileAccessor.h"
 
 //////////////////////////////////////////////////////////////////////////
 iSaveDlg::iSaveDlg(iViewMgr* pViewMgr, bool bSave)
@@ -23,17 +23,17 @@ void iSaveDlg::OnCreateDlg()
 {
     iRect clRect = ClientRect();
     sint32 yp = clRect.y;
-	
+
 	clRect.h = 341;
 	clRect.w = 510;
 
     //clRect.DeflateSize(50);
-    AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, m_bSave) );    
+    AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, m_bSave) );
 }
 
 
 iSize iSaveDlg::ClientSize()  const
-{ 
+{
     return gApp.Surface().GetSize();
 }
 
@@ -42,14 +42,14 @@ void iSaveDlg::DoCompose(const iRect& rect)
     iRect rc(rect);
 }
 
-void iSaveDlg::GetSaveFileName(iStringT& fname, uint32 slot)
+void iSaveDlg::GetSaveFileName(fileaccessor::RelativeFilePath& path, uint32 slot)
 {
-    iSaveGameView::GetSaveFileName(fname, slot);
+    iSaveGameView::GetSaveFileName(path, slot);
 }
 
-bool iSaveDlg::SelFile(iStringT& fname) const
+bool iSaveDlg::SelFile(fileaccessor::RelativeFilePath& path) const
 {
-    return m_ctrl->SelFile(fname);
+    return m_ctrl->SelFile(path);
 }
 
 const iMapInfo& iSaveDlg::SelScenario() const
@@ -63,14 +63,14 @@ void iSaveDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
     if (uid == 109)
     {
         // End dialog
-        EndDialog(param); 
+        EndDialog(param);
     }
 }
 
 
 #if 0
 /*
- *	
+ *
  */
 void EnumSaveGames(iSaveSlots& saveSlots)
 {
@@ -80,7 +80,7 @@ void EnumSaveGames(iSaveSlots& saveSlots)
 		iFilePtr pFile(xxc::OpenXFile(fname.CStr(),HMM_COMPOCODE));
 #else
 		iFilePtr pFile(OpenWin32File(fname.CStr()));
-#endif 
+#endif
 		if (pFile) {
 			iMapInfo* pMapInfo = new iMapInfo;
 			pMapInfo->m_bNewGame = false;
@@ -152,7 +152,7 @@ private:
 /*
  *	Save dialog
  */
-iSaveDlg::iSaveDlg(iViewMgr* pViewMgr, bool bSave) 
+iSaveDlg::iSaveDlg(iViewMgr* pViewMgr, bool bSave)
 : iBaseGameDlg(pViewMgr), m_bSave(bSave), m_selSlot(-1)
 {
 }
@@ -194,10 +194,10 @@ void iSaveDlg::OnCreateDlg()
 	AddChild(new iTextButton(m_pMgr,this,iRect(npos+110,clRect.y2()-DEF_BTN_HEIGHT + 3,100,DEF_BTN_HEIGHT),TRID_CANCEL, DRC_CANCEL));
 }
 
-void iSaveDlg::DoCompose(const iRect& rect) 
+void iSaveDlg::DoCompose(const iRect& rect)
 {
 	gTextComposer.TextOut(dlgfc_hdr, gApp.Surface(), rect, gTextMgr[(m_bSave)?TRID_SAVE_DLG_HDR:TRID_LOAD_DLG_HDR], rect, AlignTop);
-	//gApp.Surface().FrameRect(iRect(rect.x-1,rect.y+22-1,252,176),cColor_Black);	
+	//gApp.Surface().FrameRect(iRect(rect.x-1,rect.y+22-1,252,176),cColor_Black);
 	iRect orc(rect.x + rect.w - 150, rect.y+21, 151, 176);
 
 
@@ -206,18 +206,18 @@ void iSaveDlg::DoCompose(const iRect& rect)
 	gApp.Surface().Darken25Rect(orc);
 	if (m_selSlot != -1 && m_saveSlots[m_selSlot] != NULL) {
 		orc.y += 10;
-		
+
 		iTextComposer::FontSize fs = iTextComposer::FS_LARGE;
 		iTextComposer::FontConfig fc_hdr(fs, iDibFont::ComposeProps(RGB16(255,255,128)));
 		iTextComposer::FontConfig fc_text(fs, iDibFont::ComposeProps(RGB16(192,192,192)));
-		
+
 		gTextComposer.TextOut(fc_hdr, gApp.Surface(), orc, gTextMgr[TRID_DIFFICULTY_LEVEL], orc, AlignTop); orc.y += 15;
 		gTextComposer.TextOut(fc_text, gApp.Surface(), orc, gTextMgr[TRID_DIFF_EASY+m_saveSlots[m_selSlot]->m_Difficulty], orc, AlignTop); orc.y += 19;
 
 		gTextComposer.TextOut(fc_hdr, gApp.Surface(), orc, gTextMgr[TRID_GAME_DATE], orc, AlignTop); orc.y += 15;
 		sint32 days = m_saveSlots[m_selSlot]->m_curDay - 1;
 		gTextComposer.TextOut(fc_text, gApp.Surface(), orc, iFormat(_T("%s:%d / %s:%d / %s:%d"),gTextMgr[TRID_MONTH_S], days/28+1,gTextMgr[TRID_WEEK_S], (days%28)/7+1,gTextMgr[TRID_DAY_S],days%7+1), orc, AlignTop); orc.y += 19;
-		
+
 		gTextComposer.TextOut(fc_hdr, gApp.Surface(), orc, gTextMgr[TRID_SAVED_AT], orc, AlignTop); orc.y += 15;
 		gTextComposer.TextOut(fc_text, gApp.Surface(), orc, FormatDate(m_saveSlots[m_selSlot]->m_saveTime, true), orc, AlignTop); orc.y += 19;
 	} else {
@@ -226,12 +226,12 @@ void iSaveDlg::DoCompose(const iRect& rect)
 }
 
 iSize iSaveDlg::ClientSize()  const
-{ 
+{
 	return gApp.Surface().GetSize();
 }
 
-void iSaveDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param) 
-{ 
+void iSaveDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
+{
 	uint32 uid = pView->GetUID();
 	if (uid == DRC_OK){
 		if (CanSelect() && Confirmed()) {
@@ -245,9 +245,9 @@ void iSaveDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
 			GetChildById(DRC_OK)->SetEnabled(CanSelect());
 		} else if (cmd == CCI_LBSELECTED) {
 			if (CanSelect() && Confirmed()) {
-				EndDialog(DRC_OK); 
+				EndDialog(DRC_OK);
 			}
-		} 
+		}
 	}
 }
 

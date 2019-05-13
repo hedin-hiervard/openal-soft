@@ -57,6 +57,8 @@
 #define ARRAYSIZE(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
+using namespace fileaccessor;
+
 namespace UI_IPAD
 {
 
@@ -1262,7 +1264,7 @@ namespace UI_IPAD
                     if (m_ctrl->IsGoodSelection())
                     {
                         Result rs;
-                        iStringT fname;
+                        RelativeFilePath fname;
                         if(m_ctrl->SelFile(fname)) {
                             SaveGameFile(fname, gGame.Map());
                         } else {

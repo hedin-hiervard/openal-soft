@@ -34,6 +34,7 @@
 #include "iosdk/iosdk.h"
 
 using namespace iosdk;
+using namespace fileaccessor;
 
 namespace UI_IPHONE
 {
@@ -1490,7 +1491,7 @@ private:
                 if (m_ctrl->IsGoodSelection())
                 {
                     Result rs;
-                    iStringT fname;
+                    RelativeFilePath fname;
                     if(m_ctrl->SelFile(fname)) {
                         SaveGameFile(fname, gGame.Map());
 					} else {

@@ -802,94 +802,94 @@ void iDib::BlitToDCXY(HDC hdc, const iPoint& pos, bool bDoubleSize) const
  */
 bool SaveDibBitmap32(const iDib& dib, const iStringT& fname)
 {
-	iFilePtr pFile = CreateWin32File(fname);
-	if (!pFile) return false;
+	// iFilePtr pFile = CreateWin32File(fname);
+	// if (!pFile) return false;
 
-	uint32 pix_siz = dib.GetWidth()*dib.GetHeight();
-	check(pix_siz);
-	const iDib::pixel* buff = dib.GetPtr();
+	// uint32 pix_siz = dib.GetWidth()*dib.GetHeight();
+	// check(pix_siz);
+	// const iDib::pixel* buff = dib.GetPtr();
 
-	// Prepare BITMAPFILEHEADER
-	BITMAPFILEHEADER	bmfHeader;
-	bmfHeader.bfType = ((WORD) ('M' << 8) | 'B');
-	bmfHeader.bfReserved1 = 0;
-	bmfHeader.bfReserved2 = 0;
-	bmfHeader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (dib.GetWidth() * dib.GetHeight() * 4);
-	bmfHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+	// // Prepare BITMAPFILEHEADER
+	// BITMAPFILEHEADER	bmfHeader;
+	// bmfHeader.bfType = ((WORD) ('M' << 8) | 'B');
+	// bmfHeader.bfReserved1 = 0;
+	// bmfHeader.bfReserved2 = 0;
+	// bmfHeader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (dib.GetWidth() * dib.GetHeight() * 4);
+	// bmfHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
-	// Prepare BITMAPINFOHEADER
-	BITMAPINFOHEADER bmihdr;
-	bmihdr.biSize = sizeof(BITMAPINFOHEADER);
-	bmihdr.biWidth = dib.GetWidth();
-	bmihdr.biHeight = -((sint32)dib.GetHeight());
-	bmihdr.biPlanes = 1;
-	bmihdr.biBitCount = 32;
-	bmihdr.biCompression = BI_RGB;
-	bmihdr.biSizeImage = 0;
-	bmihdr.biXPelsPerMeter = 600;
-	bmihdr.biYPelsPerMeter = 600;
-	bmihdr.biClrUsed = 0;
-	bmihdr.biClrImportant = 0;
+	// // Prepare BITMAPINFOHEADER
+	// BITMAPINFOHEADER bmihdr;
+	// bmihdr.biSize = sizeof(BITMAPINFOHEADER);
+	// bmihdr.biWidth = dib.GetWidth();
+	// bmihdr.biHeight = -((sint32)dib.GetHeight());
+	// bmihdr.biPlanes = 1;
+	// bmihdr.biBitCount = 32;
+	// bmihdr.biCompression = BI_RGB;
+	// bmihdr.biSizeImage = 0;
+	// bmihdr.biXPelsPerMeter = 600;
+	// bmihdr.biYPelsPerMeter = 600;
+	// bmihdr.biClrUsed = 0;
+	// bmihdr.biClrImportant = 0;
 
-	pFile->Write(&bmfHeader,sizeof(BITMAPFILEHEADER));
-	pFile->Write(&bmihdr,sizeof(BITMAPINFOHEADER));
+	// pFile->Write(&bmfHeader,sizeof(BITMAPFILEHEADER));
+	// pFile->Write(&bmihdr,sizeof(BITMAPINFOHEADER));
 
-	for (uint32 yy=0; yy<dib.GetHeight(); ++yy) {
-		for (uint32 xx=0; xx<dib.GetWidth(); ++xx) {
-			uint32 clr = ((*buff)>>11)<<19 | (((*buff)>>5) & 0x3f)<<10 | ((*buff)&0x1f)<<3;
-			pFile->Write(&clr,sizeof(clr));
-			buff++;
-		}
-	}
+	// for (uint32 yy=0; yy<dib.GetHeight(); ++yy) {
+	// 	for (uint32 xx=0; xx<dib.GetWidth(); ++xx) {
+	// 		uint32 clr = ((*buff)>>11)<<19 | (((*buff)>>5) & 0x3f)<<10 | ((*buff)&0x1f)<<3;
+	// 		pFile->Write(&clr,sizeof(clr));
+	// 		buff++;
+	// 	}
+	// }
 
 	return true;
 }
 
 bool SaveDibBitmap16(const iDib& dib, const iStringT& fname)
 {
-	iFilePtr pFile = CreateWin32File(fname);
-	if (!pFile) return false;
+	// iFilePtr pFile = CreateWin32File(fname);
+	// if (!pFile) return false;
 
-	uint32 pix_siz = dib.GetWidth()*dib.GetHeight();
-	check(pix_siz);
-	const iDib::pixel* buff = dib.GetPtr();
+	// uint32 pix_siz = dib.GetWidth()*dib.GetHeight();
+	// check(pix_siz);
+	// const iDib::pixel* buff = dib.GetPtr();
 
-	// Prepare BITMAPFILEHEADER
-	BITMAPFILEHEADER	bmfHeader;
-	bmfHeader.bfType = ((WORD) ('M' << 8) | 'B');
-	bmfHeader.bfReserved1 = 0;
-	bmfHeader.bfReserved2 = 0;
-	bmfHeader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (dib.GetWidth() * dib.GetHeight() * 2);
-	bmfHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+	// // Prepare BITMAPFILEHEADER
+	// BITMAPFILEHEADER	bmfHeader;
+	// bmfHeader.bfType = ((WORD) ('M' << 8) | 'B');
+	// bmfHeader.bfReserved1 = 0;
+	// bmfHeader.bfReserved2 = 0;
+	// bmfHeader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (dib.GetWidth() * dib.GetHeight() * 2);
+	// bmfHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
-	// Prepare BITMAPINFOHEADER
-	BITMAPINFOHEADER bmihdr;
-	bmihdr.biSize = sizeof(BITMAPINFOHEADER);
-	bmihdr.biWidth = dib.GetWidth();
-	bmihdr.biHeight = -((sint32)dib.GetHeight());
-	bmihdr.biPlanes = 1;
-	bmihdr.biBitCount = 16;
-	bmihdr.biCompression = BI_RGB;
-	bmihdr.biSizeImage = 0;
-	bmihdr.biXPelsPerMeter = 600;
-	bmihdr.biYPelsPerMeter = 600;
-	bmihdr.biClrUsed = 0;
-	bmihdr.biClrImportant = 0;
+	// // Prepare BITMAPINFOHEADER
+	// BITMAPINFOHEADER bmihdr;
+	// bmihdr.biSize = sizeof(BITMAPINFOHEADER);
+	// bmihdr.biWidth = dib.GetWidth();
+	// bmihdr.biHeight = -((sint32)dib.GetHeight());
+	// bmihdr.biPlanes = 1;
+	// bmihdr.biBitCount = 16;
+	// bmihdr.biCompression = BI_RGB;
+	// bmihdr.biSizeImage = 0;
+	// bmihdr.biXPelsPerMeter = 600;
+	// bmihdr.biYPelsPerMeter = 600;
+	// bmihdr.biClrUsed = 0;
+	// bmihdr.biClrImportant = 0;
 
-	pFile->Write(&bmfHeader,sizeof(BITMAPFILEHEADER));
-	pFile->Write(&bmihdr,sizeof(BITMAPINFOHEADER));
+	// pFile->Write(&bmfHeader,sizeof(BITMAPFILEHEADER));
+	// pFile->Write(&bmihdr,sizeof(BITMAPINFOHEADER));
 
-	uint16* obuff = new uint16[dib.GetWidth()];
+	// uint16* obuff = new uint16[dib.GetWidth()];
 
-	for (uint32 yy=0; yy<dib.GetHeight(); ++yy) {
-		for (uint32 xx=0; xx<dib.GetWidth(); ++xx) {
-			obuff[xx] = (*buff & 0x1F) | ((*buff & 0xFFC0)>>1);
-			buff++;
-		}
-		pFile->Write(obuff,dib.GetWidth() * sizeof(uint16));
-	}
+	// for (uint32 yy=0; yy<dib.GetHeight(); ++yy) {
+	// 	for (uint32 xx=0; xx<dib.GetWidth(); ++xx) {
+	// 		obuff[xx] = (*buff & 0x1F) | ((*buff & 0xFFC0)>>1);
+	// 		buff++;
+	// 	}
+	// 	pFile->Write(obuff,dib.GetWidth() * sizeof(uint16));
+	// }
 
-	delete[] obuff;
+	// delete[] obuff;
 	return true;
 }
 

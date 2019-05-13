@@ -67,12 +67,12 @@ iGfxManager::GetFlippedSpriteId( SpriteId sid )
 }
 
 bool
-iGfxManager::Load( BankId cat, const TCHAR* fileName, LoadMode lmode )
+iGfxManager::Load( BankId cat, const fileaccessor::RelativeFilePath& path, LoadMode lmode )
 {
 	check( cat < MaxSpriteBanks );
 	if ( cat >= MaxSpriteBanks ) return false;
 	bank_[cat].Unload();
-	return bank_[cat].Load( fileName, lmode, gammaLevel );
+	return bank_[cat].Load( path, lmode, gammaLevel );
 }
 
 void
@@ -1603,11 +1603,11 @@ struct ApplyGammaMethod
 //////////////////////////////////////////////////////////////////////////////
 
 bool
-iGfxManager::SpriteBank::Load( const TCHAR* filename, LoadMode lmode, uint32 gammaLevel )
+iGfxManager::SpriteBank::Load( const fileaccessor::RelativeFilePath& path, LoadMode lmode, uint32 gammaLevel )
 {
-	fileName = filename;
+	fileName = path;
 	if (lmode == LM_Memory) {
-		iFilePtr file = OpenWin32File(filename);
+		iFilePtr file = OpenWin32File(path);
 		if (!file) return false;
 
 		// NOTE! Reading POD structures is safe but beware _PACKING_
@@ -1752,7 +1752,7 @@ iGfxManager::SpriteBank::Reload( uint32 gammaLevel )
 {
 	if ( loadMode != LM_MappedFile ) {
 		Unload();
-		return Load( fileName.CStr(), loadMode, gammaLevel );
+		return Load( fileName, loadMode, gammaLevel );
 	}
 	return true;
 }

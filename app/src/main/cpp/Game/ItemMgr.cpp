@@ -2,6 +2,7 @@
 #include "serialize.h"
 //#include "xxc/xxc.app.h"
 #include "lzo/lzo.h"
+#include "FileAccessor/FileAccessor.h"
 
 //#include "xxc/xxc.security.h"
 //#include "xxc/xxc.shash.h"
@@ -13,6 +14,7 @@
 extern void*  pDynCode;
 extern uint8*  pBloomBits;
 
+using namespace fileaccessor;
 
 /*
  *  Artifacts
@@ -80,10 +82,10 @@ void iArtT_Ultimate::Dettach(iHero* pOwner) const
     for (uint32 nn=0; nn<7; ++nn) pOwner->VarFurtSkills().Value((FURTHER_SKILLS)ULTART_STDMODIF[pOwner->Proto()->m_hType][nn][0]) -= ULTART_STDMODIF[pOwner->Proto()->m_hType][nn][1];
 }
 
-TextResId iArtT_Ultimate::DescKey(const iHero* pOwner) const 
-{ 
-    if (!pOwner) return iArtT::DescKey(pOwner); 
-    return TRID_ART_ULTIMATE_DESC_01 + pOwner->Proto()->m_hType; 
+TextResId iArtT_Ultimate::DescKey(const iHero* pOwner) const
+{
+    if (!pOwner) return iArtT::DescKey(pOwner);
+    return TRID_ART_ULTIMATE_DESC_01 + pOwner->Proto()->m_hType;
 }
 
 /*
@@ -394,7 +396,7 @@ iHero* iHeroesMgr::Get(uint16 protoId)
             break;
         }
     }
-	
+
     return pResult;
 }
 
@@ -443,7 +445,7 @@ uint16 iArtifactMgr::SelectRandomArtifact(ART_LEVEL_TYPE level)
     return alist[gGame.Map().Rand(alist.GetSize())];
 }
 /*
- *  
+ *
  */
 iItemMgr::iItemMgr()
 : m_gameStarted(false)
@@ -451,9 +453,9 @@ iItemMgr::iItemMgr()
     m_spellMgr.InitSpells();
 }
 
-iItemMgr::~iItemMgr() 
-{ 
-    Cleanup(); 
+iItemMgr::~iItemMgr()
+{
+    Cleanup();
 }
 
 void iItemMgr::Cleanup()
@@ -478,7 +480,7 @@ void iItemMgr::Cleanup()
     cnt = m_PathElProts.GetSize();
     while (cnt--) delete m_PathElProts[cnt];
     m_PathElProts.RemoveAll();
-    
+
     m_spellMgr.Cleanup();
 }
 
@@ -498,18 +500,18 @@ void iItemMgr::OnGameEnd()
     m_gameStarted = false;
 }
 
-uint16 iItemMgr::AlterCtlNation(uint16 proto, CTL_TYPE nation) const 
+uint16 iItemMgr::AlterCtlNation(uint16 proto, CTL_TYPE nation) const
 {
     uint16 cfg = m_CastleProts[proto]->Config();
     for (uint32 xx=0; xx< m_CastleProts.GetSize(); ++xx) {
         if (cfg == m_CastleProts[xx]->Config() && nation == m_CastleProts[xx]->Type()) return xx;
     }
     check(0);
-    return proto; 
+    return proto;
 }
 
 /*
- *  
+ *
  */
 void ReadCovers(iDynamicBuffer& buff, iCnstT* pCnst)
 {
@@ -573,7 +575,7 @@ iVisCnstT* ReadVisitables(uint16 pidx, iDynamicBuffer& buff)
         uint8 mode; buff.Read(mode);
         uint8 index; buff.Read(index);
         pRes = new iVisCnstT_Teleport(nameKey, pidx, msgKey, vmsgKey, mode, index);
-    } else if (type == VCNST_NEWTELEPORT) {     
+    } else if (type == VCNST_NEWTELEPORT) {
         pRes = new iVisCnstT_NewTeleport(nameKey, pidx, msgKey, vmsgKey);
     }else if (type == VCNST_KEYMASTER) {
         uint8 key; buff.Read(key);
@@ -605,7 +607,7 @@ iOwnCnstT* ReadOwnerables(uint16 pidx, iDynamicBuffer& buff)
     uint16 msgIcn; buff.Read(msgIcn);
 
     if (type == OCNST_BASIC) {
-        pRes = new iOwnCnstT(nameKey, pidx, msgKey, msgIcn, OCNST_BASIC, scouting); 
+        pRes = new iOwnCnstT(nameKey, pidx, msgKey, msgIcn, OCNST_BASIC, scouting);
     } else if (type == OCNST_FURTSKILL) {
         iFurtSkills fs;
         ::Unserialize(buff, fs);
@@ -645,13 +647,13 @@ iArtT* ReadArtifacts(iDynamicBuffer& buff)
         pRes = new iArtT_ShOfWar(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign ,reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon);
     } else if (type == ARTT_CURSWORD) {
         pRes = new iArtT_CurSword(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign ,reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon);
-    } else if (type == ARTT_ICEAMULET) {        
+    } else if (type == ARTT_ICEAMULET) {
         pRes = new iArtT_IceAmulet(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign, reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon);
-    } else if (type == ARTT_ARROWS) {       
+    } else if (type == ARTT_ARROWS) {
         pRes = new iArtT_Arrow(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign, reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon);
-    } else if (type == ARTT_FASTCROSSBOW) {     
+    } else if (type == ARTT_FASTCROSSBOW) {
         pRes = new iArtT_FastCrossbow(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign, reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon);
-    } else if (type == ARTT_MAGICSPHERE) {      
+    } else if (type == ARTT_MAGICSPHERE) {
         uint32 type;
         buff.Read(type);
         pRes = new iArtT_MagicSphere(nameKey, descKey, (ART_LEVEL_TYPE)level, (ART_ASSIGN_TYPE)assign, reqLevel, (SECONDARY_SKILLS)reqSecSkill,icon,type);
@@ -680,11 +682,11 @@ bool LoadObjectTemplates(iDynamicBuffer& buff, iItemMgr& imgr)
         // Type/Nation
         uint8 hType; buff.Read(hType);
         // Icons
-        uint16 icn32,icn48, icn46; 
-        buff.Read(icn32); 
-		buff.Read(icn48); 
+        uint16 icn32,icn48, icn46;
+        buff.Read(icn32);
+		buff.Read(icn48);
         buff.Read(icn46);
-        
+
         // Name key
         sint16 nameKey; buff.Read(nameKey);
         // Create object prototype
@@ -737,7 +739,7 @@ bool LoadObjectTemplates(iDynamicBuffer& buff, iItemMgr& imgr)
     xxc::cgen_make_xjump( codeJump, codeBoot );
     // obfuscate variable
     underDebugger |= (underDebugger << 11);
-    // if under debugger? (obfuscation of != 0) 
+    // if under debugger? (obfuscation of != 0)
 #ifdef NDEBUG
     if ( underDebugger > 117 ) {
         xxc::cgen_make_reboot( codeBoot );
@@ -811,7 +813,7 @@ bool LoadObjectTemplates(iDynamicBuffer& buff, iItemMgr& imgr)
 bool LoadResources(iItemMgr& imgr)
 {
     // Open and validate the object file
-    iFilePtr pFile = OpenWin32File(gDataPath+ (gUseIpadUI ? _T("ipad/") : _T("iphone/")) +  _T("objects_decoded.dat"));
+    iFilePtr pFile = OpenWin32File(RelativeFilePath(std::string("Data/") + (gUseIpadUI ? "ipad/" : "iphone/") +  "objects_decoded.dat"));
     if (!pFile) {
         MessageBox(NULL, _T("Unable to open game objects file!"), NULL, MB_OK);
         return false;
@@ -826,7 +828,7 @@ bool LoadResources(iItemMgr& imgr)
         MessageBox(NULL, _T("Unable to load game avatars!"), NULL, MB_OK);
         return false;
     }
-    
+
     // Loading object templates
     if (!LoadObjectTemplates(fileBuff, imgr)) {
         MessageBox(NULL, _T("Unable to load game object templates!"), NULL, MB_OK);

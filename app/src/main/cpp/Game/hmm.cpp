@@ -38,6 +38,7 @@
 #include "FileAccessor/FileAccessor.h"
 
 using namespace iosdk;
+using namespace fileaccessor;
 void log(const std::string& str);
 
 class iDlg_Message;
@@ -86,18 +87,16 @@ DebugCls cls_;
 #endif
 
 
-//hssSpeaker	gSpeaker;
-iStringT		gRootPath;
-iStringT		gDataPath;
-iStringT		gSavePath;
-iStringT		gAppDataPath;
-iStringT		gBundledMapsPath;
-iStringT		gDownloadedMapsPath;
-iStringT        gMapStatFilePath;
-iStringT		gMusicPath;
-iStringT        gMapShopCfgFilePath;
-iStringT        gConfigFilePath;
-iStringT        gTutorialCfgFilePath;
+RelativeFilePath		gDataPath;
+RelativeFilePath		gSavePath;
+RelativeFilePath		gAppDataPath;
+RelativeFilePath		gBundledMapsPath;
+RelativeFilePath		gDownloadedMapsPath;
+RelativeFilePath    gMapStatFilePath;
+RelativeFilePath		gMusicPath;
+RelativeFilePath    gMapShopCfgFilePath;
+RelativeFilePath    gConfigFilePath;
+RelativeFilePath    gTutorialCfgFilePath;
 
 iDibReader		gDibReader;
 iTextManager	gTextMgr;
@@ -910,68 +909,18 @@ int preload_resources()
 
         //gTwitter.Ping();
         // Root, Save and Maps folders
-        iFileName::GetAppPath(gRootPath);
-#ifdef OS_WIN32
-        iFileName::GetAppDataPath(gAppDataPath);
-        iFile::DirCreate(gAppDataPath);
-        gDataPath = gRootPath +	_T("Data\\");
-        gSavePath = gAppDataPath + _T("Save\\");
-        gMusicPath = gRootPath + _T("Music\\");
-        gBundledMapsPath = gRootPath + _T("Maps\\");
-        gConfigFilePath = gAppDataPath + _T("PalmHeroes.cfg");
-        gTutorialCfgFilePath = gAppDataPath + _T("tutorial.cfg");
-#else
-        gDataPath = gRootPath + _T("Data/");
-        gMusicPath = gRootPath + _T("Music/");
-        iStringT docPath, libPath;
-        iFileName::GetAppDocPath(docPath); // folder for saved games (Documents for iPhone users, Application Support for Mac users)
-#ifdef OS_IPHONE
-        iFileName::GetAppLibPath(libPath); // for iPhone settings, maps and stats are stored in Library
-#else
-        libPath = docPath; // for non-iphone users, store all content in Application Support
-#endif
+        // iFileName::GetAppPath(gRootPath);
 
-        iFile::DirCreate(docPath);
+        gDataPath = RelativeFilePath("Data/");
+        gMusicPath = RelativeFilePath("Music/");
+        gBundledMapsPath = RelativeFilePath("Maps/");
+        gDownloadedMapsPath = RelativeFilePath("Maps/", FileLocationType::FLT_LIBRARY);
+        gMapStatFilePath = RelativeFilePath("map.stat", FileLocationType::FLT_LIBRARY);
+        gMapShopCfgFilePath = RelativeFilePath("mapshop.cfg", FileLocationType::FLT_LIBRARY);
+        gTutorialCfgFilePath = RelativeFilePath("tutorial.cfg", FileLocationType::FLT_LIBRARY);
+        gConfigFilePath = RelativeFilePath("PalmHeroes.cfg", FileLocationType::FLT_LIBRARY);
+        gSavePath = RelativeFilePath("", FileLocationType::FLT_DOCUMENT);
 
-        gBundledMapsPath = gRootPath + _T("Maps/");
-        gDownloadedMapsPath = libPath + _T("Maps/");
-        gMapStatFilePath = libPath + _T("map.stat");
-        gMapShopCfgFilePath = libPath + _T("mapshop.cfg");
-        gTutorialCfgFilePath = libPath + _T("tutorial.cfg");
-        gConfigFilePath = libPath + _T("PalmHeroes.cfg");
-#ifdef OS_MACOS
-        gSavePath = docPath + _T("Save/");
-#else
-        gSavePath = docPath;
-#endif
-
-#ifdef OS_IPHONE
-        // for those still having all the stuff in Documents, move to Library
-        iStringT OldDownloadedMapsPath = docPath + _T("Maps/");
-        iStringT OldMapStatFilePath = docPath + _T("map.stat");
-        iStringT OldMapShopCfgFilePath = docPath + _T("mapshop.cfg");
-        iStringT OldConfigFilePath = docPath + _T("PalmHeroes.cfg");
-        iStringT OldSavePath = docPath + _T("Save/");
-
-        for (uint32 xx=0; xx<=SAVE_GAME_SLOTS; ++xx) {
-            iStringT name = iFormat(_T("save%02d.phsd"),xx);
-            iStringT oldname = OldSavePath + name;
-            iFile::Move(oldname, gSavePath + name);
-        }
-        iFile::Move(OldSavePath + _T("lastses.use"), gSavePath + _T("lastses.use"));
-        iFile::Move(OldSavePath + _T("lastses.phsd"), gSavePath + _T("lastses.phsd"));
-        iFile::Move(OldSavePath + _T("lastses.tmp"), gSavePath + _T("lastses.tmp"));
-
-        iFile::Delete(OldSavePath);
-
-        iFile::Move(OldSavePath, gSavePath);
-        iFile::Move(OldDownloadedMapsPath, gDownloadedMapsPath);
-        iFile::Move(OldMapStatFilePath, gMapStatFilePath);
-        iFile::Move(OldMapShopCfgFilePath, gMapShopCfgFilePath);
-        iFile::Move(OldConfigFilePath, gConfigFilePath);
-#endif
-
-#endif
 
         iFile::DirCreate(gSavePath);
         iFile::DirCreate(gDownloadedMapsPath);
@@ -1073,7 +1022,7 @@ int preload_resources()
         }
 
         // Init text composer
-        if (!gTextComposer.Init(gDataPath + _T("fonts_decoded.dat"), FS_COUNT, PBKEY_COMMON, PBKEY_FNT, GFNT_FILE_HDR_KEY, GFNT_FILE_VERSION)) {
+        if (!gTextComposer.Init(RelativeFilePath("Data/fonts_decoded.dat"), FS_COUNT, PBKEY_COMMON, PBKEY_FNT, GFNT_FILE_HDR_KEY, GFNT_FILE_VERSION)) {
             MessageBox(NULL, _T("Unable to init text composer!"), NULL, MB_OK);
             return -1;
         }
@@ -1094,13 +1043,13 @@ int preload_resources()
 
         // Init gfx resources and fill secret dll
         gGfxMgr.SetGamma( gSettings.GetEntryValue(CET_DISPGAMMA) );
-        if (!gGfxMgr.Load(0,(gDataPath + (gUseIpadUI ? _T("ipad/") : _T("iphone/")) + _T("game.gfx")).CStr(), gSettings.MapSpriteFile()?(iGfxManager::LM_MappedFile):(iGfxManager::LM_Memory))) {
+        if (!gGfxMgr.Load(0,RelativeFilePath(std::string("Data/") + (gUseIpadUI ? "ipad/" : "iphone/") + "game.gfx"), gSettings.MapSpriteFile()?(iGfxManager::LM_MappedFile):(iGfxManager::LM_Memory))) {
             MessageBox(NULL, _T("Unable to open sprite file!"), NULL, MB_OK);
             return -1;
         }
 
         // Init sfx resources
-        if (!gSfxMgr.Init(gDataPath+_T("game.sfx"))) {
+        if (!gSfxMgr.Init(RelativeFilePath("Data/game.sfx"))) {
             MessageBox(NULL, _T("Unable to open sound resources file!"), NULL, MB_OK);
             return -1;
         }

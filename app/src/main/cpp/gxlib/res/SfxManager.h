@@ -2,7 +2,7 @@
 #define GXLIB_RES_SFXMANAGER_H_
 
 //////////////////////////////////////////////////////////////////////////
-class iSfxEntry 
+class iSfxEntry
 {
 public:
 	iSfxEntry()
@@ -38,9 +38,9 @@ private:
 class iSfxManager
 {
 public:
-	bool Init(const iStringT& fname);
+	bool Init(const fileaccessor::RelativeFilePath& path);
 	void Cleanup();
-		
+
 	//
 	sint32 PlaySound(uint16 idx, bool bLoop = false);
 	sint32 ReplaceSound(sint32 channel, uint16 idx);

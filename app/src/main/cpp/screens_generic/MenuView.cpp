@@ -11,10 +11,13 @@
 
 #include "screens_ipad/MainMenuView.h"
 #include "screens_iphone/MainMenuView.h"
+#include "FileAccessor/FileAccessor.h"
 
 //#include "pthread.h"
 
 //#include "xxc/xxc.security.h"
+
+using namespace fileaccessor;
 
 /*
  *	Main dialog
@@ -529,13 +532,5 @@ void iMenuView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param
 
 void iMenuView::OnActivate(bool bActivate)
 {
-	if(bActivate) {
-		iStringT tmp = gMusicPath +
-#ifdef ROYAL_BOUNTY
-		_T("Tabuk.mp3");
-#else
-		_T("Relent.mp3");
-#endif
-		gMusicMgr.Play(tmp);
-	}
+		gMusicMgr.Play(RelativeFilePath("Music/Relent.mp3"));
 }

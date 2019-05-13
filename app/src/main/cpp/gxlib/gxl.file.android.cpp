@@ -22,6 +22,7 @@ public:
 
 	std::shared_ptr<std::vector<char>> m_buffer = nullptr;
   sint32 m_buffer_pos = 0;
+  std::shared_ptr<std::ostream> m_writing_stream = nullptr;
 
 	iFileWin32()
 	{
@@ -44,12 +45,11 @@ public:
         return (m_buffer != nullptr);
     }
 
-	bool Create(const iStringT& fname)
-	{
-	  // m_hFile = fopen(CvtT2A<>(fname.CStr()), "w");
-	  // return (m_hFile != INVALID_HANDLE_VALUE);
-    return false;
-	}
+  bool Create(const RelativeFilePath& path)
+  {
+    m_writing_stream = FileAccessor::sharedFileAccessor()->getWritingStream(path);
+    return m_writing_stream != nullptr;
+  }
 
 	void Close()
 	{
@@ -88,10 +88,8 @@ public:
 
 	uint32 Write(const void *buff, uint32 buffsize)
 	{
-    return 0;
-	  // check(IsOpen());
-	  // DWORD writen = fwrite(buff, 1, buffsize, m_hFile);
-	  // return writen;
+    m_writing_stream->write((char*)buff, buffsize);
+    return buffsize;
 	}
 
 	bool IsOpen() const
@@ -115,26 +113,15 @@ public:
 //
 
 //
-iFileI* CreateWin32File(const iStringT& fname)
+iFileI* CreateWin32File(const RelativeFilePath& path)
 {
 	iFileWin32* result = new iFileWin32();
-	if (!result->Create(fname)) {
+	if (!result->Create(path)) {
 		delete result;
 		return NULL;
 	}
 	return result;
 }
-
-iFileI* OpenWin32File(const iStringT& fname)
-{
-	iFileWin32* result = new iFileWin32();
-	if (!result->Open(fname)) {
-		delete result;
-		return NULL;
-	}
-	return result;
-}
-
 
 iFileI* OpenWin32File(const RelativeFilePath& path)
 {
@@ -151,61 +138,63 @@ iFileI* OpenWin32File(const RelativeFilePath& path)
  */
 namespace iFile {
 
-bool Exists(const iStringT& fname)
+bool Exists(const RelativeFilePath& file)
 {
-  return FileAccessor::sharedFileAccessor()->fileExists(RelativeFilePath(fname.CStr()));
+  return FileAccessor::sharedFileAccessor()->fileExists(file);
 }
 
-bool Delete(const iStringT& fname)
+bool Delete(const RelativeFilePath& file)
 {
-  FileAccessor::sharedFileAccessor()->deleteFile(RelativeFilePath(fname.CStr()));
+  FileAccessor::sharedFileAccessor()->deleteFile(file);
   return true;
 }
 
 
+bool Rename(const RelativeFilePath& from, const RelativeFilePath& to)
+{
+  	auto absFrom = FileAccessor::sharedFileAccessor()->resolve(from);
+	auto absTo = FileAccessor::sharedFileAccessor()->resolve(to);
+	std::rename(absFrom.to_string().c_str(), absTo.to_string().c_str());
+	return true;
+}
 
-bool Rename(const iStringT& fname, const iStringT& to_fname)
+bool Copy(const RelativeFilePath& from, const RelativeFilePath& to)
 {
   return false;
 }
 
-bool Copy(const iStringT& fname, const iStringT& to_fname)
+bool Move(const RelativeFilePath& from, const RelativeFilePath& to)
 {
-  return false;
+	return Rename(from, to);
 }
 
-bool Move(const iStringT& fname, const iStringT& to_fname)
+bool DirExists(const RelativeFilePath& dir)
 {
-	return Rename(fname,to_fname);
+  return FileAccessor::sharedFileAccessor()->fileExists(dir);
 }
 
-bool DirExists(const iStringT& dname)
+bool DirDelete(const RelativeFilePath& dir)
 {
-  return FileAccessor::sharedFileAccessor()->fileExists(RelativeFilePath(dname.CStr()));
-}
-
-bool DirDelete(const iStringT& dname)
-{
-  auto absPath = FileAccessor::sharedFileAccessor()->resolve(RelativeFilePath(dname.CStr()));
-  FileAccessor::sharedFileAccessor()->deleteDirectory(absPath);
+  auto abs = FileAccessor::sharedFileAccessor()->resolve(dir);
+  FileAccessor::sharedFileAccessor()->deleteDirectory(abs);
   return true;
 }
 
-void DirRename(const iStringT& dname, const iStringT& to_dname)
+void DirRename(const RelativeFilePath& from, const RelativeFilePath& to)
 {
 
 }
 
-bool DirCreate(const iStringT& dname)
+bool DirCreate(const RelativeFilePath& dir)
 {
-  auto absPath = FileAccessor::sharedFileAccessor()->resolve(RelativeFilePath(dname.CStr()));
+  auto absPath = FileAccessor::sharedFileAccessor()->resolve(dir);
   FileAccessor::sharedFileAccessor()->createDirectory(absPath);
   return true;
 }
 
-uint32 GetSize(const iStringT& fname)
+uint32 GetSize(const RelativeFilePath& file)
 {
-  auto buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(RelativeFilePath(fname.CStr()), "r");
+  auto buffer = FileAccessor::sharedFileAccessor()->getFileBuffer(file, "r");
   return buffer->size();
 }
 

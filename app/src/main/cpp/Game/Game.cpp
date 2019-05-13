@@ -69,6 +69,8 @@ extern uint8* pBloomBits;
 
 #include "iosdk/analytics/analytics.h"
 
+#include "FileAccessor/FileAccessor.h"
+
 using namespace iosdk;
 using namespace fileaccessor;
 
@@ -214,38 +216,36 @@ bool iGame::Init(const iStringT& fname)
 	}
 
     // check last session
-    if (
-#ifndef FREE_VER
-        (localyRegistered > 256) &&
-#endif
-        iFile::Exists(gSavePath + _T("lastses.phsd"))) {
+        RelativeFilePath lastsesPath = RelativeFilePath("lastses.phsd", FileLocationType::FLT_DOCUMENT);
+        RelativeFilePath lastsesUsePath = RelativeFilePath("lastses.use", FileLocationType::FLT_DOCUMENT);
+
+        if(FileAccessor::sharedFileAccessor()->fileExists(lastsesPath)) {
             // here is the protection agains corrupts saves: first we move lastses.phs to lastses.use, then
             // load the latter. in case it is broken, after relaunch on crash, we will boot to menu
-            iFile::Move(gSavePath + _T("lastses.phsd"), gSavePath + _T("lastses.use"));
+            iFile::Move(lastsesPath, lastsesUsePath);
 
 
-    auto lastSesPath = RelativeFilePath((gSavePath + _T("lastses.use")).CStr(), FileLocationType::FLT_DOCUMENT);
 #ifdef HMM_COMPOVERSION
             iFilePtr pSaveFile = xxc::OpenXFile(gSavePath + _T("lastses.use"),HMM_COMPOCODE);
 #else
-            iFilePtr pSaveFile = OpenWin32File(lastSesPath);
+            iFilePtr pSaveFile = OpenWin32File(lastsesPath);
 #endif
             check(pSaveFile);
             if (pSaveFile) {
                 uint32 fourcc; pSaveFile->Read(&fourcc,sizeof(fourcc));
                 iMapInfo mapInfo;
-                mapInfo.m_FileName = lastSesPath;
+                mapInfo.m_FileName = lastsesPath;
                 mapInfo.m_bNewGame = false;
                 if(mapInfo.ReadMapInfo(pSaveFile.get())) {
                     mapInfo.ReorderPlayers();
                     if (StartNewGame(mapInfo, false, false)) {
                         pSaveFile.reset();
-                        iFile::Delete(gSavePath + _T("lastses.use"));
+                        iFile::Delete(lastsesUsePath);
                         return m_bInited = true;
                     }
                 }
                 pSaveFile.reset();
-                iFile::Delete(gSavePath + _T("lastses.use"));
+                iFile::Delete(lastsesUsePath);
             }
     }
 
@@ -382,9 +382,8 @@ bool iGame::StartNewGame(const iMapInfo& mapInfo, bool bNewGame, bool bUpdateVis
 bool iGame::StartTutorialMap()
 {
 	iStringT filename;
-  filename = _T("break.phmd");
 
-  auto tutorialPath = RelativeFilePath((gBundledMapsPath + filename).CStr());
+  auto tutorialPath = gBundledMapsPath.pathByAppendingString("break.phmd");
 
     iFilePtr pMapFile = OpenWin32File(tutorialPath);
 	check(pMapFile);
@@ -441,7 +440,7 @@ void iGame::ExitGame(bool bChangeView)
     m_Map.CleanupGameWorld();
     m_itemMgr.OnGameEnd();
 
-	iFile::Delete(gSavePath + _T("lastses.tmp"));
+	iFile::Delete(RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT));
 
     if (m_pBattle)
     {
@@ -1070,43 +1069,43 @@ void iGame::OnKeyUp(sint32 key)
 {
 	//xxc::sec_shuffle();
 
-    if (key == gSettings.ActionKey(BAT_MINIMIZE_APP)) {
-        gApp.Minimize();
-    } else if (key == gSettings.ActionKey(BAT_MAKE_SCREENSHOT)) {
-        int i;
-        iStringT scrndir = gRootPath + _T("Scrn\\");
-        iFile::DirCreate(scrndir);
-        for (i = 1; i < 999; i++)
-        {
-            iStringT fname = scrndir + iFormat(_T("screenshot%03d.bmp"), i);
-            if (!iFile::Exists(fname))
-            {
-                SaveDibBitmap16(gApp.Surface(), fname);
-                AddMsg(iStringT(_T("#F4B4")) + gTextMgr[TRID_MSG_SCREENSHOT_SAVED]);
-                break;
-            }
-        }
+//     if (key == gSettings.ActionKey(BAT_MINIMIZE_APP)) {
+//         gApp.Minimize();
+//     } else if (key == gSettings.ActionKey(BAT_MAKE_SCREENSHOT)) {
+//         int i;
+//         iStringT scrndir = gRootPath + _T("Scrn\\");
+//         iFile::DirCreate(scrndir);
+//         for (i = 1; i < 999; i++)
+//         {
+//             iStringT fname = scrndir + iFormat(_T("screenshot%03d.bmp"), i);
+//             if (!iFile::Exists(fname))
+//             {
+//                 SaveDibBitmap16(gApp.Surface(), fname);
+//                 AddMsg(iStringT(_T("#F4B4")) + gTextMgr[TRID_MSG_SCREENSHOT_SAVED]);
+//                 break;
+//             }
+//         }
 
-        //      iStringT fname = gRootPath + _T("screenshot.bmp");
-        //      SaveDibBitmap16(gApp.Surface(), fname);
-        //      AddMsg(iStringT(_T("#F4B4")) + gTextMgr[TRID_MSG_SCREENSHOT_SAVED]);
-    }
-    // Cotulla: NOT SUPPORTED FOR IPAD
-#if 0
-    else if (key == gSettings.ActionKey(BAT_QUICK_SAVE))
-    {
-#ifdef MULTIPLAYER
-        if (!gMPMgr.IsMultiplayer())
-        {
-#endif
-                iStringT fname;
-                iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 2);
-                SaveGameFile(fname, gGame.Map() );
-#ifdef MULTIPLAYER
-        }
-#endif
-    }
-#endif
+//         //      iStringT fname = gRootPath + _T("screenshot.bmp");
+//         //      SaveDibBitmap16(gApp.Surface(), fname);
+//         //      AddMsg(iStringT(_T("#F4B4")) + gTextMgr[TRID_MSG_SCREENSHOT_SAVED]);
+//     }
+//     // Cotulla: NOT SUPPORTED FOR IPAD
+// #if 0
+//     else if (key == gSettings.ActionKey(BAT_QUICK_SAVE))
+//     {
+// #ifdef MULTIPLAYER
+//         if (!gMPMgr.IsMultiplayer())
+//         {
+// #endif
+//                 iStringT fname;
+//                 iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 2);
+//                 SaveGameFile(fname, gGame.Map() );
+// #ifdef MULTIPLAYER
+//         }
+// #endif
+//     }
+// #endif
 
 }
 
@@ -1189,7 +1188,7 @@ void iGame::OnVictory( VICTORY_CONDITION_TYPE vc )
     if(gGame.Map().GameMode() == iMapInfo::GM_SPLAYER)
         Analytics::sharedInstance()->TrackEvent("game", "won map: single", CvtT2A<>(gGame.Map().MapEnglishName().CStr()).Unsafe());
 
-	iFile::Delete(gSavePath + _T("lastses.tmp"));
+	iFile::Delete(RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT));
 }
 
 void iGame::OnDefeat( LOSE_CONDITION_TYPE lc, bool bExitGame )
@@ -1214,7 +1213,7 @@ void iGame::OnDefeat( LOSE_CONDITION_TYPE lc, bool bExitGame )
     }
     if(gGame.Map().GameMode() == iMapInfo::GM_SPLAYER)
         Analytics::sharedInstance()->TrackEvent("game", "lost map: single", CvtT2A<>(gGame.Map().MapEnglishName().CStr()).Unsafe());
-	iFile::Delete(gSavePath + _T("lastses.tmp"));
+	   iFile::Delete(RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT));
 }
 
 void iGame::OnActorChanged(iPlayer* pNewActor, bool bAttack)
@@ -1546,19 +1545,22 @@ bool iGame::CheckPlayerWinAndLose( iPlayer *pPlayer )
 
 void iGame::Crashsave()
 {
-	iStringT saveDir = gSavePath.Left(gSavePath.Length()-1);
 	bool bOk = false;
-	iFilePtr pFile(CreateWin32File(gSavePath + _T("lastses.tmp")));
+	iFilePtr pFile(CreateWin32File(RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT)));
 	check(pFile);
 	bOk = (pFile && gGame.Map().SaveToFile(pFile.operator->()));
-	if (bOk) iFile::Move(gSavePath + _T("lastses.tmp"), gSavePath + _T("lastses.phsd"));
+	if (bOk)
+      iFile::Move(
+          RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT),
+          RelativeFilePath("lastses.phsd", FileLocationType::FLT_DOCUMENT)
+        );
 }
 
 void iGame::Autosave()
 {
-	iStringT fname;
+	RelativeFilePath fname;
 	iSaveDlg::GetSaveFileName(fname,0);
-	iFile::Delete(gSavePath + _T("lastses.tmp"));
+	iFile::Delete(RelativeFilePath("lastses.tmp", FileLocationType::FLT_DOCUMENT));
 
 	SaveGameFile( fname, gGame.Map() );
 }
@@ -1573,22 +1575,22 @@ void iGame::ShowSaveScreen(){
 #endif
 void iGame::Quicksave()
 {
-	iStringT fname;
-	iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 1);
+	RelativeFilePath path;
+	iSaveDlg::GetSaveFileName(path, SAVE_GAME_SLOTS - 1);
 	//iFile::Delete(gSavePath + _T("lastses.tmp"));
 
-	SaveGameFile( fname, gGame.Map() );
+	SaveGameFile( path, gGame.Map() );
 }
 
 void iGame::Quickload()
 {
-	iStringT fname;
-	iSaveDlg::GetSaveFileName(fname, SAVE_GAME_SLOTS - 1);
+  RelativeFilePath path;
+	iSaveDlg::GetSaveFileName(path, SAVE_GAME_SLOTS - 1);
 	iMapInfo mapInfo;
 	mapInfo.m_bNewGame = false;
-	mapInfo.m_FileName = RelativeFilePath(fname.CStr(), FileLocationType::FLT_DOCUMENT);
+	mapInfo.m_FileName = path;
 
-	iFilePtr pFile(OpenWin32File(fname));
+	iFilePtr pFile(OpenWin32File(mapInfo.m_FileName));
 
 	if(!pFile)
 		return;

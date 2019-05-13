@@ -13,18 +13,18 @@ iLogMgr::~iLogMgr()
 
 bool iLogMgr::Init(const iStringT& fname)
 {
-	m_pLogFile = CreateWin32File(fname);
-	if (!m_pLogFile) return false;
-	uint16 hdr = 0xFEFF;
-	m_pLogFile->Write(&hdr, sizeof(hdr));
+	// m_pLogFile = CreateWin32File(fname);
+	// if (!m_pLogFile) return false;
+	// uint16 hdr = 0xFEFF;
+	// m_pLogFile->Write(&hdr, sizeof(hdr));
 
 	return true;
 }
 
 void iLogMgr::Log(const iStringT& entry)
 {
-	if (!m_pLogFile) return;
-	m_pLogFile->Write(entry.CStr(), entry.Length()*sizeof(iCharT));
-	m_pLogFile->Flush();
+	// if (!m_pLogFile) return;
+	// m_pLogFile->Write(entry.CStr(), entry.Length()*sizeof(iCharT));
+	// m_pLogFile->Flush();
 }
 

@@ -1,7 +1,10 @@
 #ifndef PHEROES_GAME_CTL_SAVE_H_
 #define PHEROES_GAME_CTL_SAVE_H_
 
+#include "FileAccessor/FileAccessor.h"
+
 const uint32 SAVE_GAME_SLOTS = 100;
+
 
 struct iSaveSlot {
 	iMapInfo *mapInfo;
@@ -17,8 +20,8 @@ class iSaveGameView : public iView, public IViewCmdHandler
 public:
     iSaveGameView(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, uint32 uid, bool bSave) ;
     ~iSaveGameView();
-    static void GetSaveFileName(iStringT& fname, uint32 slot);
-    bool SelFile(iStringT& fname) const;
+    static void GetSaveFileName(fileaccessor::RelativeFilePath& path, uint32 slot);
+    bool SelFile(fileaccessor::RelativeFilePath& path) const;
     const iMapInfo& SelScenario() const;
 	const iMapInfo* GetAutoSave() const;
     inline void OnMouseUp(const iPoint &pos, MouseId mID, MouseButtonId mbID) {}
@@ -26,7 +29,7 @@ public:
     void LoadData();
 	bool Process(fix32 t);
 private:
-    enum SortBy 
+    enum SortBy
     {
         Name = 0,
         RevName,
@@ -44,15 +47,15 @@ private:
     inline bool CanSelect() const { return m_selSlot != -1 && (m_bSave || m_saveSlots[m_selSlot].mapInfo != NULL); }
     bool Confirmed() const;
     void SendResult(uint32 res);
-    void CheckHeaderButton(uint32 id);   
-	
+    void CheckHeaderButton(uint32 id);
+
 
 
 private:
     bool		m_bSave;
     sint32		m_selSlot;
     iSaveSlots	m_saveSlots;
-    IViewCmdHandler*  m_pCmdHandler; 
+    IViewCmdHandler*  m_pCmdHandler;
     iSaveListBox *m_pLB;
     SortBy      m_sort;
 };

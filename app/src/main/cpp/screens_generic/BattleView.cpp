@@ -2,7 +2,7 @@
 
 #ifdef _DEEP_DEBUG_
 #	define new DEBUG_NEW
-#endif 
+#endif
 
 
 #include "BattleView.h"
@@ -21,6 +21,9 @@
 #include "Dlg_ScenProps.h"
 //#include "xxc/xxc.security.h"
 #include "OverlandView.h"
+#include "FileAccessor/FileAccessor.h"
+
+using namespace fileaccessor;
 
 const fix32 CELL_EVT_DELAY = fix32(2.0f);
 const fix32 HIGHLIGHT_BLINK_DELAY = fix32(0.5f);
@@ -28,7 +31,7 @@ const fix32 HIGHLIGHT_BLINK_DELAY = fix32(0.5f);
 uint16 iBattleView::sm_hexWidth;
 uint16 iBattleView::sm_hexHalfWidth;
 uint16 iBattleView::sm_hexHeight;
-uint8 iBattleView::sm_gridZoom;	
+uint8 iBattleView::sm_gridZoom;
 uint16 iBattleView::sm_backOffset;
 
 const iDib::pixel SKY_GRAD_COLORS[STYPE_COUNT][2] = {
@@ -96,7 +99,7 @@ const iCtlDecDesc FORT_DECS[iCastleFort::TypeCount][iCastleFort::StateCount] = {
 		{PDGG(COMBAT_BTOWER), iPoint(-33, -2), false}, {PDGG(COMBAT_BTURRET), iPoint(-33, -2), false}, {PDGG(COMBAT_BTOWER) + 1, iPoint(-33, -2), false}, {PDGG(COMBAT_BTOWER) + 2, iPoint(-33, -2), false}
 	}
 };
-#else 
+#else
 
 const iCtlDecDesc FORT_DECS_IPHONE[iCastleFort::TypeCount][iCastleFort::StateCount] = {
     {
@@ -181,7 +184,7 @@ void iCreatInfoPopup::DoCompose(const iRect& clRect)
 	// title
 	rc.y += gTextComposer.TextBoxOut(dlgfc_topic, gApp.Surface(),gTextMgr[ct*3+TRID_CREATURE_PEASANT_F2], iRect(rc.x,rc.y,rc.w,15));
 
-	// icon	
+	// icon
 	rc.y+=45;
 
 	// Perks
@@ -197,8 +200,8 @@ void iCreatInfoPopup::DoCompose(const iRect& clRect)
 		ox += 15;
 	}
 	rc.y += 15;
-	// specs	
-	iTextComposer::FontConfig fc(dlgfc_splain.fontSize, RGB16(192,192,220));	
+	// specs
+	iTextComposer::FontConfig fc(dlgfc_splain.fontSize, RGB16(192,192,220));
 	const sint32 lh = gTextComposer.GetFontHeight(fc.fontSize) * 3 / 2;
 	iRect trc(rc.x,rc.y,68,lh);
 
@@ -264,7 +267,7 @@ iSize iCreatInfoPopup::ClientSize()
 		h += mult + iMIN<sint32>(5, m_pGroup->SpellList().GetSize()) * mult;
 	}
 
-	// 
+	//
 	h += 5;
 	return iSize(w,h);
 }
@@ -289,11 +292,11 @@ iPoint iBattleView::CreatCorpsePos(iPoint anchor, iBattleGroup::ORIENT orient, u
 	cop.y -= 50;
 
 	if(size == 2) {
-		if (orient == iBattleGroup::Right) 
+		if (orient == iBattleGroup::Right)
 			cop.x -= 0;//11;
 		else
-			cop.x += 25;		
-	}		
+			cop.x += 25;
+	}
 	return cop;
 }
 
@@ -313,20 +316,20 @@ struct iBatCmpItem {
 //
 
 struct iBatCmpItem_Creature : public iBatCmpItem {
-	iBatCmpItem_Creature(const iBattleGroup* pGroup, bool bCurrent, bool bHighlighted, bool bCropped) : 
+	iBatCmpItem_Creature(const iBattleGroup* pGroup, bool bCurrent, bool bHighlighted, bool bCropped) :
 iBatCmpItem(pGroup->ScreenPos() != cInvalidPoint ? pGroup->ScreenPos() :
 			iBattleView::Map2Screen(pGroup->Pos()), bCurrent), m_pGroup(pGroup), m_bHighlighted(bHighlighted), m_bCropped(bCropped) {}
 
 void ComposeShadow(iDib& surf, const iPoint& anchor) const
 {
 	sint16 ct = m_pGroup->Type();
-	iPoint cop;		
+	iPoint cop;
 	if (m_pGroup->IsAlive()) {
-		
+
 		uint16 sid = CREAT_DESC[ct].sprite;
-		cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), m_pGroup->Orient() == (iBattleGroup::Left), AlignBottom);		
-		
-		// Draw group		
+		cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), m_pGroup->Orient() == (iBattleGroup::Left), AlignBottom);
+
+		// Draw group
 		sint32 frames = CREAT_DESC[ct].movAnim == ANIM_6 ? 7 : 19;
 		if (m_pGroup->State() == iBattleGroup::Melee || m_pGroup->State()==iBattleGroup::Shooting) sid += frames;
 		else if (m_pGroup->State() == iBattleGroup::RecDamage) sid += frames * 2;
@@ -340,14 +343,14 @@ void ComposeShadow(iDib& surf, const iPoint& anchor) const
 			cop += iPoint(6, -6);
 		}
 
-		gGfxMgr.BlitUniversal(sid, surf, cop , srcrect, iGfxManager::EfxShadowBattle, false, -1, 255, (m_pGroup->Orient() == (iBattleGroup::Right)) ? iGfxManager::FlipNone : iGfxManager::FlipVert );		
+		gGfxMgr.BlitUniversal(sid, surf, cop , srcrect, iGfxManager::EfxShadowBattle, false, -1, 255, (m_pGroup->Orient() == (iBattleGroup::Right)) ? iGfxManager::FlipNone : iGfxManager::FlipVert );
 	} else {
 		uint16 sid = CREAT_DESC[ct].sprite;
-		
-		cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), false, AlignBottom);		
+
+		cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), false, AlignBottom);
 		sint32 frames = CREAT_DESC[ct].movAnim == ANIM_6 ? 7 : 19;
-		sid += frames * 3;		
-		
+		sid += frames * 3;
+
 		iRect objrc = gGfxMgr.ObjRect(sid);
 		iRect srcrect = iRect(0, 0, gGfxMgr.Dimension(sid).w, objrc.y2());
 
@@ -361,14 +364,14 @@ void ComposeShadow(iDib& surf, const iPoint& anchor) const
 
 void Compose(iDib& surf, const iPoint& anchor, bool bInt) const
 {
-	sint16 ct = m_pGroup->Type();		
+	sint16 ct = m_pGroup->Type();
 	if (!m_pGroup->IsAlive()) return;
-	
+
 	uint16 sid = CREAT_DESC[ct].sprite;
-	iPoint cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), m_pGroup->Orient() == (iBattleGroup::Left), AlignBottom);		
+	iPoint cop = GetRealSpritePos(sid, iRect(anchor, iSize(iBattleView::sm_hexWidth, iBattleView::sm_hexHeight / 2)), m_pGroup->Orient() == (iBattleGroup::Left), AlignBottom);
 		//iBattleView::CreatPos(anchor, m_pGroup->Orient(), m_pGroup->Size());
 
-	// Draw group	
+	// Draw group
 	sint32 frames = CREAT_DESC[ct].movAnim == ANIM_6 ? 7 : 19;
 	if (m_pGroup->State() == iBattleGroup::Melee || m_pGroup->State()==iBattleGroup::Shooting) sid += frames;
 	else if (m_pGroup->State() == iBattleGroup::RecDamage) sid += frames * 2;
@@ -380,17 +383,17 @@ void Compose(iDib& surf, const iPoint& anchor, bool bInt) const
 	if(m_bCropped)
 		srcrect.h -= 6;
 
-	gGfxMgr.BlitUniversal(sid, surf, cop, srcrect, m_bHighlighted ? iGfxManager::EfxGlow : iGfxManager::EfxNone, false, -1, 255, m_pGroup->Orient() == (iBattleGroup::Right) ? iGfxManager::FlipNone : iGfxManager::FlipVert);	
-	
+	gGfxMgr.BlitUniversal(sid, surf, cop, srcrect, m_bHighlighted ? iGfxManager::EfxGlow : iGfxManager::EfxNone, false, -1, 255, m_pGroup->Orient() == (iBattleGroup::Right) ? iGfxManager::FlipNone : iGfxManager::FlipVert);
+
 	// Draw current group edging
 	if (bInt && m_bCurrent && m_pGroup->State() == iBattleGroup::Idle) {
-		gGfxMgr.BlitUniversal(sid + frames * 4, surf, cop, cInvalidRect, iGfxManager::EfxNone, false, -1, 255, m_pGroup->Orient() == (iBattleGroup::Right) ? iGfxManager::FlipNone : iGfxManager::FlipVert);	
+		gGfxMgr.BlitUniversal(sid + frames * 4, surf, cop, cInvalidRect, iGfxManager::EfxNone, false, -1, 255, m_pGroup->Orient() == (iBattleGroup::Right) ? iGfxManager::FlipNone : iGfxManager::FlipVert);
 	}
 
 	iPoint p = anchor + iPoint(iBattleView::sm_hexHalfWidth - 15, iBattleView::sm_hexHeight / 2 - 8);
 	// Draw group's quantity
-	if(m_pGroup->State() == iBattleGroup::Idle) {			
-		iRect rc(p.x+1,p.y+9,30,16);		
+	if(m_pGroup->State() == iBattleGroup::Idle) {
+		iRect rc(p.x+1,p.y+9,30,16);
 		SPELL_DISPOS sd = m_pGroup->SpellsDispos();
 		if(m_pGroup->Orient() == (iBattleGroup::Left))
 			rc.x--;
@@ -402,7 +405,7 @@ void Compose(iDib& surf, const iPoint& anchor, bool bInt) const
 		//if (composeList[xx].value->PassMap().GetAt(composeList[xx].value->Pos().x+TAIL_OFFSET[!composeList[xx].value->Orient()], composeList[xx].value->Pos().y) == CT_PASSABLE) rc.x += TAIL_OFFSET[!composeList[xx].value->Orient()] * 20;
 		/*if (m_pGroup->InMoat()) surf.VGradientRect(rc,RGB16(192,76,32),RGB16(80,32,16));
 		else */
-		
+
 		surf.FrameRect(rc,RGB16(208,176,28));
 		gTextComposer.TextOut(creatqfc, surf, rc, FormatShortNumber(m_pGroup->Count()), rc, AlignCenter);
 	}
@@ -423,7 +426,7 @@ struct iBatCmpItem_Obstacle : public iBatCmpItem {
 	void ComposeShadow(iDib& surf, const iPoint& anchor) const
 	{
 		iPoint cop = anchor + gGame.ItemMgr().BatObstMgr().Item(m_pObstacle->obstId).offset;
-		cop.x -= 15;		
+		cop.x -= 15;
 		SpriteId sid = gGame.ItemMgr().BatObstMgr().Item(m_pObstacle->obstId).sprite;
 		gGfxMgr.BlitEffect(sid, surf, cop,iGfxManager::EfxShadowBattle);
 	}
@@ -447,7 +450,7 @@ struct iBatCmpItem_Catapult : public iBatCmpItem {
 	}
 
 	void Compose(iDib& surf, const iPoint& anchor, bool bInt) const
-	{				
+	{
 		SpriteId sid = PDGG(SHOOT_AMMO);
 		if(m_pCatapult->State() == iBattleUnit_Catapult::Shooting)
 			sid++;
@@ -466,7 +469,7 @@ struct iBatCmpItem_Ammo : public iBatCmpItem {
 	}
 
 	void Compose(iDib& surf, const iPoint& anchor, bool bInt) const
-	{				
+	{
 		SpriteId sid = m_ammo.sid;
 		if(m_ammo.reversed)
 			gGfxMgr.BlitFlipped(sid, surf, anchor + iPoint(-100, 0));
@@ -489,14 +492,14 @@ struct iBatCmpItem_FortElement : public iBatCmpItem {
             bGround = FORT_DECS_IPAD[m_pElement->type][m_pElement->state].bGround;
         else
             bGround = FORT_DECS_IPHONE[m_pElement->type][m_pElement->state].bGround;
-        
+
 		if (bGround) {
             SpriteId sid;
             if(gUseIpadUI)
                 sid = FORT_DECS_IPAD[m_pElement->type][m_pElement->state].sid;
             else
                 sid = FORT_DECS_IPHONE[m_pElement->type][m_pElement->state].sid;
-            
+
 			gGfxMgr.Blit(sid, surf, iBattleView::FortElemPos(anchor, m_pElement->type, m_pElement->state));
 		}
 	}
@@ -507,23 +510,23 @@ struct iBatCmpItem_FortElement : public iBatCmpItem {
 
         SpriteId sid;
         bool bGround;
-        
+
         if(gUseIpadUI)
             sid = FORT_DECS_IPAD[m_pElement->type][m_pElement->state].sid;
         else
             sid = FORT_DECS_IPHONE[m_pElement->type][m_pElement->state].sid;
-        
+
         if(gUseIpadUI)
             bGround = FORT_DECS_IPAD[m_pElement->type][m_pElement->state].bGround;
         else
             bGround = FORT_DECS_IPHONE[m_pElement->type][m_pElement->state].bGround;
-            
-        
+
+
 		if (!bGround) {
 			gGfxMgr.Blit(sid, surf, iBattleView::FortElemPos(anch, m_pElement->type, m_pElement->state));
 		}
-		if (m_pElement->bRecDmg) 
-			gGfxMgr.Blit(PDGG(BTL_RECDMG), surf, iBattleView::FortElemHitPos(anch, m_pElement->type, m_pElement->state));		
+		if (m_pElement->bRecDmg)
+			gGfxMgr.Blit(PDGG(BTL_RECDMG), surf, iBattleView::FortElemHitPos(anch, m_pElement->type, m_pElement->state));
 	}
 
 	const iCastleFort::iElement*	m_pElement;
@@ -563,7 +566,7 @@ iBattleView::iBattleView()
 , m_bDontMove(true)
 , m_MoveEntry(cInvalidPoint)
 , m_highlightedGroup(cInvalidPoint)
-#ifdef PC_VERSION 
+#ifdef PC_VERSION
 , m_bDefender(false)
 , m_bBeginAutocombat(false)
 , m_bEndAutocombat(false)
@@ -596,7 +599,7 @@ void iBattleView::EndBattle(iBattleResult br)
 #ifdef MULTIPLAYER
 	gMPMgr.OnCombatEnd(br);
 	gMPMgr.SetBattleWrapper(NULL);
-#endif	
+#endif
 
 	// Show result
 	iDlg_BattleResult brd(m_pMgr, m_pBattle->Engine(), br);
@@ -604,7 +607,7 @@ void iBattleView::EndBattle(iBattleResult br)
 
 	// End battle
 	m_pBattle->EndBattle(br);
-	
+
 	// remove the cell events left
 	m_cellEvents.DeleteAll();
 }
@@ -612,9 +615,9 @@ void iBattleView::EndBattle(iBattleResult br)
 
 
 bool iBattleView::BeginSpellTrack(iCombatSpell* pSpell)
-{    
-	bool res = true;	
-   
+{
+	bool res = true;
+
     m_bTracking[0] = false;
 	check(!m_spellTargets.GetSize());
 	iHero* pCaster = m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->SpellCaster();
@@ -628,10 +631,10 @@ bool iBattleView::BeginSpellTrack(iCombatSpell* pSpell)
 		iSimpleArray<iBattleGroup*> targets;
 		m_pBattle->Engine().SelectSpellTargets(pSpell, targets);
 		if (!targets.GetSize()) res = false;
-	}	
+	}
 
 	if(res)
-		AddChild(m_pCastSpellToolBar = new iCastSpellToolBar(m_pMgr, this, 
+		AddChild(m_pCastSpellToolBar = new iCastSpellToolBar(m_pMgr, this,
 #ifdef PC_VERSION
                                                              iRect(0, m_Rect.y2()-DEF_BTN_HEIGHT - 5, m_Rect.w, DEF_BTN_HEIGHT + 5),
 #else
@@ -663,14 +666,14 @@ iBattleGroup* iBattleView::GetSpellTarget(const iPoint& cell) {
 		targetOwner =  m_pBattle->Engine().GetBattleInfo().Member(ourSide);
 	//else leave NULL to select all
 
-	iSimpleArray<iBattleGroup*> targets = m_pBattle->Engine().FindAllGroups(cell, 
-		targetOwner, m_pCastSpellToolBar->Spell()->AffectsToDead(), m_pCastSpellToolBar->Spell()->Id() == MSP_ANIMATEDEAD);			
+	iSimpleArray<iBattleGroup*> targets = m_pBattle->Engine().FindAllGroups(cell,
+		targetOwner, m_pCastSpellToolBar->Spell()->AffectsToDead(), m_pCastSpellToolBar->Spell()->Id() == MSP_ANIMATEDEAD);
 
 	//uncomment to test:
 	//targets.Add(m_pBattle->Engine().AArmy().Groups().At(0));
-	//targets.Add(m_pBattle->Engine().DArmy().Groups().At(0));			
+	//targets.Add(m_pBattle->Engine().DArmy().Groups().At(0));
 
-	iBattleGroup *pTarget = NULL;						
+	iBattleGroup *pTarget = NULL;
 	if(targets.GetSize() > 1) {
 		uint32 idx;
 		iSimpleArray<iStringT> texts;
@@ -680,7 +683,7 @@ iBattleGroup* iBattleView::GetSpellTarget(const iPoint& cell) {
 				texts.Add(iFormat<iCharT>(_T("%d"), targets[xx]->Count()));
 			else if(m_pCastSpellToolBar->Spell()->SpellClass() == SPC_RESURRECT) {
 				sint32 hp =  ((iSpell_Resurrect*)(m_pCastSpellToolBar->Spell()))->EstimateHitPoints(pCaster);
-				texts.Add(iFormat<iCharT>(_T("%d/%d"), 
+				texts.Add(iFormat<iCharT>(_T("%d/%d"),
 					targets[xx]->CountResurrected(hp),
 					targets[xx]->InitialCount()));
 			}
@@ -689,14 +692,14 @@ iBattleGroup* iBattleView::GetSpellTarget(const iPoint& cell) {
 
 		}
 		iDlg_ChooseBattleGroup dlg(m_pMgr, targets, texts, pCaster->Owner()->PlayerId(), &idx);
-		if(dlg.DoModal() == DRC_OK)				
-			pTarget = targets.At(idx);					
+		if(dlg.DoModal() == DRC_OK)
+			pTarget = targets.At(idx);
 		else
 			pTarget = NULL;
 	} else if(targets.GetSize() == 0)
 		pTarget = NULL;
 	else
-		pTarget = targets.At(0);					
+		pTarget = targets.At(0);
 	return pTarget;
 }
 
@@ -722,7 +725,7 @@ void iBattleView::EndSpellTrack(const iPoint& cell)
 		delete m_pCastSpellToolBar;
 		m_pCastSpellToolBar = NULL;
 	}
-		
+
 	m_toolTip = _T("");
 	m_spellTargets.RemoveAll();
 	EnableControls(Nothing);
@@ -730,7 +733,7 @@ void iBattleView::EndSpellTrack(const iPoint& cell)
 
 bool iBattleView::OnGroupChanged()
 {
-	iBattleUnit* pCurUnit = m_pBattle->Engine().TurnSeq().CurUnit();	
+	iBattleUnit* pCurUnit = m_pBattle->Engine().TurnSeq().CurUnit();
 
 	if (iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(pCurUnit)) {
 		iBattleGroup* pGroup  = pCurCreatGroup->GetCreatGroup();
@@ -743,7 +746,7 @@ bool iBattleView::OnGroupChanged()
 		PLAYER_ID pid = pGroup->Owner()->Owner();
 		bool bAiPlayer = (pid == PID_NEUTRAL || gGame.Map().FindPlayer(pid)->PlayerType() == PT_COMPUTER);
 #ifdef MULTIPLAYER
-		bool bRemPlayer = (pid != PID_NEUTRAL && gGame.Map().FindPlayer(pid)->PlayerType() == PT_REMOTE) || 
+		bool bRemPlayer = (pid != PID_NEUTRAL && gGame.Map().FindPlayer(pid)->PlayerType() == PT_REMOTE) ||
 			(pid != PID_NEUTRAL && gMPMgr.IsPRA() && gGame.Map().FindPlayer(pid)->PlayerType() == PT_COMPUTER);
 		if(gMPMgr.IsReplaying()) {
 			m_pToolBar->EnableControls(RemoteTurn);
@@ -768,7 +771,7 @@ bool iBattleView::OnGroupChanged()
 				gMPMgr.DisablePRA();
 #endif
 				EnableControls(EnemyTurn);
-				m_bHumanTurn = false;				
+				m_bHumanTurn = false;
 
 				// Try to cast the spell
 				bool bCasted = ProcessSpellCastAI(m_pBattle->Engine());
@@ -786,9 +789,9 @@ bool iBattleView::OnGroupChanged()
 
 				// Process battle step
 				if (!bCasted) {
-					if (ProcessBattleStepAI(m_pBattle->Engine())) 
+					if (ProcessBattleStepAI(m_pBattle->Engine()))
 						BeginAni();
-					else if (!OnGroupChanged()) 
+					else if (!OnGroupChanged())
 						return false;
 				}
 			} else {
@@ -804,7 +807,7 @@ bool iBattleView::OnGroupChanged()
 			}
 
 	} else if (DynamicCast<iBattleUnit_Catapult*>(pCurUnit)) {
-		iCastleFort::ElementType target = m_pBattle->Engine().CastleFort()->GetTarget();		
+		iCastleFort::ElementType target = m_pBattle->Engine().CastleFort()->GetTarget();
 		if (target != iCastleFort::InvalidElement) {
 			m_pBattle->Engine().CatapultShot(target);
 			BeginAni();
@@ -813,13 +816,13 @@ bool iBattleView::OnGroupChanged()
 		iBattleGroup* pTarget = SelectTurretTarget(m_pBattle->Engine());
 		check(pTarget);
 		m_pBattle->Engine().TurretShot(pTarget);
-		BeginAni();		
+		BeginAni();
 	}
 	return true;
 }
 
 void iBattleView::BeginAni()
-{		
+{
 	m_bAni = true;
 	EnableControls(Acting);
 	m_actTimer = fix32::zero;
@@ -834,13 +837,13 @@ void iBattleView::EndAni()
 }
 
 // Calculates delta distance between two cells
-inline uint32 CellsDelta2(sint32 px1, sint32 py1, sint32 px2, sint32 py2) 
-{ 
+inline uint32 CellsDelta2(sint32 px1, sint32 py1, sint32 px2, sint32 py2)
+{
 	px1 = px1 + py1/2;
 	px2 = px2 + py2/2;
-	uint32 dx = iABS(px1 - px2); 
+	uint32 dx = iABS(px1 - px2);
 	uint32 dy = iABS(py1 - py2);
-	return iMIN(dx,dy) + iDIF(dx,dy); 
+	return iMIN(dx,dy) + iDIF(dx,dy);
 }
 
 
@@ -862,9 +865,9 @@ void iBattleView::PrepareSurface()
 {
     iSize sz = gGfxMgr.Dimension(PDGG(COMBAT_BTYPE_BARREN));
     iSize szSky = gGfxMgr.Dimension(PDGG(COMBAT_STYPE_BARREN_MOUNT));
-    
+
     sz.h += szSky.h;
-    
+
 	m_dibSurf.Cleanup();
 	m_dibSurf.Init(sz, iDib::RGB);
 	iIsoMetric im(5);
@@ -884,8 +887,8 @@ void iBattleView::PrepareSurface()
 	// Surf
 	gGfxMgr.BlitMasked(PDGG(SURF_TILES) + m_surfType*4 + cseq, PDGG(TRANS_TILES)+14,m_dibSurf,op);
 	}
-	}*/	
-	
+	}*/
+
 	// Background
 	gGfxMgr.Blit(PDGG(COMBAT_BTYPE_BARREN) + m_background, m_dibSurf, iPoint(0, gGfxMgr.Dimension(PDGG(COMBAT_STYPE_BARREN_MOUNT)).h));
 	// Sky
@@ -893,7 +896,7 @@ void iBattleView::PrepareSurface()
 
 	// Draw moat
 	if (const iCastleFort* pFort = m_pBattle->Engine().CastleFort()) {
-		if (pFort->HasMoat()) {				
+		if (pFort->HasMoat()) {
 #ifdef PC_VERSION
 #ifdef OS_MACOS
             iPoint pnt = Map2Screen(iPoint(4,0))+iPoint(-250, -150);
@@ -922,21 +925,21 @@ void iBattleView::PrepareSurface()
 
 bool iBattleView::Process(fix32 t)
 {
-	// actions	
+	// actions
 	if (m_pBattle->Engine().ActionCount()) {
-		m_actTimer += t;		
+		m_actTimer += t;
 		while (m_pBattle->Engine().ActionCount() && (m_actTimer >= (
 #ifdef MULTIPLAYER
-			gMPMgr.IsReplaying() ? 0 :			
+			gMPMgr.IsReplaying() ? 0 :
 #endif
 			m_pBattle->Engine().CurAction()->m_delay
-			))) {		
+			))) {
 				iBattleAct* pAct = m_pBattle->Engine().StepAction();
 				check(pAct);
 				Invalidate();
-				m_actTimer -= 
+				m_actTimer -=
 #ifdef MULTIPLAYER
-					gMPMgr.IsReplaying() ? 0 :			
+					gMPMgr.IsReplaying() ? 0 :
 #endif
 					pAct->m_delay;
 				delete pAct;
@@ -986,13 +989,13 @@ bool iBattleView::Process(fix32 t)
 		(*it)->dstate = (uint8)iCLAMP<sint32>(0,255,((*it)->m_time * fix32(255.0f) / CELL_EVT_DELAY).ceil());
 		++it;
 	}
-    
+
 #ifdef PC_VERSION
     if( m_bAni && !m_bEndAutocombat )
         return true;
-    
+
     if( SpellTracking() ){
-        
+
         m_bDefender = false;
         m_bWait = false;
         m_bBeginAutocombat = false;
@@ -1000,41 +1003,41 @@ bool iBattleView::Process(fix32 t)
         m_bSpell = false;
         return true;
     }
-    
+
     if( m_bBeginAutocombat ){
-        
+
         m_bBeginAutocombat = false;
-        
+
         if(IsAnyAutobattle())
             EndAutobattle();
         else
             BeginAutobattle();
     }
     else if( m_bEndAutocombat ){
-        
+
         m_bEndAutocombat = false;
-        
+
         if(IsAnyAutobattle())
             EndAutobattle();
     }
     else if(m_bDefender){
-    
+
         m_bDefender = false;
-        
+
         SetInfoMode(false);
 		//set the flag, so it doesn't select move entry right now
 		m_bDontMove = true;
-        
+
 		m_pBattle->Engine().Defend();
 		EnableControls(Nothing);
 		OnGroupChanged();
     }
     else if(m_bWait){
-    
+
         m_bWait = false;
-        
+
         if(m_pBattle->Engine().CanWait()) {
-            
+
 			m_pBattle->Engine().Wait();
 			EnableControls(iBattleView::Nothing);
             OnGroupChanged();
@@ -1045,9 +1048,9 @@ bool iBattleView::Process(fix32 t)
         }
     }
     else if( m_bSpell ){
-    
+
         m_bSpell = false;
-        
+
         SpellDlg();
     }
 #endif
@@ -1056,7 +1059,7 @@ bool iBattleView::Process(fix32 t)
 }
 
 void iBattleView::AddLogEvent(const iStringT& msg)
-{	
+{
 	m_log.Add(msg);
 }
 
@@ -1096,13 +1099,13 @@ void iBattleView::DoCompose()
                     } else if (iBattleUnit_Turret* pTurret = DynamicCast<iBattleUnit_Turret*>(turnSeq.GetTurnSeqItem(xx))) {
                         gGfxMgr.Blit(PDGG(ARROW_TOWER), m_dibTurnGlyph, GetRealSpritePos(PDGG(ARROW_TOWER), iRect(iPoint(), m_dibTurnGlyph.GetSize()), false, AlignBottom));
                     }
-                } 			
-                m_dibTurnGlyph.CopyToDibXY(gApp.Surface(), tseqRect, (uint8)((15-xx)*10));			
+                }
+                m_dibTurnGlyph.CopyToDibXY(gApp.Surface(), tseqRect, (uint8)((15-xx)*10));
                 tseqRect.x += glyphSize.w;
             }
         }
     }
-	
+
 	iBattleUnit* pCurUnit  = m_pBattle->Engine().TurnSeq().CurUnit();
 	if(!pCurUnit || !pCurUnit->Owner() || !pCurUnit->Owner()->IsValid()) return; // the owning hero was already removed from map
 	PLAYER_ID pid = pCurUnit->Owner()->Owner();
@@ -1114,12 +1117,12 @@ void iBattleView::DoCompose()
 #endif
 
 	iPoint op;
-	// Draw Grid	
+	// Draw Grid
 		op = anchor;
- 
+
 		for (sint32 yy=0; yy<11; ++yy) {
 			for (uint32 xx=0; xx<13; ++xx) {
-				if (gSettings.GetEntryValue(CET_COMBATGRID)) 
+				if (gSettings.GetEntryValue(CET_COMBATGRID))
 					gGfxMgr.BlitEffect(PDGG(GRID_HEX), gApp.Surface(), op,iGfxManager::EfxTransparent);
 				// Draw cover map (only for interactive side)
 				if (bInt && !SpellTracking()){
@@ -1145,7 +1148,7 @@ void iBattleView::DoCompose()
 	// Draw current troop and targets highlighters (only for interactive side)
 	if (bInt) {
 		if (SpellTracking()) {
-            
+
 			iHero* pCaster = m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->SpellCaster();
 			check(pCaster);
 			MAGIC_SCHOOL_LEVEL msl = m_pCastSpellToolBar->Spell()->GetSchoolLevel(pCaster);
@@ -1171,7 +1174,7 @@ void iBattleView::DoCompose()
 					} else gGfxMgr.Blit( PDGG(HEX_CELL), gApp.Surface(), op);
 					//gGfxMgr.BlitEffect( PDGG(HEX_TARGET_CELL), gApp.Surface(), op, iGfxManager::EfxTransparent);
 				}
-             
+
 			}
 		} else {
 			if (iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(pCurUnit)) {
@@ -1180,35 +1183,35 @@ void iBattleView::DoCompose()
 							iPoint op = Map2Screen(pCurCreatGroup->GetCreatGroup()->GetMeleeEntry(xx)->m_pos);
 							gGfxMgr.Blit( PDGG(HEX_TARGET_CELL), gApp.Surface(), op);
 							gGfxMgr.BlitEffect( PDGG(HEX_TARGET_CELL), gApp.Surface(), op, iGfxManager::EfxTransparent);
-                    }	
-				} 
+                    }
+				}
 				if (IsShoot()) {
 					for (uint32 xx=0; xx<pCurCreatGroup->GetCreatGroup()->ShootListCount(); ++xx) {
 						iPoint op = Map2Screen(pCurCreatGroup->GetCreatGroup()->GetShootEntry(xx)->m_pos);
 						gGfxMgr.Blit( PDGG(HEX_TARGET_CELL), gApp.Surface(), op);
-						if (pCurCreatGroup->GetCreatGroup()->GetShootEntry(xx)->m_pos != m_trackCell) 
+						if (pCurCreatGroup->GetCreatGroup()->GetShootEntry(xx)->m_pos != m_trackCell)
                                                     gGfxMgr.BlitEffect( PDGG(HEX_TARGET_CELL), gApp.Surface(), op, iGfxManager::EfxTransparent);
 					}
 				}
-			}						
-			//if (m_pMeleeTrack) 
+			}
+			//if (m_pMeleeTrack)
 			//	gGfxMgr.Blit(PDGG(HEX_TARGET_CELL), gApp.Surface(), Map2Screen(m_trackCell));
 		}
 	}
-	
+
 	if(m_MoveEntry != cInvalidPoint)
-		gGfxMgr.Blit(PDGG(HEX_TARGET_CELL), gApp.Surface(), Map2Screen(m_MoveEntry));		
+		gGfxMgr.Blit(PDGG(HEX_TARGET_CELL), gApp.Surface(), Map2Screen(m_MoveEntry));
 
 #ifdef PC_VERSION
     if( bInt && m_Entered != cInvalidPoint ){
-    
+
         gGfxMgr.Blit(PDGG(HEX_TARGET_CELL), gApp.Surface(), Map2Screen(m_Entered));
         ComposeSpellCursor();
     }
 #endif
-    
+
 	iSortArray<iBatCmpItem*> cmpList;
-    
+
 	// Add castle's fort elements
 	if (const iCastleFort* pFort = m_pBattle->Engine().CastleFort()) {
 		for (uint32 xx=0; xx<pFort->ElementsCount(); ++xx) {
@@ -1225,12 +1228,12 @@ void iBattleView::DoCompose()
 	op = anchor;
 	iBattleGroup* pGroup = NULL;
 	if (iBattleUnit_CreatGroup* pCurCreatGroup = DynamicCast<iBattleUnit_CreatGroup*>(pCurUnit)) pGroup = pCurCreatGroup->GetCreatGroup();
-	for (uint32 xx=0; xx<m_pBattle->Engine().AArmy().Count(); ++xx) { 
+	for (uint32 xx=0; xx<m_pBattle->Engine().AArmy().Count(); ++xx) {
 		iPoint pos = m_pBattle->Engine().AArmy()[xx]->ScreenPos() == cInvalidPoint ? m_pBattle->Engine().AArmy()[xx]->Pos() : m_pBattle->Engine().AArmy()[xx]->ScreenPos();
 		uint32 val = (pos.y*sm_hexHalfWidth+pos.x);
 		iBattleGroup* gr = m_pBattle->Engine().AArmy()[xx];
 		if (gr->State() == iBattleGroup::Melee || gr->State() == iBattleGroup::Shooting) val += 2;
-		cmpList.Insert(new iBatCmpItem_Creature(gr, ((gr == pGroup && m_bHighlight) || (gr->IsGroupCell(m_highlightedTarget) && gr->IsAlive())) && !SpellTracking(), 
+		cmpList.Insert(new iBatCmpItem_Creature(gr, ((gr == pGroup && m_bHighlight) || (gr->IsGroupCell(m_highlightedTarget) && gr->IsAlive())) && !SpellTracking(),
 			gr->Pos() == m_highlightedGroup, gr->InMoat() && (gr->State() != iBattleGroup::Moving || gr->TransType() != TRANS_FLY)), val);
 	}
 	for (uint32 xx=0; xx<m_pBattle->Engine().DArmy().Count(); ++xx) {
@@ -1243,7 +1246,7 @@ void iBattleView::DoCompose()
 	}
 
 	// Add obstacles
-	for (uint32 xx=0; xx<m_obstacles.GetSize(); ++xx) { 
+	for (uint32 xx=0; xx<m_obstacles.GetSize(); ++xx) {
 		uint32 val = (m_obstacles[xx].cell.y*sm_hexHalfWidth+m_obstacles[xx].cell.x);
 		cmpList.Insert(new iBatCmpItem_Obstacle(&m_obstacles[xx]), val);
 	}
@@ -1264,9 +1267,9 @@ void iBattleView::DoCompose()
 	// Draw sprites
 	for (uint32 xx=0; xx<cmpList.Size(); ++xx) {
 //        if(/*xx==0 ||*/ xx==1 /*|| xx==2 || xx==3 || xx==4 || xx==5 || xx==6 || xx==7 || xx==8 || xx==9*/)
-		cmpList[xx].value->Compose(gApp.Surface(),cmpList[xx].value->m_pos, bInt 
-#ifdef MULTIPLAYER			
-			|| bRemote			
+		cmpList[xx].value->Compose(gApp.Surface(),cmpList[xx].value->m_pos, bInt
+#ifdef MULTIPLAYER
+			|| bRemote
 #endif
 			);
 	}
@@ -1321,7 +1324,7 @@ void iBattleView::BeginAutobattle()
     /*// add only once
     if (m_pAutoBattleToolBar == NULL)
     {*/
-	//AddChild(m_pAutoBattleToolBar = new iAutoBattleToolBar(m_pMgr, this, iRect(0, m_Rect.y2()-DEF_BTN_HEIGHT - 5,m_Rect.w, DEF_BTN_HEIGHT + 5)));    
+	//AddChild(m_pAutoBattleToolBar = new iAutoBattleToolBar(m_pMgr, this, iRect(0, m_Rect.y2()-DEF_BTN_HEIGHT - 5,m_Rect.w, DEF_BTN_HEIGHT + 5)));
 
     m_pBattle->Engine().SetAutobattle(true);
 	OnGroupChanged();
@@ -1333,9 +1336,9 @@ void iBattleView::EndAutobattle()
         return;
 */
 	//check(m_pAutoBattleToolBar);
-	/*RemoveChild(m_pAutoBattleToolBar);    
+	/*RemoveChild(m_pAutoBattleToolBar);
 	delete m_pAutoBattleToolBar; // it's here because RemoveChild doesn't call to delete
-	m_pAutoBattleToolBar = NULL;		
+	m_pAutoBattleToolBar = NULL;
 	*/
 	m_pAutoBattleToolBar->SetVisible(false);
 	m_pBattle->Engine().SetAutobattle(false);
@@ -1346,7 +1349,7 @@ void iBattleView::SpellDlg(){
 	SetInfoMode(false);
 	//set the flag, so it doesn't select move entry right now
 	m_bDontMove = true;
-	
+
 	iHero* pHero = m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->SpellCaster();
 	check(pHero);
 	// Check for Spere of Negation
@@ -1355,19 +1358,19 @@ void iBattleView::SpellDlg(){
 		dlg.DoModal();
 		return;
 	}
-	
+
 	// fix for double cast bug: remove the previous spelltrack if any
 	EndSpellTrack(cInvalidPoint);		// fix for double cast bug: remove the previous spelltrack if any
-	
+
 	EnableControls(SpellBook);
 	iDlg_Spellbook csDlg(m_pMgr, pHero, SPT_MASK_COMBAT, false);
-	
+
 	sint32 res = csDlg.DoModal();
-	
-	uint32 flags = CanInfo | CanMelee;		
+
+	uint32 flags = CanInfo | CanMelee;
 	if (m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->CanCastSpell()) flags |= CanCast;
-	if (m_pBattle->Engine().CanWait()) flags |= CanWait;		
-	
+	if (m_pBattle->Engine().CanWait()) flags |= CanWait;
+
 	if (res == DRC_YES) {
 		iBaseSpell* pSpell = gGame.ItemMgr().m_spellMgr.Spell(csDlg.SelSpell());
 		check(pSpell && pSpell->Type() == SPT_COMBAT);
@@ -1393,7 +1396,7 @@ void iBattleView::SpellDlg(){
 void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
 {
 	uint32 uid = pView->GetUID();
-	
+
 	if (m_pCastSpellToolBar && uid == DRC_CANCEL) {
 		EndSpellTrack(cInvalidPoint);
 	} else if (m_pAutoBattleToolBar && uid == DRC_CANCEL) {
@@ -1414,7 +1417,7 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 			} else if (iBattleMember_Castle *pCastleActor = DynamicCast<iBattleMember_Castle*>(pActMember)) {
 				pHero = pCastleActor->GetVisitor();
 				pCastle = pCastleActor->GetCastle();
-			} 
+			}
 
 			if(!pHero) {
 				check(pCastle);
@@ -1424,12 +1427,12 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 				HighlightMemberButton(uid, false);
 				if(res == iDlg_BattleCastle::MainMenu) {
 					iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_EXITMM], PID_NEUTRAL);
-					if (qdlg.DoModal() == DRC_YES) {				
-						gGame.MainMenu();								
-					}			
+					if (qdlg.DoModal() == DRC_YES) {
+						gGame.MainMenu();
+					}
 				} else if(res == iDlg_BattleCastle::AutoBattle) {
 					BeginAutobattle();
-				} 
+				}
 				return;
 			}
 
@@ -1442,7 +1445,7 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 				flags |= iDlg_BattleHero::CanRetreat;
 				if (DynamicCast<iBattleMember_Hero*>(pEnemyMember)) flags |= iDlg_BattleHero::CanSurrender;
 			}
-			
+
 			HighlightMemberButton(uid, true);
 			iDlg_BattleHero bhDlg(m_pMgr, *pHero, pActMember->GetSide() == pFriendlyMember->GetSide(), flags);
 			sint32 res = bhDlg.DoModal();
@@ -1464,9 +1467,9 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 
 			} else if(res == iDlg_BattleHero::MainMenu) {
 				iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_EXITMM], PID_NEUTRAL);
-				if (qdlg.DoModal() == DRC_YES) {				
-					gGame.MainMenu();								
-				}			
+				if (qdlg.DoModal() == DRC_YES) {
+					gGame.MainMenu();
+				}
 			} else if(res == iDlg_BattleHero::AutoBattle) {
 				BeginAutobattle();
 			} else if (res == iDlg_BattleHero::Surrender) {
@@ -1508,7 +1511,7 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 		OnGroupChanged();
 	} else if (uid == BCI_DEFEND_BTN) {
         gTutorial.Trigger(TUT_BATTLE_DEFEND);
-        
+
 		SetInfoMode(false);
 		//set the flag, so it doesn't select move entry right now
 		m_bDontMove = true;
@@ -1525,7 +1528,7 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 		BeginAutobattle();
 	} else if (uid == BCI_MSGLOG_BTN) {
 		//iDlg_BattleLog bldlg(m_pMgr, m_pBattle->Engine().TurnSeq().CurUnit()->Owner()->Owner(), m_log);
-		//bldlg.DoModal();	
+		//bldlg.DoModal();
 #ifdef MULTIPLAYER
 	} else if(uid == BCI_KICK_BTN) {
 		PLAYER_ID pid = gGame.Map().RealCurPlayer();
@@ -1533,19 +1536,19 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 			, PID_NEUTRAL);
 		if (qdlg.DoModal() == DRC_YES) {
 			gMPMgr.DoKick(pid);
-		}					
+		}
 #endif
 	} else if (uid == BCI_SETTINGS_BTN) {
 		iSettingsDlg sdlg(&gApp.ViewMgr(), true);
 		sint32 res = sdlg.DoModal();
-		if (res == GMRC_MAINMENU) {				
+		if (res == GMRC_MAINMENU) {
 			// Quit to main menu
 			iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_EXITMM], PID_NEUTRAL);
-			if (qdlg.DoModal() == DRC_YES) {				
-				gGame.MainMenu();								
+			if (qdlg.DoModal() == DRC_YES) {
+				gGame.MainMenu();
 			}
-		} else if (res == GMRC_QUIT) {			
-			// Quit to OS			
+		} else if (res == GMRC_QUIT) {
+			// Quit to OS
 			iQuestDlg qdlg(&gApp.ViewMgr(), iStringT(), gTextMgr[TRID_CONFIRM_QUIT], PID_NEUTRAL);
 			if (qdlg.DoModal() == DRC_YES) {
 				gGame.Quit();
@@ -1563,7 +1566,7 @@ void iBattleView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 par
 					gGame.ExitGame(false);
 					gGame.StartNewGame(scenProps, false, false);
 					//}
-				} 
+				}
 			}
 		}
 	} else if(uid == BCI_INFO_BTN) {
@@ -1583,31 +1586,31 @@ void iBattleView::Recalc()
 	uint16 height = gApp.Surface().GetHeight();
 #else
     uint16 width = GetWindowWidth();
-	uint16 height = GetWindowHeight();  
+	uint16 height = GetWindowHeight();
 #endif
 	if(width >= 1024) {
-		sm_hexWidth = 72; 
+		sm_hexWidth = 72;
 		sm_hexHalfWidth = 36;
 		sm_hexHeight = 42;
-		sm_gridZoom = 2;		
+		sm_gridZoom = 2;
 	} else if(width >= 480) {
 		sm_hexWidth = 36;
 		sm_hexHalfWidth = 18;
 		sm_hexHeight = 20;
-		sm_gridZoom = 1;		
+		sm_gridZoom = 1;
 	} else {
 		sm_hexWidth = 24;
 		sm_hexHalfWidth = 13;
 		sm_hexHeight = 17;
-		sm_gridZoom = 0;		
+		sm_gridZoom = 0;
 	}
-    
+
     iPoint offset = iPoint(0,0);
     if(!gUseIpadUI)
     {
         offset.y = -13;
     }
-    
+
 #ifndef PC_VERSION
 	anchor = m_Rect.point() + iPoint((width - 13 * sm_hexWidth + sm_hexHalfWidth) / 2, (height - 11 * sm_hexHeight) / 2 + sm_hexHeight) + offset;
 #else
@@ -1617,17 +1620,17 @@ void iBattleView::Recalc()
 
 void iBattleView::OnActivate(bool bActivate)
 {
-	iStringT battleMusic[4] = {
-		_T("Night of the Owl.mp3"),
-		_T("Firesong.mp3"),
-		_T("Chee Zee Jungle.mp3"),
-		_T("Cartoon Battle.mp3"),		
+	std::string battleMusic[4] = {
+		("Night of the Owl.mp3"),
+		("Firesong.mp3"),
+		("Chee Zee Jungle.mp3"),
+		("Cartoon Battle.mp3"),
 	};
 	if(bActivate) {
-		
+
 		bFirstDarken = true;
 		iRandomizer r(gGame.Map().GetRandSeed());
-		iStringT music = gMusicPath + battleMusic[r.Rand(4)];
+		auto music = RelativeFilePath("Music/" + battleMusic[r.Rand(4)]);
 		gMusicMgr.Play(music);
 	}
 
@@ -1647,13 +1650,13 @@ iPoint iBattleView::FortElemHitPos( iPoint pos, iCastleFort::ElementType type, i
         sid = FORT_DECS_IPHONE[type][state].sid;
         offset = FORT_DECS_IPHONE[type][state].offset;
     }
-    
+
 	return pos + offset + gGfxMgr.Anchor(sid) + iPoint(gGfxMgr.Dimension(sid).w / 2, gGfxMgr.Dimension(sid).h / 2);
 }
 
 iPoint iBattleView::FortElemPos( iPoint pos, iCastleFort::ElementType type, iCastleFort::ElementState state )
 {
-    
+
     SpriteId sid;
     iPoint offset;
     if(gUseIpadUI)
@@ -1666,7 +1669,7 @@ iPoint iBattleView::FortElemPos( iPoint pos, iCastleFort::ElementType type, iCas
         sid = FORT_DECS_IPHONE[type][state].sid;
         offset = FORT_DECS_IPHONE[type][state].offset;
     }
-    
+
 	return pos + offset;
 }
 
@@ -1676,13 +1679,13 @@ iPoint iBattleView::FortElemPos( iPoint pos, iCastleFort::ElementType type, iCas
 */
 iAutoBattleToolBar::iAutoBattleToolBar(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect)
 : iView(pViewMgr, rect, GENERIC_VIEWPORT, 0, Enabled|Visible)
-{	
+{
 }
 
 void iAutoBattleToolBar::OnCompose()
 {
-	iRect rc = GetScrRect();	
-	
+	iRect rc = GetScrRect();
+
 	//gGfxMgr.BlitTile(PDGG(BKTILE), gApp.Surface(), rc);
 	//ButtonFrame(gApp.Surface(), rc, 0);
 	//
@@ -1699,7 +1702,7 @@ void iAutoBattleToolBar::OnCompose()
 */
 iCastSpellToolBar::iCastSpellToolBar(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHandler, const iRect& rect, iHero* pCaster, iCombatSpell* pSpell)
 : iView(pViewMgr, rect, GENERIC_VIEWPORT, 0, Enabled|Visible), m_pSpell(pSpell), m_pCaster(pCaster), m_pTarget(NULL)
-{	
+{
 #ifdef PC_VERSION
 	sint32 bw = gTextComposer.GetTextSize(gTextMgr[TRID_CANCEL], btnfc_normal).w + 30;
     iRect rc = AlignChild(iSize(bw, DEF_BTN_HEIGHT), AlignRight) - iPoint(3, 0) + iPoint(0, 3);
@@ -1710,16 +1713,16 @@ iCastSpellToolBar::iCastSpellToolBar(iViewMgr* pViewMgr, IViewCmdHandler* pCmdHa
 void iCastSpellToolBar::OnCompose()
 {
 #ifdef PC_VERSION
-	iRect rc = GetScrRect();	
+	iRect rc = GetScrRect();
 	//gGfxMgr.BlitTile(PDGG(BKTILE), gApp.Surface(), rc);
 	//ButtonFrame(gApp.Surface(), rc, 0);
-	// 
+	//
 	iRect bkrc(rc);
 	bkrc.InflateRect(50, 0);
 	bkrc.InflateRect(0, 0, 0, 10);
 
     sint32 w = 0;
-    
+
 	iStringT txt;
 	iStringT spname = iFormat(_T("#I%04X %s"), m_pSpell->Icon(), gTextMgr[m_pSpell->NameKey()]);
 	if(m_pTarget) {
@@ -1729,10 +1732,10 @@ void iCastSpellToolBar::OnCompose()
 			iSpell_Damage* pDmgSpell = (iSpell_Damage*)m_pSpell;
 			txt += _T(" ") + iFormat(gTextMgr[TRID_MSG_BAT_DAMAGE1], pDmgSpell->EstimateDamage(m_pCaster, m_pTarget));
 		}
-        
+
         w += gTextComposer.GetTextSize(txt, dlgfc_hdr).w;
 	}
-	else  {		
+	else  {
 		txt += iFormat(_T("%s %s"), gTextMgr[TRID_MSG_CHOOSE_TARGET], spname.CStr());
 		if(m_pSpell->SpellClass() == SPC_DAMAGE)
 		{
@@ -1740,19 +1743,19 @@ void iCastSpellToolBar::OnCompose()
 			txt += _T(" ") + iFormat(gTextMgr[TRID_MSG_BAT_DAMAGE1], pDmgSpell->SpellBookDamage(m_pCaster));
 		}
         w += gTextComposer.GetTextSize(txt, dlgfc_hdr).w;
-	}    
-				
+	}
+
     bkrc.w = w + gTextComposer.GetTextSize(gTextMgr[TRID_CANCEL], btnfc_normal).w + 30 + 50*2 +10;
-    
+
     sint32 offset = 571 - bkrc.w/2;
-    
+
     iRect rect = m_pBtnCancel->GetRect();
     rect.x = w + 20 + offset;
     m_pBtnCancel->SetRect(rect);
-    
-    bkrc.x += offset;    
+
+    bkrc.x += offset;
     ComposeGlowBkgnd(gApp.Surface(), bkrc, true, true );//false);
-    
+
     rc.x += offset;
     gTextComposer.TextOut(dlgfc_hdr, gApp.Surface(), rc.point(), txt, rc, AlignLeft);
 #endif

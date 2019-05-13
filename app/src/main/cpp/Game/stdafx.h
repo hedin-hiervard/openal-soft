@@ -112,6 +112,7 @@ extern  bool            gUseIpadUI;
 #include "gxl.ctr.sortarray.h"
 #include "TextManager.h"
 #include "TextComposer.h"
+#include "FileAccessor/FileAccessor.h"
 
 #include "common.h"
 #include "cm_creatures.h"
@@ -188,16 +189,17 @@ struct iSecret {
 #endif
 //#undef NEED_REGISTRATION
 
-extern	iStringT		gRootPath;
-extern	iStringT		gDataPath;
-extern	iStringT		gSavePath;
-extern	iStringT		gBundledMapsPath;
-extern	iStringT		gDownloadedMapsPath;
-extern  iStringT        gMapStatFilePath;
-extern  iStringT        gMapShopCfgFilePath;
-extern  iStringT        gConfigFilePath;
-extern	iStringT		gMusicPath;
-extern  iStringT        gTutorialCfgFilePath;
+extern fileaccessor::RelativeFilePath    gDataPath;
+extern fileaccessor::RelativeFilePath    gSavePath;
+extern fileaccessor::RelativeFilePath    gAppDataPath;
+extern fileaccessor::RelativeFilePath    gBundledMapsPath;
+extern fileaccessor::RelativeFilePath    gDownloadedMapsPath;
+extern fileaccessor::RelativeFilePath    gMapStatFilePath;
+extern fileaccessor::RelativeFilePath    gMusicPath;
+extern fileaccessor::RelativeFilePath    gMapShopCfgFilePath;
+extern fileaccessor::RelativeFilePath    gConfigFilePath;
+extern fileaccessor::RelativeFilePath    gTutorialCfgFilePath;
+
 extern	iGXApp&			gApp;
 extern	iDibReader		gDibReader;
 extern	iTextComposer&	gTextComposer;

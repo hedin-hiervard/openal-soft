@@ -23,7 +23,7 @@ public:
 
 private:
 	void OnCreateDlg()
-	{ 
+	{
 		iRect clRect = ClientRect();
 		AddChild(new iPHLabel(m_pMgr, iRect(clRect.x,clRect.y,clRect.w,15), m_hdr, AlignCenter, dlgfc_topic));
 		AddChild(new iTextButton(m_pMgr,this,iRect(clRect.x+(clRect.w/2-20),clRect.y2()-DEF_BTN_HEIGHT,40,DEF_BTN_HEIGHT),TRID_CANCEL, DRC_CANCEL));
@@ -36,13 +36,13 @@ private:
 	}
 
 	void DoCompose(const iRect& rect)
-	{ 
+	{
 		gTextComposer.TextBoxOut(dlgfc_plain, gApp.Surface(), gTextMgr[TRID_HKEY_PRESS_KEY], iRect(rect.x+10, rect.y+25, rect.w-20, rect.h-20));
 	}
 
 	iSize ClientSize() const
-	{ 
-		return gTextComposer.GetTextBoxSize(gTextMgr[TRID_HKEY_PRESS_KEY], 120, dlgfc_topic) + iSize(20,60);	
+	{
+		return gTextComposer.GetTextBoxSize(gTextMgr[TRID_HKEY_PRESS_KEY], 120, dlgfc_topic) + iSize(20,60);
 	}
 
 	void iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 param)
@@ -128,9 +128,9 @@ void iSettingsDlg::OnCreateDlg()
 
 	// Label
 	AddChild(new iPHLabel(m_pMgr,iRect(clRect.x, clRect.y, clRect.w, 15), gTextMgr[TRID_MENU_GAMESETTINGS], AlignTop, dlgfc_hdr));
-	
+
 	// Track bars
-	
+
 	// Sfx volume
 	AddChild(m_sfxVolumeLabel = new iPHLabel(m_pMgr,iRect(xpos, ypos, 120, 12), iStringT(), AlignTop, dlgfc_splain)); ypos += 13;
 	AddChild(m_sfxVolumeSlider = new iPHMiniSlider(m_pMgr,this,iRect(xpos, ypos , 120, 11), 101)); ypos += 15;
@@ -142,13 +142,13 @@ void iSettingsDlg::OnCreateDlg()
 		m_sfxVolumeSlider->SetCurPos(gSettings.GetEntryValue(CET_SFXVOLUME));
 	}
 	UpdateSliderLabel(101);
-	
+
 	// Display gamma (not needed anymore as of 1.04. Hedin)
 	//AddChild(m_dispGammaLabel = new iPHLabel(m_pMgr,iRect(xpos, ypos, 120, 12), iStringT(), AlignTop, dlgfc_splain)); ypos += 13;
 	//AddChild(m_dispGammaSlider = new iPHMiniSlider(m_pMgr,this,iRect(xpos, ypos , 120, 12), 102)); ypos += 15;
 	//m_dispGammaSlider->SetMetrics(5,1);
 	//m_dispGammaSlider->SetCurPos(gSettings.GetEntryValue(CET_DISPGAMMA));
-	//UpdateSliderLabel(102);	
+	//UpdateSliderLabel(102);
 
 	// Map scroll speed
 	AddChild(m_mapScrollLabel = new iPHLabel(m_pMgr,iRect(xpos, ypos, 120, 12), iStringT(), AlignTop, dlgfc_splain)); ypos += 13;
@@ -165,7 +165,7 @@ void iSettingsDlg::OnCreateDlg()
 	m_heroSpeedSlider->SetCurPos(gSettings.GetEntryValue(CET_HEROSPEED));
 //	AddChild(m_heroSpeedSlider = new iPHMiniSlider(m_pMgr,this,iRect(xpos, ypos , 120, 12), 104)); ypos += 15;
 	UpdateSliderLabel(104);
-	
+
 	// Combat speed
 	AddChild(m_combatSpeedLabel = new iPHLabel(m_pMgr,iRect(xpos, ypos, 120, 12), iStringT(), AlignTop, dlgfc_splain)); ypos += 13;
 	AddChild(m_combatSpeedSlider = new iPHMiniSlider(m_pMgr,this,iRect(xpos, ypos , 120, 12), 105)); ypos += 15;
@@ -176,7 +176,7 @@ void iSettingsDlg::OnCreateDlg()
 
 	// Game Language
 	AddChild(new iTextButton(m_pMgr,this,iRect(xpos, ypos, 120, DEF_BTN_HEIGHT),TRID_GAME_LANGUAGE, 102));	ypos += DEF_BTN_HEIGHT;
-	
+
 	// Checkboxes
 	xpos = clRect.x + (clRect.w/2) + 10;
 	ypos = clRect.y + 29;
@@ -192,18 +192,18 @@ void iSettingsDlg::OnCreateDlg()
 //	AddChild(m_checkBoxes[6] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 12), gTextMgr[TRID_CFGENTRY_SURVMAPSCALE], 207, Visible|Enabled, gSettings.GetEntryValue(CET_SURVMAPSCALE)>0)); ypos += 16;
 	AddChild(m_checkBoxes[7] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 12), gTextMgr[TRID_CFGENTRY_AUTOSAVE], 208, Visible|Enabled, gSettings.GetEntryValue(CET_AUTOSAVE)>0)); ypos += 16;
 	AddChild(m_checkBoxes[8] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 12), gTextMgr[TRID_CFGENTRY_LHANDER], 209, Visible|Enabled, gSettings.GetEntryValue(CET_LHANDMAODE)>0)); ypos += 16;
-	
+
 	/*
 	AddChild(m_checkBoxes[0] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_ENDTURN], 201, Visible|Enabled, gSettings.GetEntryValue(CET_ENDTURNCONF)>0)); ypos += 21;
 	AddChild(m_checkBoxes[1] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_MAPGRID], 202, Visible|Enabled, gSettings.GetEntryValue(CET_OVRLANDGRID)>0)); ypos += 21;
 	AddChild(m_checkBoxes[2] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_COMBATGRID], 203, Visible|Enabled, gSettings.GetEntryValue(CET_COMBATGRID)>0)); ypos += 21;
 	AddChild(m_checkBoxes[3] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_QUICKCOMBAT], 204, Visible|Enabled, gSettings.GetEntryValue(CET_QUICKCOMBAT)>0)); ypos += 21;
-	
+
 	AddChild(m_checkBoxes[5] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_SURVMAPFILT], 206, Visible|Enabled, gSettings.GetEntryValue(CET_SURVMAPFILTR)>0)); ypos += 21;
 	AddChild(m_checkBoxes[6] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_SURVMAPSCALE], 207, Visible|Enabled, gSettings.GetEntryValue(CET_SURVMAPSCALE)>0)); ypos += 21;
 	AddChild(m_checkBoxes[7] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_AUTOSAVE], 208, Visible|Enabled, gSettings.GetEntryValue(CET_AUTOSAVE)>0)); ypos += 21;
 #ifndef OS_IPHONE
-	AddChild(m_checkBoxes[8] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_LHANDER], 209, Visible|Enabled, gSettings.GetEntryValue(CET_LHANDMAODE)>0)); ypos += 21;	
+	AddChild(m_checkBoxes[8] = new iCheckBox(m_pMgr,this,iRect(xpos, ypos, 120, 17), gTextMgr[TRID_CFGENTRY_LHANDER], 209, Visible|Enabled, gSettings.GetEntryValue(CET_LHANDMAODE)>0)); ypos += 21;
 #endif
 	*/
 	// Hardware keys and Ok button
@@ -213,7 +213,7 @@ void iSettingsDlg::OnCreateDlg()
 		AddChild(new iTextButton(m_pMgr,this,iRect(clRect.x+(clRect.w/2-57) + 80,clRect.y2()-DEF_BTN_HEIGHT,90,DEF_BTN_HEIGHT),TRID_SYSTEM_MENU, 302));
 	} else {
 		AddChild(new iTextButton(m_pMgr,this,iRect(clRect.x+(clRect.w/2-57),clRect.y2()-DEF_BTN_HEIGHT,40,DEF_BTN_HEIGHT),TRID_OK, DRC_OK));
-		AddChild(new iTextButton(m_pMgr,this,iRect(clRect.x+(clRect.w/2-57) + 45,clRect.y2()-DEF_BTN_HEIGHT,70,DEF_BTN_HEIGHT),TRID_HARDWARE_KEYS, 301));		
+		AddChild(new iTextButton(m_pMgr,this,iRect(clRect.x+(clRect.w/2-57) + 45,clRect.y2()-DEF_BTN_HEIGHT,70,DEF_BTN_HEIGHT),TRID_HARDWARE_KEYS, 301));
 	}
 }
 
@@ -224,7 +224,7 @@ void iSettingsDlg::DoCompose(const iRect& rect)
 
 iSize iSettingsDlg::ClientSize() const
 {
-	return iSize(280,175 + DEF_BTN_HEIGHT); 
+	return iSize(280,175 + DEF_BTN_HEIGHT);
 }
 
 void iSettingsDlg::UpdateSliderLabel(uint32 sliderId)
@@ -232,7 +232,7 @@ void iSettingsDlg::UpdateSliderLabel(uint32 sliderId)
 #ifdef OS_IPHONE
 	return;
 #endif
-	
+
 	if (sliderId == 101) {
 		// Sfx Volume
 		if (!m_sfxVolumeSlider->CurPos()) m_sfxVolumeLabel->SetText(iStringT(gTextMgr[TRID_SFX_VOLUME]) + _T(": ") + gTextMgr[TRID_OFF]);
@@ -289,13 +289,13 @@ void iSettingsDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
 		hkdlg.DoModal();
 	} else if (uid == 302) {
 		iGameMenuDlg dlg(m_pMgr, true);
-		EndDialog(dlg.DoModal());		
+		EndDialog(dlg.DoModal());
 	}else if (uid == 101) {
 		// Sfx volume
 		UpdateSliderLabel(101);
 		gSettings.SetEntryValue(CET_SFXVOLUME, param);
 		if (param && !gApp.SndPlayer().Inited()) {
-			gSfxMgr.Init(gDataPath+_T("game.sfx"));
+			gSfxMgr.Init(fileaccessor::RelativeFilePath("game.sfx"));
 			gApp.SndPlayer().Init();
 			gApp.SndPlayer().SetVolume(param*25);
 			if (gGame.Map().CurHero()) gGame.SoundMap().SetupEnvSounds(gGame.Map().CurHero()->Pos());
@@ -306,7 +306,7 @@ void iSettingsDlg::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 pa
 		//Pop the game language dialog
 		iDlg_GameLanguage dlg(m_pMgr);
 		dlg.DoModal();
-		
+
 		EndDialog(0);
 		// Display gamma
 		//UpdateSliderLabel(102);

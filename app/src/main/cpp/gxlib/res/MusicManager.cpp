@@ -22,13 +22,13 @@ iMusicManager::iMusicManager()
 
 iMusicManager::~iMusicManager()
 {
-	
+
 }
 
 bool iMusicManager::Init()
 {
 #ifdef OS_WIN32
-	device = audiere::OpenDevice(); 
+	device = audiere::OpenDevice();
 #endif
 #ifdef OS_APPLE
 	return iphoneMusicMgr_Init();
@@ -42,7 +42,7 @@ void iMusicManager::Cleanup()
 	iphoneMusicMgr_Deinit();
 #endif
 }
-		
+
 void iMusicManager::SetVolume(uint32 newvol)
 {
 #ifdef OS_WIN32
@@ -55,26 +55,13 @@ void iMusicManager::SetVolume(uint32 newvol)
 #endif
 }
 
-void iMusicManager::Play(iStringT& filename, bool restorePos)
+void iMusicManager::Play(const fileaccessor::RelativeFilePath& path, bool restorePos)
 {
-	if(nowPlaying == filename) return;
-	iStringA tmp = iStringA(CvtT2A<>(filename.CStr()));
-#ifdef OS_WIN32
-	Stop();
-	sound = audiere::OpenSound(device, tmp.CStr(), true);
-	sound->setVolume( volume );
-	sound->setRepeat(true); 
-	sound->play();
-#endif
+	if(nowPlaying == path) return;
 
-#ifdef OS_APPLE
-	RecordPos(nowPlaying, iphoneMusicMgr_GetCurPos());
-	iphoneMusicMgr_Play(tmp.CStr());
-	if(restorePos)
-		iphoneMusicMgr_SetCurPos(GetRecordedPos(filename));
-#endif
-	nowPlaying = filename;
-	
+	// RecordPos(nowPlaying, iphoneMusicMgr_GetCurPos());
+	// iphoneMusicMgr_Play(tmp.CStr());
+	// nowPlaying = path;
 }
 
 void iMusicManager::Stop()
@@ -86,28 +73,28 @@ void iMusicManager::Stop()
 
 #ifdef OS_APPLE
 	iphoneMusicMgr_Stop();
-#endif	
+#endif
 }
 
-void iMusicManager::RecordPos(iStringT& track, uint32 pos)
+void iMusicManager::RecordPos(const fileaccessor::RelativeFilePath& path, uint32 pos)
 {
-	for(uint32 xx=0; xx<m_posHist.GetSize(); xx++) 
-		if(m_posHist[xx].track == track) {
-			m_posHist[xx].pos = pos;
-			return;
-		}
-	
-	posRec rec;
-	rec.track = track;
-	rec.pos = pos;
-	m_posHist.Add(rec);
+	// for(uint32 xx=0; xx<m_posHist.GetSize(); xx++)
+	// 	if(m_posHist[xx].track == track) {
+	// 		m_posHist[xx].pos = pos;
+	// 		return;
+	// 	}
+
+	// posRec rec;
+	// rec.track = track;
+	// rec.pos = pos;
+	// m_posHist.Add(rec);
 }
-uint32 iMusicManager::GetRecordedPos(iStringT &track)
+uint32 iMusicManager::GetRecordedPos(const fileaccessor::RelativeFilePath& path)
 {
-	for(uint32 xx=0; xx<m_posHist.GetSize(); xx++) 
-		if(m_posHist[xx].track == track) {
-			return m_posHist[xx].pos;
-		}
+	// for(uint32 xx=0; xx<m_posHist.GetSize(); xx++)
+	// 	if(m_posHist[xx].track == track) {
+	// 		return m_posHist[xx].pos;
+	// 	}
 	return 0;
 }
 
@@ -115,14 +102,14 @@ uint32 iMusicManager::GetRecordedPos(iStringT &track)
 void iMusicManager::Play(){
 
 	if( isPause ){
-		
+
 		isPause = false;
-	
+
 		if( nowPlaying.Length() ){
-		
-			iStringA tmp = iStringA(CvtT2A<>(nowPlaying.CStr()));
-			iphoneMusicMgr_Play(tmp.CStr());
-			iphoneMusicMgr_SetCurPos(curPos);
+
+			// iStringA tmp = iStringA(CvtT2A<>(nowPlaying82()));
+			// iphoneMusicMgr_Play(tmp.CStr());
+			// iphoneMusicMgr_SetCurPos(curPos);
 		}
 	}
 }
@@ -130,10 +117,10 @@ void iMusicManager::Play(){
 void iMusicManager::Pause(){
 
 	if( !isPause ){
-	
+
 		isPause = true;
-		curPos = iphoneMusicMgr_GetCurPos();
-		iphoneMusicMgr_Stop();
+		// curPos = iphoneMusicMgr_GetCurPos();
+		// iphoneMusicMgr_Stop();
 	}
 }
 #endif

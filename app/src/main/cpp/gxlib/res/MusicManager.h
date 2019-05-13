@@ -1,10 +1,12 @@
 #ifndef GXLIB_RES_MUSICMANAGER_H_
 #define GXLIB_RES_MUSICMANAGER_H_
 
+#include "FileAccessor/FileAccessor.h"
+
 #ifdef OS_WIN32
 #include "audiere.h"
 //#pragma common(lib, "audiere.lib")
-//using namespace audiere; 
+//using namespace audiere;
 #endif
 
 class iMusicManager
@@ -12,9 +14,9 @@ class iMusicManager
 public:
 	bool Init();
 	void Cleanup();
-		
+
 	//
-	void Play(iStringT& filename, bool restorPos= false);
+	void Play(const fileaccessor::RelativeFilePath& path, bool restorPos= false);
 #if defined( OS_MACOS )
 	void Play();
 	void Pause();
@@ -27,14 +29,14 @@ public:
 			return theSingleInstance;
 		}
 private:
-	void RecordPos(iStringT& track, uint32 pos);
-	uint32 GetRecordedPos(iStringT &track);
+	void RecordPos(const fileaccessor::RelativeFilePath& path, uint32 pos);
+	uint32 GetRecordedPos(const fileaccessor::RelativeFilePath& path);
 private:
 	iMusicManager();
 	~iMusicManager();
 
 	struct posRec {
-		iStringT track;
+		const fileaccessor::RelativeFilePath& path;
 		uint32 pos;
 	};
 #ifdef OS_WIN32
@@ -42,7 +44,7 @@ private:
 	audiere::AudioDevicePtr device;
 	float volume;
 #endif
-	iStringT nowPlaying;
+	const fileaccessor::RelativeFilePath nowPlaying;
 	iSimpleArray<posRec> m_posHist;
 #if defined( OS_MACOS )
 	uint32 curPos;

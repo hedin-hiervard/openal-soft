@@ -7,6 +7,8 @@
 #include "ScreenSlider.h"
 //#include "NewMapShop/NewMapShop.h"
 
+using namespace fileaccessor;
+
 namespace UI_IPHONE
 {
 
@@ -645,14 +647,14 @@ namespace UI_IPHONE
 
     }
 
-    iStringT castleThemes[CTLT_COUNT] = {
-        _T("Achaidh_Cheide"),   // citadel
-        _T("Thunderhead"),      // stronghold
-        _T("Ibn Al-Noor"),	    // tower
-        _T("Eastern_Thought"),  // dungeon
-        _T("Finding_Movement"), // fortress
-        _T("Frost_Waltz"),       // necropolis
-        _T("Pale_Rider")       // variags
+    std::string castleThemes[CTLT_COUNT] = {
+        ("Achaidh_Cheide"),   // citadel
+        ("Thunderhead"),      // stronghold
+        ("Ibn Al-Noor"),	    // tower
+        ("Eastern_Thought"),  // dungeon
+        ("Finding_Movement"), // fortress
+        ("Frost_Waltz"),       // necropolis
+        ("Pale_Rider")       // variags
     };
 
 
@@ -669,7 +671,7 @@ namespace UI_IPHONE
         //m_pArmyExchange->SetTopOwner(m_pCastle, true);
         UpdateSize();
         Update();
-        iStringT tmp = gMusicPath + castleThemes[m_pCastle->Proto()->Type()] + _T(".mp3");
+        auto tmp = RelativeFilePath(std::string("Music/") + castleThemes[m_pCastle->Proto()->Type()] + (".mp3"));
         gMusicMgr.Play(tmp, true);
     }
 

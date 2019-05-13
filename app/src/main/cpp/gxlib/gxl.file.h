@@ -95,8 +95,7 @@ public:
 /*
  *	Fabric functions
  */
-iFileI* CreateWin32File(const iStringT& fname);
-iFileI* OpenWin32File(const iStringT& fname);
+iFileI* CreateWin32File(const fileaccessor::RelativeFilePath& path);
 iFileI* OpenWin32File(const fileaccessor::RelativeFilePath& path);
 
 #if !defined(UNDER_CE) && !defined(OS_APPLE) && !defined(OS_LINUX) && !defined(OS_ANDROID)
@@ -123,16 +122,16 @@ bool	CopyFile( iFileI* src, iFileI* dst );
  *	iFile static functions
  */
 namespace iFile {
-	bool Exists(const iStringT& fname);
-	bool Delete(const iStringT& fname);
-	bool Rename(const iStringT& fname, const iStringT& to_fname);
-	bool Copy(const iStringT& fname, const iStringT& to_fname);
-	bool Move(const iStringT& fname, const iStringT& to_fname);
-	bool DirExists(const iStringT& dname);
-	bool DirDelete(const iStringT& dname);
-	void DirRename(const iStringT& dname, const iStringT& to_dname);
-	bool DirCreate(const iStringT& dname);
-	uint32 GetSize(const iStringT& fname);
+	bool Exists(const fileaccessor::RelativeFilePath& path);
+	bool Delete(const fileaccessor::RelativeFilePath& path);
+	bool Rename(const fileaccessor::RelativeFilePath& from, const fileaccessor::RelativeFilePath& to);
+  bool Copy(const fileaccessor::RelativeFilePath& from, const fileaccessor::RelativeFilePath& to);
+	bool Move(const fileaccessor::RelativeFilePath& from, const fileaccessor::RelativeFilePath& to);
+	bool DirExists(const fileaccessor::RelativeFilePath& dir);
+	bool DirDelete(const fileaccessor::RelativeFilePath& dir);
+	void DirRename(const fileaccessor::RelativeFilePath& from, const fileaccessor::RelativeFilePath& to);
+	bool DirCreate(const fileaccessor::RelativeFilePath& dir);
+	uint32 GetSize(const fileaccessor::RelativeFilePath& dir);
 } // namespace iFile
 
 /*

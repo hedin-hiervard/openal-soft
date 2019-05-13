@@ -65,7 +65,7 @@ static void EnumSaveGames(bool bSave, iSaveSlots& saveSlots)
 	// skip the autosave & quicksave if saving
     for (uint32 xx = bSave ? 1 : 0; xx < SAVE_GAME_SLOTS - (bSave ? 1 : 0); ++xx)
     {
-        auto fpath = RelativeFilePath((gSavePath + iFormat(_T("save%02d.phsd"),xx)).CStr(), FileLocationType::FLT_DOCUMENT);
+        auto fpath = RelativeFilePath(iFormat(_T("save%02d.phsd"),xx).CStr(), FileLocationType::FLT_DOCUMENT);
 #ifdef HMM_COMPOVERSION
         iFilePtr pFile(xxc::OpenXFile(fname.CStr(),HMM_COMPOCODE));
 #else
@@ -107,16 +107,16 @@ static void EnumSaveGames(bool bSave, iSaveSlots& saveSlots)
 	}
 }
 
-static bool GetNextFileName(iStringT& fname)
+static bool GetNextFileName(fileaccessor::RelativeFilePath& path)
 {
-    fname = _T("");
+
 	// do not select quicksave & autosave
     for (uint32 xx = 1; xx < SAVE_GAME_SLOTS - 1; ++xx)
     {
-        iStringT fn = gSavePath + iFormat(_T("save%02d.phsd"),xx);
+        auto fn = RelativeFilePath(iFormat(_T("save%02d.phsd"),xx).CStr(), FileLocationType::FLT_DOCUMENT);
         if (!iFile::Exists(fn))
         {
-            fname = fn;
+            path = fn;
             return true;
         }
     }
@@ -312,20 +312,20 @@ bool iSaveGameView::Process(fix32 t)
 	return false;
 }
 
-void iSaveGameView::GetSaveFileName(iStringT& fname, uint32 slot)
+void iSaveGameView::GetSaveFileName(fileaccessor::RelativeFilePath& path, uint32 slot)
 {
-    fname = gSavePath + iFormat(_T("save%02d.phsd"),slot);
+    path = RelativeFilePath(iFormat(_T("save%02d.phsd"),slot).CStr(), FileLocationType::FLT_DOCUMENT);
 }
 
-bool iSaveGameView::SelFile(iStringT& fname) const
+bool iSaveGameView::SelFile(fileaccessor::RelativeFilePath& path) const
 {
     if (m_selSlot > 0  && m_selSlot < (sint32)m_saveSlots.GetSize())
 	{
-        GetSaveFileName(fname, m_saveSlots[m_selSlot].idx);
+        GetSaveFileName(path, m_saveSlots[m_selSlot].idx);
 		return true;
 	}
     else if (m_selSlot == 0)
-        return GetNextFileName(fname);
+        return GetNextFileName(path);
     else
         return false;
 }

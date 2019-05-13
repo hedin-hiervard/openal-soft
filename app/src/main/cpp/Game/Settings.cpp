@@ -64,25 +64,25 @@ uint32 hashname( wchar_t* ptr, unsigned seed = 0x1234abcd )
 
 void InitFileSizez(file_sizez& sizez)
 {
-	sizez.RemoveAll();
-	iStringT strText =  gRootPath + _T("*.*");
-	iStringT appName;
-	iFileName::GetAppName(appName);
-#ifdef OS_WIN32
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(strText.CStr(), &wfd);
-	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
-			if (appName.CompareIgnoreCase(wfd.cFileName) == 0) {
-				file_size_struct fss;
-				fss.name = hashname(wfd.cFileName);
-				fss.size = wfd.nFileSizeLow;
-				sizez.Add(fss);
-			}
-		} while (FindNextFile(hFind, &wfd));
-		FindClose(hFind);
-	}
-#endif
+// 	sizez.RemoveAll();
+// 	iStringT strText =  gRootPath + _T("*.*");
+// 	iStringT appName;
+// 	iFileName::GetAppName(appName);
+// #ifdef OS_WIN32
+// 	WIN32_FIND_DATA wfd;
+// 	HANDLE hFind = FindFirstFile(strText.CStr(), &wfd);
+// 	if (hFind != INVALID_HANDLE_VALUE) {
+// 		do {
+// 			if (appName.CompareIgnoreCase(wfd.cFileName) == 0) {
+// 				file_size_struct fss;
+// 				fss.name = hashname(wfd.cFileName);
+// 				fss.size = wfd.nFileSizeLow;
+// 				sizez.Add(fss);
+// 			}
+// 		} while (FindNextFile(hFind, &wfd));
+// 		FindClose(hFind);
+// 	}
+// #endif
 }
 //////////////////////////////////////////////////////////////////////////
 iSettings::iSettings() : m_gameSN(0)

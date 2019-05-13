@@ -22,7 +22,7 @@ namespace fileaccessor {
         FILE *fp = fopen(fullpath.to_string().c_str(), mode.c_str());
         if(!fp)
         {
-            return data;
+            return nullptr;
         }
 
         fseek(fp, 0, SEEK_END);
