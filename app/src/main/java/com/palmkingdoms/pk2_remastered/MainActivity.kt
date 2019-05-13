@@ -104,6 +104,18 @@ class MainActivity : Activity() {
 //
 //    }
 
+    fun isTablet(): Boolean {
+        val xdpi = resources.displayMetrics.xdpi
+        val ydpi = resources.displayMetrics.ydpi
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        val x = Math.pow((width / xdpi).toDouble(), 2.0)
+        val y = Math.pow((height / ydpi).toDouble(), 2.0)
+        val screenInches = Math.sqrt(x + y)
+        return screenInches >= 4.8
+    }
+
+
     external fun native_onMouseDown(x: Int, y: Int, mID: Int, mbID: Int)
     external fun native_onMouseUp(x: Int, y: Int, mID: Int, mbID: Int)
     external fun native_onMouseMove(x: Int, y: Int, mID: Int, mbID: Int)

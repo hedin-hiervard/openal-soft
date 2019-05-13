@@ -18,6 +18,7 @@ pthread_mutex_t buffer_mutex;
 
 jmethodID log_java_method_id;
 jmethodID quit_java_method_id;
+jmethodID is_tablet_java_method_id;
 jmethodID update_surface_java_method_id;
 jmethodID get_surface_java_method_id;
 jmethodID get_apk_path_method_id;
@@ -104,8 +105,9 @@ void Android_surfaceUnlock() {
 
 bool IsIpad()
 {
-    return true;
-    // return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    JNIEnv* env = getJNIEnv();
+    jboolean result =  env->CallBooleanMethod(activity_obj, is_tablet_java_method_id);
+    return result;
 }
 
 void Android_updateSurface() {
@@ -214,6 +216,7 @@ VOID_METHOD(onStart)(
     activity_obj = env->NewGlobalRef(t);
     jclass cls = env->GetObjectClass(t);
     log_java_method_id = env->GetMethodID(cls, "log", "(Ljava/lang/String;)V");
+    is_tablet_java_method_id = env->GetMethodID(cls, "isTablet", "()Z");
     quit_java_method_id = env->GetMethodID(cls, "quit", "()V");
     update_surface_java_method_id = env->GetMethodID(cls, "updateSurface", "()V");
     get_surface_java_method_id = env->GetMethodID(cls, "getSurface", "()Ljava/nio/ByteBuffer;");
