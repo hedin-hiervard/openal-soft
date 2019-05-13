@@ -80,10 +80,11 @@ public:
 
 	uint32 Read(void *buff, uint32 buffsize)
 	{
-		auto to_read = iMIN(buffsize, m_buffer->size() - m_buffer_pos);
-      memcpy(buff, &((*m_buffer)[m_buffer_pos]), to_read);
-      m_buffer_pos += to_read;
-	  return to_read;
+	    uint32 s = static_cast<uint32>(m_buffer->size());
+	    auto to_read = iMIN(buffsize, s - m_buffer_pos);
+        memcpy(buff, &((*m_buffer)[m_buffer_pos]), to_read);
+        m_buffer_pos += to_read;
+        return to_read;
 	}
 
 	uint32 Write(const void *buff, uint32 buffsize)

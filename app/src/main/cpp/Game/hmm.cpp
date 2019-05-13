@@ -202,7 +202,7 @@ iLogMgr gLogMgr;
 void OpenItunesLink();
 #endif
 void RenderFPS(DWORD count) {
-//	gTextComposer.TextOut(gApp.Surface(), iPoint(0, 10), iFormat(_T("FPS: %d"), count));
+	gTextComposer.TextOut(gApp.Surface(), iPoint(0, 50), iFormat(_T("FPS: %d"), count));
 }
 
 #if defined(OS_APPLE) || defined(OS_ANDROID)
@@ -975,12 +975,19 @@ int preload_resources()
         }
 #endif
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
-//    if(sz.w >= 1920 && sz.h >= 960) {
-//        flags |= GXLF_QUADSIZE;
-//    }
-//    else
-        if(sz.w >= 960 && sz.h >= 480) {
-      flags |= GXLF_DOUBLESIZE;
+    if(IsIpad()) {
+        if(sz.w >= 4096 && sz.h >= 3072) {
+            flags |= GXLF_QUADSIZE;
+        } else
+        if(sz.w >= 2048 && sz.h >= 1536) {
+            flags |= GXLF_DOUBLESIZE;
+        }
+    } else { // phone
+        if (sz.w >= 1920 && sz.h >= 960) {
+            flags |= GXLF_QUADSIZE;
+        } else if (sz.w >= 960 && sz.h >= 480) {
+            flags |= GXLF_DOUBLESIZE;
+        }
     }
 
 #if defined(OS_IPHONE) || defined(OS_ANDROID) // iOS

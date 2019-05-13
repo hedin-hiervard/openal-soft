@@ -309,7 +309,7 @@ sint32 iGXApp::Cycle()
 #if defined( OS_MACOS )
 			pthread_mutex_unlock(&backbufMutex);
 #endif
-#if 0
+#if 1
 			static DWORD dwStartTime = 0, dwEndTime = 0, dwCurTime = 0, dwFrame = 0, dwLastFrame = 0;
 			dwFrame++;
 			dwCurTime = GetTickCount();

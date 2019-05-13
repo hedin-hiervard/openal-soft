@@ -13,3 +13,4 @@
 .externalNativeBuild
 
 app/tmp/
+app/release/
