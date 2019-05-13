@@ -21,7 +21,7 @@ public:
 	void SetGroup(iBattleGroup* pGroup);
 	inline void SetMinerals(const iMineralSet* ms) { m_ms = ms; }
 	inline void SetCost(const iMineralSet cost) { m_cost = cost; m_bCost = true; }
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     inline void SetFlags(uint32 flags) { m_flags = flags; }
 #endif
     void UpdateButtons();

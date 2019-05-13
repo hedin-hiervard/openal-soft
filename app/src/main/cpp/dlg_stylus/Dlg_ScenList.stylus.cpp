@@ -335,8 +335,8 @@ void iScenListDlg::OnCreateDlg()
 //	FilterScenarios(m_scList);
 //#endif
 	SortScenarios(Name);
-	
-#ifdef OS_IPHONE
+
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	uint32 btnw = 50;
 #else
 	uint32 btnw = 24;
@@ -377,8 +377,8 @@ void iScenListDlg::DoCompose(const iRect& rect)
 }
 
 iSize iScenListDlg::ClientSize() const
-{ 
-#ifdef OS_IPHONE
+{
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	return gApp.Surface().GetSize();
 #else
 	return iSize(280,150 + DEF_BTN_HEIGHT + DEF_BTN_HEIGHT); 

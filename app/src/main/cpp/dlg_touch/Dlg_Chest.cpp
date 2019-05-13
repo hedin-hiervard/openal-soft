@@ -83,8 +83,8 @@ void iDlg_Chest::DoCompose(const iRect& clRect)
     const iMineralSet& ms = m_pHero->Owner()->Minerals();
     iSize mineralsize = GetMineralSetComposeSize(ms, false, true, true);
     
-    sint32 posx = 
-#ifdef OS_IPHONE
+    sint32 posx =
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         10;
 #else
         rc.x - 25; 

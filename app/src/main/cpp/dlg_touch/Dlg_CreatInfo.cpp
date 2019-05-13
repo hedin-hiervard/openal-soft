@@ -784,7 +784,7 @@ void iDlg_CreatInfo::OnCreateDlg()
     // Buttons
     sint32 bw = iIphoneBtn::sm_defSizeDeluxe.w;
     sint32 hw =
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     0;
 #else
     iIphoneBtn::sm_defSizeDeluxe.h;

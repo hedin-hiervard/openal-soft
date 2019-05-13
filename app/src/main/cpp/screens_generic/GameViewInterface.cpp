@@ -53,7 +53,7 @@ void iChildGameView::AfterCompose()
 
 void iChildGameView::FallDown()
 {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     iDib dib(gApp.Surface().GetSize(), iDib::RGB);
     iRect rc = GetScrRect();
     SetRect(rc);

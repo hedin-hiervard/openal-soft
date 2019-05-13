@@ -436,7 +436,7 @@ void iListBox::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId mbID)
 void iListBox::SetScrollPos(sint32 newpos)
 {
 	iRect rc = GetScrRect();
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     m_scrollPos = iCLAMP<sint32>(-(sint32)rc.h/2, (LBItemsCount()) * LBItemHeight(), newpos);
 #else
 	m_scrollPos = iCLAMP<sint32>(0, (LBItemsCount()) * LBItemHeight() - GetScrRect().h, newpos);

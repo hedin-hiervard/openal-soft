@@ -152,7 +152,7 @@ void iGameMenuView::OnMouseDown(const iPoint &pos, MouseId mID, MouseButtonId mb
 
 void iGameMenuView::OnSwipeUp(sint32 length)
 {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	if(
 	dynamic_cast<iListBox*>(gApp.ViewMgr().CapturedView()) ||
 	dynamic_cast<iAmountChooser*>(gApp.ViewMgr().CapturedView()))

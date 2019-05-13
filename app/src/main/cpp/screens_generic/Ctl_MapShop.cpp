@@ -486,7 +486,7 @@ void iMapShopView::OnCompose()
         iRect rr = GetScrRect();
 
 		iRect rc = AlignRect(iSize(m_pLB->GetSize().w
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                                    -50
 #endif
                                    , m_pLB->LBItemHeight()), GetScrRect(), AlignTop) + iPoint(0, 20);
@@ -494,7 +494,7 @@ void iMapShopView::OnCompose()
 		const MapShop::ProductInfo& it = gMapShop.GetProducts()[m_selScen];
 
 		sint32 w = gTextComposer.GetTextSize(UTF8TOISTRINGT(it.name), newmenufc_big_text).w;
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 		w += 100;
 #else
         w += 50;

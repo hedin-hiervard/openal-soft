@@ -229,7 +229,7 @@ iSize iSettingsDlg::ClientSize() const
 
 void iSettingsDlg::UpdateSliderLabel(uint32 sliderId)
 {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	return;
 #endif
 

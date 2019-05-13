@@ -730,7 +730,7 @@ void iMainView_touch::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId 
     
 #ifndef PC_VERSION
     if(m_pInfoBtn->GetButtonState() & iButton::Pressed) {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         //if(mID == IsOneHanded() ? 0 : 1)
 #endif
         {
@@ -1062,7 +1062,7 @@ void iMainView_touch::OnMouseTrack(const iPoint& pos, MouseId mID, MouseButtonId
     iPoint actPos = m_OLComposer.ActAnchor(pos +  (m_OLComposer.GetZoom() == 1 ? fingerOffset: zoomedFingerOffset));
 #ifndef PC_VERSION
     if(m_pInfoBtn->GetButtonState() & iButton::Pressed) {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         if(mID == IsOneHanded() ? 0 : 1)
 #endif
         {
@@ -1426,7 +1426,7 @@ bool iMainView_touch::Process(fix32 t)
         //m_pNextHeroCastleBtn->SetHighlighted(false);
     }
     /*
-     #ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
      // check if no fingers, disappear infobar
      if(!IsMouseDown(0) && !m_pInfoBtn->IsMouseDown(0)) {
      m_pInfoBar->SetVisible(false);

@@ -592,7 +592,7 @@ namespace UI_IPAD
     
     void iHeroView::OnSwipeUp( sint32 length )
     {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         if(length < 40 || gApp.ViewMgr().DragGlyph() ||
            dynamic_cast<iListBox*>(gApp.ViewMgr().CapturedView()) ||
            dynamic_cast<iAmountChooser*>(gApp.ViewMgr().CapturedView()))

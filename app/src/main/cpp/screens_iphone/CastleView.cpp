@@ -737,7 +737,7 @@ namespace UI_IPHONE
 
 
     void iCastleView::OnSwipeUp(sint32 length) {
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
         if(length < 40 || gApp.ViewMgr().DragGlyph() ||
            dynamic_cast<iListBox*>(gApp.ViewMgr().CapturedView()) ||
            dynamic_cast<iAmountChooser*>(gApp.ViewMgr().CapturedView()))
@@ -1021,7 +1021,7 @@ namespace UI_IPHONE
         }
         iRect rc = iRect(0, 0, m_Rect.w, m_pArmyExchange->GetRect().y);
         m_pInfoBtn->SetRect(AlignRect(iIphoneBtn::sm_defSize, rc, AlignBottom) - iPoint(iIphoneBtn::sm_defSize.w
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                                                                                         +17
 #endif
                                                                                         , 10));
@@ -1029,7 +1029,7 @@ namespace UI_IPHONE
 
         m_pBuyGoldBtn->SetRect(AlignRect(iIphoneBtn::sm_defSize, rc, AlignBottom) + iPoint(iIphoneBtn::sm_defSize.w * 2, -10));
         rc.DeflateRect(0, 0, 0, iIphoneBtn::sm_defSize.h
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                        - 10
 #endif
                        );
@@ -1083,7 +1083,7 @@ namespace UI_IPHONE
 
                 if(m_pAmount->CurPos() > 0) {
                     trc = iRect(m_pInfoBtn->GetScrPos(), iPoint(m_pRecruitBtn->GetScrRect().x2(), m_pRecruitBtn->GetScrRect().y2()))
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                     + iPoint(8,0)
 #endif
                     ;

@@ -174,7 +174,7 @@ void iMenuView::Start()
 {
 	if(m_bStarted) return;
 
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 	m_startTime = GetTickCount();
 #endif
 
@@ -260,14 +260,15 @@ void iMenuView::Start()
 			gGame.Quit();
 			break;
 		}
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
 		else if (res == 105) {
 			//StopCredits();
 			gGame.ShowViewDelayed(iChildGameView::CV_SCROLL);
 			break;
-		} else if(res == 115) {
-			OpenItunesLink();
 		}
+//		} else if(res == 115) {
+//			OpenItunesLink();
+//		}
 #endif
 #ifdef MULTIPLAYER
 		else if (res == 106) {
@@ -340,7 +341,7 @@ void iMenuView::NewStart(bool fInGame)
 {
     if(m_bStarted) return;
 
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     m_startTime = GetTickCount();
 #endif
 

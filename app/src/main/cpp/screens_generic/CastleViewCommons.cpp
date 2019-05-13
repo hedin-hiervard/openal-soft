@@ -173,15 +173,15 @@ void iArmyExchange::UpdateSize()
 	}
 	
 	if(m_pBottomArmy->IsVisible()) {
-		m_pTopArmy->SetRect(AlignChild(m_pTopArmy->GetSize(), AlignTop) + offset 
-#ifdef OS_IPHONE
+		m_pTopArmy->SetRect(AlignChild(m_pTopArmy->GetSize(), AlignTop) + offset
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                             + iPoint(0, -2) 
 #endif
                             );	
 		m_pTopArmy->SetGT(iArmyListEx_touch::GT_TOP);
 	} else {
 		m_pTopArmy->SetRect(AlignChild(m_pTopArmy->GetSize(), AlignCenter) + offset
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
                             + iPoint(0, -1) 
 #endif
                             );	

@@ -357,7 +357,7 @@ iSize iQuestDlg::ClientSize() const
 {
     iSize res = iTextDlg::ClientSize();
     res.h +=
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     DEF_BTN_HEIGHT;
 #else
     2*DEF_BTN_HEIGHT;
@@ -377,7 +377,7 @@ void iQuestDlg::OnCreateDlg()
     //	AddChild(m_pBtnNo = new iTextButton(m_pMgr,this,AlignChild(iSize(bw, DEF_BTN_HEIGHT), AlignBottom) - iPoint(bw, 0),TRID_NO, DRC_NO));
     sint32 bw = iIphoneBtn::sm_defSize.w;
     sint32 bh =
-#ifdef OS_IPHONE
+#if defined(OS_IPHONE) || defined(OS_ANDROID)
     0;
 #else
     iIphoneBtn::sm_defSize.h;
