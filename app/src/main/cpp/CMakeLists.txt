@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+add_subdirectory(openal)
+
 set(source
   ./Common/lang_cze.cpp
   ./Common/lang_eng.cpp
@@ -290,6 +292,7 @@ target_include_directories(
     ./dlg_touch
     ./complib
     ./reslib
+    ./openal/include
     ../../../../fileaccessor/src/main/cpp
   )
 
@@ -318,15 +321,15 @@ target_compile_options(
 )
 
 find_package(ZLIB)
+find_package(OpenAL)
 
 find_library(
         log-lib
         log)
 
-
 target_link_libraries(
         native-lib
         ${log-lib}
         ${ZLIB_LIBRARIES}
-
+        OpenAL
       )

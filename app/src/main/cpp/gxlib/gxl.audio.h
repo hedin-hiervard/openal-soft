@@ -6,8 +6,8 @@
 //#include <AudioToolbox/AudioToolbox.h>
 #else
 
-// #include <OpenAL/al.h>
-// #include <OpenAL/alc.h>
+#include "AL/al.h"
+#include "AL/alc.h"
 #include <gxl.common.def.h>
 #include <gxl.ctr.array.h>
 
@@ -119,13 +119,12 @@ private:
 	CRITICAL_SECTION 	m_csGuard;
 	iSimpleArray<sampleInfo> m_sampleLibrary;
 #else
-// 	ALCcontext* mContext; // stores the context (the 'air')
-// 	ALCdevice* mDevice; // stores the device
-// //	sint32		sourceID;
-// 	iSimpleArray<uint32> sourcePool;
-// 	ALfloat		m_volume;
-// 	//NSMutableArray * bufferStorageArray; // stores the buffer ids from openAL
-// 	//NSMutableDictionary * soundDictionary; // stores our soundkeys
+ 	ALCcontext* mContext; // stores the context (the 'air')
+ 	ALCdevice* mDevice; // stores the device
+ 	iSimpleArray<uint32> sourcePool;
+ 	ALfloat		m_volume;
+ 	//NSMutableArray * bufferStorageArray; // stores the buffer ids from openAL
+ 	//NSMutableDictionary * soundDictionary; // stores our soundkeys
 	uint32 AcquireFreeSource();
 #endif
 
