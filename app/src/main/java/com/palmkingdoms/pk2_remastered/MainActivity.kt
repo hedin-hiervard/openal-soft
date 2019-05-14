@@ -116,7 +116,7 @@ class MainActivity : Activity() {
         val x = Math.pow((width / xdpi).toDouble(), 2.0)
         val y = Math.pow((height / ydpi).toDouble(), 2.0)
         val screenInches = Math.sqrt(x + y)
-        return screenInches >= 6.5
+        return screenInches >= 6.5 && width >= 1024 && height >= 768
     }
 
     fun musicPlay(path: String) {
