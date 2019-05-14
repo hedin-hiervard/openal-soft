@@ -976,10 +976,10 @@ int preload_resources()
 #endif
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
     if(IsIpad()) {
-        if(sz.w >= 4096 && sz.h >= 3072) {
+        if(sz.w >= 3840 && sz.h >= 2160) {
             flags |= GXLF_QUADSIZE;
         } else
-        if(sz.w >= 2048 && sz.h >= 1536) {
+        if(sz.w >= 1920 && sz.h >= 1080) {
             flags |= GXLF_DOUBLESIZE;
         }
     } else { // phone
@@ -989,6 +989,7 @@ int preload_resources()
             flags |= GXLF_DOUBLESIZE;
         }
     }
+
 
 #if defined(OS_IPHONE) || defined(OS_ANDROID) // iOS
     if (!gApp.Init(&gGame, 60, flags, sz))

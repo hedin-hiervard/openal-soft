@@ -1588,7 +1588,7 @@ void iBattleView::Recalc()
     uint16 width = GetWindowWidth();
 	uint16 height = GetWindowHeight();
 #endif
-	if(width >= 1024) {
+	if(width >= 960) {
 		sm_hexWidth = 72;
 		sm_hexHalfWidth = 36;
 		sm_hexHeight = 42;
