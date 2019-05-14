@@ -83,7 +83,7 @@ class MyGLRenderer : GLSurfaceView.Renderer {
 
         activity?.textureBuffer?.position(0)
         for(i in 0 .. textureHeight * textureWidth * 2 - 1) {
-            activity?.textureBuffer?.put(120.toByte())
+            activity?.textureBuffer?.put(0.toByte())
         }
     }
 
