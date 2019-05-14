@@ -112,7 +112,7 @@ class MainActivity : Activity() {
         val x = Math.pow((width / xdpi).toDouble(), 2.0)
         val y = Math.pow((height / ydpi).toDouble(), 2.0)
         val screenInches = Math.sqrt(x + y)
-        return screenInches >= 4.8
+        return screenInches >= 6.5
     }
 
 
