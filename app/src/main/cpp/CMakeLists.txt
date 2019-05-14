@@ -332,4 +332,5 @@ target_link_libraries(
         ${log-lib}
         ${ZLIB_LIBRARIES}
         OpenAL
+        OpenSLES
       )
