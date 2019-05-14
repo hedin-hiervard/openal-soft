@@ -36,7 +36,7 @@ private:
 	~iMusicManager();
 
 	struct posRec {
-		const fileaccessor::RelativeFilePath& path;
+		fileaccessor::RelativeFilePath path;
 		uint32 pos;
 	};
 #ifdef OS_WIN32
@@ -44,7 +44,7 @@ private:
 	audiere::AudioDevicePtr device;
 	float volume;
 #endif
-	const fileaccessor::RelativeFilePath nowPlaying;
+	fileaccessor::RelativeFilePath nowPlaying;
 	iSimpleArray<posRec> m_posHist;
 #if defined( OS_MACOS )
 	uint32 curPos;

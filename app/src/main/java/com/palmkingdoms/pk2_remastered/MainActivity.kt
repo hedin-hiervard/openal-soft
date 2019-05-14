@@ -16,6 +16,8 @@
 package com.palmkingdoms.pk2_remastered
 
 import android.app.Activity
+import android.media.MediaPlayer
+import android.net.Uri
 import android.opengl.GLSurfaceView
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +34,7 @@ class MainActivity : Activity() {
 
     private lateinit var mGLView: MyGLSurfaceView
     lateinit var textureBuffer: ByteBuffer
+    private lateinit var musicHelper: MusicHelper
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,7 @@ class MainActivity : Activity() {
         mGLView = MyGLSurfaceView(this)
         mGLView.activity = this
         setContentView(mGLView)
+        musicHelper = MusicHelper(applicationContext)
     }
 
     override fun onPause() {
@@ -113,6 +117,27 @@ class MainActivity : Activity() {
         val y = Math.pow((height / ydpi).toDouble(), 2.0)
         val screenInches = Math.sqrt(x + y)
         return screenInches >= 6.5
+    }
+
+    fun musicPlay(path: String) {
+        val resPath = path.removePrefix("assets/")
+        musicHelper.playBackgroundMusic(resPath, true)
+    }
+
+    fun musicStop() {
+        musicHelper.stopBackgroundMusic()
+    }
+
+    fun musicGetPos(): Int {
+        return musicHelper.backgroundMusicPosition;
+    }
+
+    fun musicSetPos(pos: Int) {
+        musicHelper.backgroundMusicPosition = pos
+    }
+
+    fun musicSetVolume(vol: Float) {
+        musicHelper.backgroundVolume = vol
     }
 
 

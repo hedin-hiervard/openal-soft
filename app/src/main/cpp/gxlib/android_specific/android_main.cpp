@@ -26,6 +26,12 @@ jmethodID get_cache_dir_method_id;
 jmethodID get_library_dir_method_id;
 jmethodID get_documents_dir_method_id;
 jmethodID get_log_dir_method_id;
+jmethodID music_play_method_id;
+jmethodID music_stop_method_id;
+jmethodID music_set_volume_method_id;
+jmethodID music_get_cur_pos_method_id;
+jmethodID music_set_cur_pos_method_id;
+
 jclass class_fa;
 
 char* _textureBuffer = NULL;
@@ -58,6 +64,33 @@ void* main_thread(void* param) {
     return NULL;
 }
 
+
+void androidMusicMgr_Play(const char *filename) {
+    JNIEnv* env = getJNIEnv();
+    jstring jmsg = env->NewStringUTF(filename);
+    env->CallVoidMethod(activity_obj, music_play_method_id, jmsg);
+    env->DeleteLocalRef(jmsg);
+}
+
+void androidMusicMgr_Stop() {
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(activity_obj, music_stop_method_id);
+}
+
+void androidMusicMgr_SetVolume(double newvol) {
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(activity_obj, music_set_volume_method_id, (jfloat)newvol);
+}
+
+unsigned int androidMusicMgr_GetCurPos() {
+    JNIEnv* env = getJNIEnv();
+    return env->CallIntMethod(activity_obj, music_get_cur_pos_method_id);
+}
+
+void androidMusicMgr_SetCurPos(unsigned int pos) {
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(activity_obj, music_set_cur_pos_method_id, pos);
+}
 
 std::string jstring2string(jstring jstr)
 {
@@ -220,6 +253,12 @@ VOID_METHOD(onStart)(
     quit_java_method_id = env->GetMethodID(cls, "quit", "()V");
     update_surface_java_method_id = env->GetMethodID(cls, "updateSurface", "()V");
     get_surface_java_method_id = env->GetMethodID(cls, "getSurface", "()Ljava/nio/ByteBuffer;");
+    music_play_method_id = env->GetMethodID(cls, "musicPlay", "(Ljava/lang/String;)V");
+    music_stop_method_id = env->GetMethodID(cls, "musicStop", "()V");
+    music_set_volume_method_id = env->GetMethodID(cls, "musicSetVolume", "(F)V");
+    music_get_cur_pos_method_id = env->GetMethodID(cls, "musicGetPos", "()I");
+    music_set_cur_pos_method_id = env->GetMethodID(cls, "musicSetPos", "(I)V");
+
 
     class_fa = env->FindClass("com/palmkingdoms/pk2_remastered/FileAccessor");
     class_fa = (jclass)env->NewGlobalRef(class_fa);
