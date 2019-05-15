@@ -78,7 +78,7 @@ namespace UI_IPHONE
     
     void iGameResultView::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId mbID)
     {
-        iRect rc(0, m_Rect.h - 400, m_Rect.w, 400);
+        iRect rc(0, (sint32)m_Rect.h - 400, (sint32)m_Rect.w, 400);
         if(!rc.PtInRect(pos)) return;
         
         if(m_bTweet) {

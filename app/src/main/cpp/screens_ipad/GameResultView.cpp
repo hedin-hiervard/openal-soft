@@ -79,7 +79,7 @@ namespace UI_IPAD
     void iGameResultView::OnMouseDown(const iPoint& pos, MouseId mID, MouseButtonId mbID)
     {
 #ifndef PC_VERSION
-        iRect rc(0, m_Rect.h - 400, m_Rect.w, 400);
+        iRect rc(0, (sint32)m_Rect.h - 400, (sint32)m_Rect.w, 400);
         if(!rc.PtInRect(pos)) return;
 #endif
         if(m_bTweet) {

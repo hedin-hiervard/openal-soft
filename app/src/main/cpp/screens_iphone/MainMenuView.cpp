@@ -436,7 +436,7 @@ public:
         AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
 
         //        iRect btnRc(18, m_Rect.h - 118, 100, 100);
-        iRect btnRc(7, m_Rect.h - 60, m_Rect.w / 4 - 2, 60);
+        iRect btnRc(7, (sint32)m_Rect.h - 60, (sint32)m_Rect.w / 4 - 2, 60);
 
         //      sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
 
@@ -959,7 +959,7 @@ protected:
         fc.cmpProps.faceColor = RGB16(0,0,0);
         fc.cmpProps.alpha = m_alpha;
 
-        ypos += (m_Rect.h - m_draw_count * 25 - gTextComposer.GetFontHeight(fc.fontSize)) / 3;
+        ypos += ((sint32)m_Rect.h - m_draw_count * 25 - gTextComposer.GetFontHeight(fc.fontSize)) / 3;
 
 		fc.fontSize = FS_PT_24;
 		gTextComposer.TextOut(fc, gApp.Surface(), iPoint(),  m_title, iRect(rc.x,rc.y + ypos, rc.w, 14), AlignTop);
@@ -1533,7 +1533,7 @@ public:
         AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
 
         iRect btnRc(18, m_Rect.h - 118, 100, 100);
-        sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
+        sint32 off = ((sint32)m_Rect.w - 2 * 18 - 4 * 100) / 3;
 
         AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
                                        PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1, Visible|Enabled));
@@ -1543,7 +1543,7 @@ public:
 
         AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
                                        PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2, Visible|Enabled));
-        btnRc.x = m_Rect.w - 18 - 100;
+        btnRc.x = (sint32)m_Rect.w - 18 - 100;
 
         AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
                                        PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
@@ -1843,7 +1843,7 @@ m_results.Add((res));
 void iMainMenuView::FillControlsForType()
 {
     iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-    uint32 sx, sy;
+    sint32 sx, sy;
     uint32* p_buttons_trid;
     uint n_buttons_count;
     iMenuTab* pBtn;
@@ -1882,7 +1882,7 @@ void iMainMenuView::FillControlsForType()
 	iSize sz = gGfxMgr.Dimension(PDGG(NMENU_BBTN_NBACK));
 	iRect rc = AlignRect(sz, m_Rect, AlignCenter);
     rc.x = 21;
-    rc.x += m_Rect.w / 2;
+    rc.x += (sint32)m_Rect.w / 2;
     AddChild(m_pBtnBack = new iImgBtn(m_pMgr, this, rc, 400, PDGG(NMENU_BBTN_NBACK), PDGG(NMENU_BBTN_PBACK)));
 
 
@@ -1890,7 +1890,7 @@ void iMainMenuView::FillControlsForType()
 	sint32 w = 400, h = 300;
 
     sx = 21;
-    sy = (m_Rect.h - h) / 2;
+    sy = ((sint32)m_Rect.h - h) / 2;
 
 #if defined(ROYAL_BOUNTY)
 	sy += 60;
@@ -1903,8 +1903,8 @@ void iMainMenuView::FillControlsForType()
         sy += 60;
     }
 
-	sx += m_Rect.w / 2 + 55;
-	sy = (m_Rect.h - h) / 2;
+	sx += (sint32)m_Rect.w / 2 + 55;
+	sy = ((sint32)m_Rect.h - h) / 2;
 
     if (m_type == TypeMain)
     {
@@ -2055,7 +2055,7 @@ void iMainMenuView::UpdateControls()
 
 	if(bScroll) {
 		iRect rc = m_Rect;
-		rc.x = -(sint32)rc.w / 2 + (m_Rect.w / 2 - 480) / 2;
+		rc.x = -(sint32)rc.w / 2 + ((sint32)m_Rect.w / 2 - 480) / 2;
 		m_activebtn = -1;
 		SetRect(rc);
 		//gAniHost.StopAllAnimation(false);
@@ -2117,7 +2117,7 @@ void iMainMenuView::iCMDH_ControlCommand(iView* pView, CTRL_CMD_ID cmd, sint32 p
 
 
 			iRect rc = m_Rect;
-			rc.x = 0 +  (m_Rect.w / 2 - 480) / 2;
+			rc.x = 0 +  ((sint32)m_Rect.w / 2 - 480) / 2;
 			m_activebtn = -1;
 			UpdateControls();
             //	gAniHost.StopAllAnimation(false);

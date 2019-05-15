@@ -420,8 +420,8 @@ namespace UI_IPAD
             AddChild(m_ctrl1 = new iScenListView(m_pMgr, this, clRect, 109, m_hotseat ? SCL_HOTSEAT : SCL_SINGLE));
             AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
 
-            iRect btnRc(18, m_Rect.h - 118, 100, 100);
-            sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
+            iRect btnRc(18, (sint32)m_Rect.h - 118, 100, 100);
+            sint32 off = ((sint32)m_Rect.w - 2 * 18 - 4 * 100) / 3;
 
             /*
              iRect btnRc(18, m_Rect.h - 18 - 80, 100, 80);
@@ -436,7 +436,7 @@ namespace UI_IPAD
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
                                            PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2, Visible|Enabled));
-            btnRc.x = m_Rect.w - 18 - 100;
+            btnRc.x = (sint32)m_Rect.w - 18 - 100;
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
                                            PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
@@ -1122,7 +1122,7 @@ namespace UI_IPAD
 
             AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, false) );
 
-            iRect btnRc(m_Rect.w - 18 - 100, m_Rect.h - 118, 100, 100);
+            iRect btnRc((sint32)m_Rect.w - 18 - 100, (sint32)m_Rect.h - 118, 100, 100);
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NLOAD),
                                            PDGG(NMENU_BBTN_PLOAD), TRID_LOAD, Visible|Enabled));
@@ -1219,7 +1219,7 @@ namespace UI_IPAD
 
             AddChild(m_ctrl = new iSaveGameView(m_pMgr, this, clRect, 109, true) );
 
-            iRect btnRc(m_Rect.w - 18 - 100, m_Rect.h - 118, 100, 100);
+            iRect btnRc((sint32)m_Rect.w - 18 - 100, (sint32)m_Rect.h - 118, 100, 100);
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NSAVE),
                                            PDGG(NMENU_BBTN_PSAVE), TRID_SAVE, Visible|Enabled));
@@ -1305,8 +1305,8 @@ namespace UI_IPAD
             AddChild(m_ctrl1 = new iScenListView(m_pMgr, this, clRect, 109, SCL_TUTORIAL));
             AddChild(m_ctrl2 = new iScenPropsView(m_pMgr, this, clRect, 109));
 
-            iRect btnRc(18, m_Rect.h - 118, 100, 100);
-            sint32 off = (m_Rect.w - 2 * 18 - 4 * 100) / 3;
+            iRect btnRc(18, (sint32)m_Rect.h - 118, 100, 100);
+            sint32 off = ((sint32)m_Rect.w - 2 * 18 - 4 * 100) / 3;
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 200, PDGG(NMENU_BBTN_NADV),
                                            PDGG(NMENU_BBTN_PADV), TRID_MENU_MAPS1, Visible|Enabled));
@@ -1316,7 +1316,7 @@ namespace UI_IPAD
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 201, PDGG(NMENU_BBTN_NHNS),
                                            PDGG(NMENU_BBTN_PHNS), TRID_MENU_MAPS2, Visible|Enabled));
-            btnRc.x = m_Rect.w - 18 - 100;
+            btnRc.x = (sint32)m_Rect.w - 18 - 100;
 
             AddChild(new iNewMenuBottomBtn(m_pMgr, this, btnRc, 202, PDGG(NMENU_BBTN_NALLMAPS),
                                            PDGG(NMENU_BBTN_PALLMAPS), TRID_MENU_MAPS4));
@@ -1639,7 +1639,7 @@ namespace UI_IPAD
     void iMainMenuView::FillControlsForType()
     {
         iRect clRect = iRect(0, 0, m_Rect.w, m_Rect.h);
-        uint32 sx, sy;
+        sint32 sx, sy;
         uint32* p_buttons_trid;
         uint n_buttons_count;
         iMenuTab* pBtn;
@@ -1677,8 +1677,8 @@ namespace UI_IPAD
 
         const sint32 w = 930, h = 400;
 
-        sx = (m_Rect.w - w) / 2;
-        sy = (m_Rect.h - h) / 2;
+        sx = ((sint32)m_Rect.w - w) / 2;
+        sy = ((sint32)m_Rect.h - h) / 2;
         for (uint32 xx = 0; xx < n_buttons_count; ++xx)
         {
             iMenuBtn* pBtn = new iMenuBtn(m_pMgr, this, iRect(sx,sy,376,70), p_buttons_trid[xx], 200 + xx);
