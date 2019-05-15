@@ -1,3 +1,3 @@
 [submodule "app/src/main/cpp/openal"]
 	path = app/src/main/cpp/openal
-	url = git@github.com:AerialX/openal-soft-android.git
+	url = git@github.com:hedin-hiervard/openal-soft.git
