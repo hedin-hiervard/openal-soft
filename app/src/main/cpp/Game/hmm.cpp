@@ -976,16 +976,16 @@ int preload_resources()
 #endif
     iSize sz = iSize(GetWindowWidth(), GetWindowHeight());
     if(IsIpad()) {
-        if(sz.w >= 4096 && sz.h >= 3072) {
+        if(sz.w >= 3840 && sz.h >= 2160) {
             flags |= GXLF_QUADSIZE;
         } else
-        if(sz.w >= 2048 && sz.h >= 1536) {
+        if(sz.w >= 1920 && sz.h >= 1080) {
             flags |= GXLF_DOUBLESIZE;
         }
     } else { // phone
-        if (sz.w >= 1920 && sz.h >= 1280) {
+        if (sz.w >= 1920 && sz.h >= 960) {
             flags |= GXLF_QUADSIZE;
-        } else if (sz.w >= 960 && sz.h >= 640) {
+        } else if (sz.w >= 960 && sz.h >= 480) {
             flags |= GXLF_DOUBLESIZE;
         }
     }

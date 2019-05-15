@@ -282,7 +282,8 @@ void iCreditsComposer::Compose(iDib& surface, const iPoint& pos)
 #endif
 #endif
     iRect rc = AlignRect(gGfxMgr.Dimension(sid), iRect(iPoint(), surface.GetSize()), AlignCenter);
-    gApp.Surface().Fill(surface.GetPixel(rc.point()));
+
+//    gApp.Surface().Fill(surface.GetPixel(rc.point()));
     
 	gGfxMgr.Blit(sid, gApp.Surface(), rc);
 #ifdef PC_VERSION
